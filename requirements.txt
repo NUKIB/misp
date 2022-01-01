@@ -1,0 +1,12 @@
+pymisp
+lief
+python-magic
+plyara
+pyzmq
+redis
+hiredis
+jinja2
+ordered-set
+pytz
+simplejson
+stix2-patterns>=1.2.0
