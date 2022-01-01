@@ -43,6 +43,7 @@ jobs:
       uses: azure/container-scan@v0
       with:
         image-name: ${{ env.TEST_TAG }}
+        severity-threshold: CRITICAL
     -
       name: Build Docker for linux/arm64
       uses: docker/build-push-action@v2
