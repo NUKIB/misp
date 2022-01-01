@@ -5,10 +5,18 @@ FROM $BASE_IMAGE as base
 # pydeep requires building, so use different stage for that and also build su-exec from source code
 FROM base as build
 COPY su-exec.c /tmp/
-RUN dnf install -y epel-release && \
-    dnf install -y --setopt=tsflags=nodocs gcc python39-devel python39-wheel ssdeep-devel unzip make && \
-    pip3 wheel pydeep -w /wheels && \
-    gcc -Wall -Werror -g -o /tmp/su-exec /tmp/su-exec.c
+RUN dnf module enable -y php:7.4 && \
+    dnf install -y epel-release && \
+    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc python39-devel python39-pip python39-wheel php-devel php-mbstring php-json php-xml ssdeep-devel unzip make brotli-devel && \
+    rm -rf /var/cache/dnf && \
+    useradd --create-home --system --user-group build
+
+RUN gcc -Wall -Werror -g -o /tmp/su-exec /tmp/su-exec.c && \
+    chmod u+x /tmp/su-exec
+RUN /tmp/su-exec build pip3 wheel pydeep -w /tmp/wheels
+COPY bin/misp_compile_php_extensions.sh /tmp/
+RUN chmod u+x /tmp/misp_compile_php_extensions.sh && \
+    /tmp/misp_compile_php_extensions.sh
 
 # MISP image
 FROM base as misp
@@ -16,13 +24,8 @@ FROM base as misp
 # Install required system and Python packages
 COPY packages /tmp/packages
 COPY requirements.txt /tmp/
-COPY RPM-GPG-KEY-remi.el8 /etc/pki/rpm-gpg/
-RUN curl -O https://rpms.remirepo.net/enterprise/remi-release-8.rpm && \
-    rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-remi.el8 && \
-    rpmkeys --checksig remi-release-8.rpm && \
-    dnf install -y --setopt=tsflags=nodocs epel-release ./remi-release-8.rpm && \
-    rm remi-release-8.rpm && \
-    dnf module -y enable mod_auth_openidc php:remi-7.4 python39 && \
+RUN dnf install -y --setopt=tsflags=nodocs epel-release && \
+    dnf module -y enable mod_auth_openidc php:7.4 python39 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.9 && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
@@ -32,13 +35,14 @@ ARG MISP_VERSION=develop
 ENV MISP_VERSION $MISP_VERSION
 ENV GNUPGHOME /var/www/MISP/.gnupg
 
-COPY --from=build /wheels /wheels
+COPY --from=build /tmp/wheels /wheels
 COPY --from=build /tmp/su-exec /usr/local/bin/
+COPY --from=build /tmp/php-modules/* /usr/lib64/php/modules/
 COPY bin/ /usr/local/bin/
 COPY misp.conf /etc/httpd/conf.d/misp.conf
 COPY httpd-errors/* /var/www/html/
 COPY rsyslog.conf /etc/
-COPY snuffleupagus-default.rules /etc/php.d/
+COPY snuffleupagus-misp.rules /etc/php.d/
 COPY .jobber /root/
 COPY supervisor.ini /etc/supervisord.d/misp.ini
 RUN chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
@@ -49,7 +53,7 @@ RUN chmod u=r,g=r,o=r /var/www/MISP/app/Config/* && \
     chmod 644 /etc/supervisord.d/misp.ini && \
     chmod 644 /etc/rsyslog.conf && \
     chmod 644 /etc/httpd/conf.d/misp.conf && \
-    chmod 644 /etc/php.d/snuffleupagus-default.rules && \
+    chmod 644 /etc/php.d/snuffleupagus-misp.rules && \
     chmod 644 /root/.jobber && \
     mkdir /run/php-fpm
 

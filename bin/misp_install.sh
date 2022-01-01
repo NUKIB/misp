@@ -5,6 +5,17 @@ PHP_INI=/etc/php.ini
 set -e
 set -o xtrace
 
+# PHP custom build extensions configuration
+echo 'extension = brotli.so' > /etc/php.d/40-brotli.ini
+echo 'extension = igbinary.so' > /etc/php.d/40-igbinary.ini
+echo 'extension = ssdeep.so' > /etc/php.d/40-ssdeep.ini
+echo "extension = redis.so
+
+redis.session.locking_enabled = 1
+redis.session.lock_expire = 30
+redis.session.lock_wait_time = 50000
+redis.session.lock_retries = 30" > /etc/php.d/50-redis.ini
+
 # PHP-FPM config
 echo 'date.timezone = "UTC"' > /etc/php-fpm.d/timezone.ini # set default time zone
 echo 'pm.status_path = /fpm-status' >> /etc/php-fpm.d/www.conf # enable PHP-FPM status page
@@ -26,14 +37,9 @@ sed -e 's/opcache.enable_cli=1/opcache.enable_cli=0/' -i /etc/php.d/10-opcache.i
 # use igbinary serializer for apcu and sessions
 sed -e 's/session.serialize_handler = php/session.serialize_handler = igbinary/' -i ${PHP_INI}
 sed -e "s/;apc.serializer='php'/apc.serializer='igbinary'/" -i /etc/php.d/40-apcu.ini
-sed -e "s/;redis.session.locking_enabled = 0/redis.session.locking_enabled = 1/" -i /etc/php.d/50-redis.ini
-sed -e "s/;redis.session.lock_expire = 0/redis.session.lock_expire = 30/" -i /etc/php.d/50-redis.ini
-sed -e "s/;redis.session.lock_wait_time = 2000/redis.session.lock_wait_time = 50000/" -i /etc/php.d/50-redis.ini
-sed -e "s/;redis.session.lock_retries = 10/redis.session.lock_retries = 30/" -i /etc/php.d/50-redis.ini
 # Disable modules that are not required by MISP
 rm /etc/php.d/{20-ftp.ini,20-shmop.ini,20-sysvmsg.ini,20-sysvsem.ini,20-sysvshm.ini,20-exif.ini}
 rm /etc/php.d/15-xdebug.ini # disable xdebug by default
-rm /etc/php.d/40-snuffleupagus.ini # disable snuffleupagus by default
 
 # Apache config
 chmod o+r /etc/httpd/conf.d/misp.conf

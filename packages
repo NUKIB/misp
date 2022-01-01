@@ -27,13 +27,9 @@ php-xml
 php-bcmath
 php-opcache
 php-intl
-php-brotli
 php-gmp
+php-json
 php-process
-php-snuffleupagus
-php-pecl-redis5
 php-pecl-apcu
-php-pecl-igbinary
 php-pecl-xdebug
-php-pecl-ssdeep
 php-pecl-zip
