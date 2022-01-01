@@ -1,0 +1,35 @@
+version: 1.4
+
+prefs:
+  logPath: /var/www/MISP/app/tmp/logs/jobber.log
+  runLog:
+    type: file
+    path: /var/www/MISP/app/tmp/logs/jobber-runs
+    maxFileLen: 100m
+    maxHistories: 2
+
+jobs:
+  CacheFeeds:
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server cacheFeed 1 all 2>/dev/null
+    time: 0 R0-10 6,8,10,12,14,16,18
+    onError: Backoff
+
+  FetchFeeds:
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server fetchFeed 1 all 2>/dev/null
+    time: 0 R0-10 6,8,10,12,14,16,18
+    onError: Backoff
+
+  PullServers:
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server pullAll 1
+    time: 0 R0-10 6,10,15
+    onError: Backoff
+
+  ScanAttachment:
+    cmd: su-exec apache /var/www/MISP/app/Console/cake admin scanAttachment all
+    time: 0 R0-10 6
+    onError: Backoff
+
+  LogRotate:
+    cmd: logrotate /etc/logrotate.conf
+    time: 0 0 5
+    onError: Backoff

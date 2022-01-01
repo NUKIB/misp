@@ -1,0 +1,42 @@
+# Rules tailored for MISP
+# Copyright (C) 2022 National Cyber and Information Security Agency of the Czech Republic
+
+# Prevent the execution of writeable PHP files.
+#sp.readonly_exec.simulation().enable();
+
+# Disabling the loading of external entities in the XML parser.
+sp.disable_xxe.enable();
+
+# Prevent various `mail`-related vulnerabilities
+sp.disable_function.function("mail").drop();
+
+# Since it's now burned, me might as well mitigate it publicly
+sp.disable_function.function("putenv").param("setting").value_r("LD_").drop();
+
+# This one was burned in Nov 2019 - https://gist.github.com/LoadLow/90b60bd5535d6c3927bb24d5f9955b80
+sp.disable_function.function("putenv").param("setting").value_r("GCONV_").drop();
+
+# Prevent runtime modification of interesting things
+sp.disable_function.function("ini_set").param("varname").value("assert.active").drop();
+sp.disable_function.function("ini_set").param("varname").value("zend.assertions").drop();
+sp.disable_function.function("ini_set").param("varname").value("open_basedir").drop();
+
+# File upload
+sp.disable_function.function("move_uploaded_file").param("new_path").value_r("\\.ph").drop();
+sp.disable_function.function("move_uploaded_file").param("new_path").value_r("\\.ht").drop();
+
+# Command executions
+sp.disable_function.function("shell_exec").filename("/var/www/MISP/app/Lib/Tools/PubSubTool.php").allow();
+sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Lib/Tools/ProcessTool.php").allow();
+sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Lib/Tools/BackgroundJobs/BackgroundJob.php").allow();
+sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Vendor/pear/crypt_gpg/Crypt/GPG/Engine.php").allow();
+sp.disable_function.function("proc_open").drop();
+sp.disable_function.function("exec").drop();
+sp.disable_function.function("system").drop();
+sp.disable_function.function("passthru").drop();
+sp.disable_function.function("shell_exec").drop();
+sp.disable_function.function("popen").drop();
+sp.disable_function.function("pcntl_exec").drop();
+
+# PHP execution
+sp.disable_function.function("eval").drop();

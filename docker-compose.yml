@@ -1,0 +1,48 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mariadb:10.7
+    restart: always
+    container_name: mysql-e
+    environment:
+      MYSQL_DATABASE: 'misp'
+      MYSQL_USER: 'misp'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+
+  redis:
+    image: redis:6.2
+    restart: always
+    container_name: redis-e
+
+  misp-modules:
+    image:  ghcr.io/nukib/misp-modules:latest
+    restart: always
+    container_name: misp-modules-e
+
+  misp:
+    image: misp
+    restart: always
+    container_name: misp-e
+    depends_on:
+      - mysql
+      - redis
+    tmpfs:
+      - /tmp
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_LOGIN: misp
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: misp
+      REDIS_HOST: redis
+      MISP_BASEURL: http://localhost:8081
+      MISP_UUID: 0a674a5a-c4cb-491d-80cf-5adb48b5c1cd  # Please modify
+      MISP_ORG: Testing org
+      MISP_MODULE_URL: "http://misp-modules"
+      MISP_EMAIL: ahoj@example.com # Please modify
+      SECURITY_SALT: abcd
+      ZEROMQ_ENABLED: "yes"
+    ports:
+      - 127.0.0.1:8081:80
+      - 127.0.0.1:50001:50000
