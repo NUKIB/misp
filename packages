@@ -4,7 +4,6 @@ mod_auth_openidc
 zip
 supervisor
 ssdeep-libs
-https://github.com/dshearer/jobber/releases/download/v1.4.4/jobber-1.4.4-1.el8.x86_64.rpm
 rsyslog
 
 # Python
