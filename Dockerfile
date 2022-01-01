@@ -2,21 +2,29 @@
 ARG BASE_IMAGE=quay.io/centos/centos:stream8
 FROM $BASE_IMAGE as base
 
-# pydeep requires building, so use different stage for that and also build su-exec from source code
+# Some packages requires building, so use different stage for that
 FROM base as build
-COPY su-exec.c /tmp/
 RUN dnf module enable -y php:7.4 && \
     dnf install -y epel-release && \
-    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc python39-devel python39-pip python39-wheel php-devel php-mbstring php-json php-xml ssdeep-devel unzip make brotli-devel && \
+    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc python39-devel python39-pip python39-wheel php-devel php-mbstring php-json php-xml ssdeep-devel unzip make brotli-devel rpmdevtools yum-utils && \
     rm -rf /var/cache/dnf && \
     useradd --create-home --system --user-group build
-
+# Build su-exec
+COPY su-exec.c /tmp/
 RUN gcc -Wall -Werror -g -o /tmp/su-exec /tmp/su-exec.c && \
     chmod u+x /tmp/su-exec
+# Build Python packages
 RUN /tmp/su-exec build pip3 wheel pydeep -w /tmp/wheels
+# Build PHP extensions
 COPY bin/misp_compile_php_extensions.sh /tmp/
 RUN chmod u+x /tmp/misp_compile_php_extensions.sh && \
     /tmp/misp_compile_php_extensions.sh
+# Build jobber, that is not released for arm64 arch
+RUN mkdir /tmp/jobber && \
+    cd /tmp/jobber && \
+    curl -L https://github.com/dshearer/jobber/archive/refs/tags/v1.4.4.tar.gz | tar zx --strip-components=1 && \
+    yum-builddep --assumeyes packaging/rpm/*.spec && \
+    make -C packaging/rpm pkg-local "DESTDIR=/tmp/"
 
 # MISP image
 FROM base as misp
@@ -38,6 +46,7 @@ ENV GNUPGHOME /var/www/MISP/.gnupg
 COPY --from=build /tmp/wheels /wheels
 COPY --from=build /tmp/su-exec /usr/local/bin/
 COPY --from=build /tmp/php-modules/* /usr/lib64/php/modules/
+COPY --from=build /tmp/jobber*.rpm /tmp
 COPY bin/ /usr/local/bin/
 COPY misp.conf /etc/httpd/conf.d/misp.conf
 COPY httpd-errors/* /var/www/html/
@@ -45,7 +54,8 @@ COPY rsyslog.conf /etc/
 COPY snuffleupagus-misp.rules /etc/php.d/
 COPY .jobber /root/
 COPY supervisor.ini /etc/supervisord.d/misp.ini
-RUN chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
+RUN dnf install -y /tmp/jobber*.rpm && \
+    chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
     pip3 install --disable-pip-version-check /wheels/* && \
     /usr/local/bin/misp_install.sh
 COPY Config/* /var/www/MISP/app/Config/
