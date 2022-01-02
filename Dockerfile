@@ -28,7 +28,7 @@ FROM builder as jobber-build
 RUN mkdir /tmp/jobber && \
     cd /tmp/jobber && \
     curl -L https://github.com/dshearer/jobber/archive/refs/tags/v1.4.4.tar.gz | tar zx --strip-components=1 && \
-    yum-builddep --assumeyes packaging/rpm/*.spec && \
+    dnf builddep --assumeyes packaging/rpm/*.spec && \
     make -C packaging/rpm pkg-local "DESTDIR=/tmp/"
 
 # MISP image
@@ -60,8 +60,8 @@ COPY snuffleupagus-misp.rules /etc/php.d/
 COPY .jobber /root/
 COPY supervisor.ini /etc/supervisord.d/misp.ini
 RUN dnf install -y /tmp/jobber*.rpm && \
-    chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
     pip3 install --disable-pip-version-check /wheels/* && \
+    chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
     /usr/local/bin/misp_install.sh
 COPY Config/* /var/www/MISP/app/Config/
 RUN chmod u=r,g=r,o=r /var/www/MISP/app/Config/* && \
