@@ -33,7 +33,7 @@ jobs:
     -
       name: Test
       run: |
-        docker compose up -d
+        docker compose up --detach --quiet-pull
         sleep 10 # Wait until container is ready
         AUTHKEY=$(docker exec misp-e su-exec apache /var/www/MISP/app/Console/cake userInit -q)
         curl -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8081/servers/getVersion | jq
