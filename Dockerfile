@@ -44,10 +44,6 @@ RUN dnf install -y --setopt=tsflags=nodocs epel-release && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
     rm -rf /var/cache/dnf /tmp/packages
 
-ARG MISP_VERSION=develop
-ENV MISP_VERSION $MISP_VERSION
-ENV GNUPGHOME /var/www/MISP/.gnupg
-
 COPY --from=builder /usr/local/bin/su-exec /usr/local/bin/
 COPY --from=python-build /tmp/wheels /wheels
 COPY --from=php-build /tmp/php-modules/* /usr/lib64/php/modules/
@@ -59,6 +55,11 @@ COPY rsyslog.conf /etc/
 COPY snuffleupagus-misp.rules /etc/php.d/
 COPY .jobber /root/
 COPY supervisor.ini /etc/supervisord.d/misp.ini
+
+ARG CACHEBUST=1
+ARG MISP_VERSION=develop
+ENV MISP_VERSION $MISP_VERSION
+
 RUN dnf install -y /tmp/jobber*.rpm && \
     pip3 install --disable-pip-version-check /wheels/* && \
     chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
@@ -82,6 +83,8 @@ RUN touch /verified && \
 FROM misp
 # Hack that will force run verify stage
 COPY --from=verify /verified /
+
+ENV GNUPGHOME /var/www/MISP/.gnupg
 
 VOLUME /var/www/MISP/app/tmp/logs/
 VOLUME /var/www/MISP/app/files/certs/
