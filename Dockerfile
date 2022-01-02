@@ -6,7 +6,7 @@ FROM $BASE_IMAGE as base
 FROM base as builder
 RUN dnf module enable -y php:7.4 && \
     dnf install -y epel-release && \
-    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc python39-devel python39-pip python39-wheel php-devel php-mbstring php-json php-xml ssdeep-devel unzip make brotli-devel rpmdevtools yum-utils && \
+    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc ssdeep-devel unzip make rpmdevtools yum-utils && \
     useradd --create-home --system --user-group build
 # Build su-exec
 COPY su-exec.c /tmp/
@@ -15,13 +15,17 @@ RUN gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c && \
 
 # Build Python packages
 FROM builder as python-build
-RUN su-exec build pip3 wheel pydeep -w /tmp/wheels
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False python39-devel python39-pip python39-wheel && \
+    su-exec build pip3 wheel pydeep -w /tmp/wheels && \
+    dnf history undo -y 0
 
 # Build PHP extensions
 FROM builder as php-build
 COPY bin/misp_compile_php_extensions.sh /tmp/
-RUN chmod u+x /tmp/misp_compile_php_extensions.sh && \
-    /tmp/misp_compile_php_extensions.sh
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel && \
+    chmod u+x /tmp/misp_compile_php_extensions.sh && \
+    /tmp/misp_compile_php_extensions.sh && \
+    dnf history undo -y 0
 
 # Build jobber, that is not released for arm64 arch
 FROM builder as jobber-build
