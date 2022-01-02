@@ -32,6 +32,8 @@ jobs:
         tags: ${{ env.TEST_TAG }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args: |
+          CACHEBUST=${{ github.run_id }}
     -
       name: Test
       run: |
@@ -55,7 +57,9 @@ jobs:
         platforms: linux/arm64
         tags: ${{ env.TEST_TAG }}
         cache-from: type=gha
-        cache-to: type=gha,mode=max|
+        cache-to: type=gha,mode=max
+        build-args: |
+          CACHEBUST=${{ github.run_id }}
     -
       name: Login to DockerHub
       if: github.event_name != 'pull_request'
@@ -75,3 +79,5 @@ jobs:
         tags: ghcr.io/nukib/misp:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args: |
+          CACHEBUST=${{ github.run_id }}
