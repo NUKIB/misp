@@ -33,9 +33,9 @@ jobs:
     -
       name: Test
       run: |
-        docker compose up --detach --quiet-pull
+        MISP_IMAGE=${{ env.TEST_TAG }} docker compose up --detach --quiet-pull
         sleep 10 # Wait until container is ready
-        AUTHKEY=$(docker exec misp-e su-exec apache /var/www/MISP/app/Console/cake userInit -q)
+        AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake userInit -q)
         curl -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8081/servers/getVersion | jq
         docker compose down
     -
@@ -60,13 +60,6 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
-      name: Docker meta
-      if: github.event_name != 'pull_request'
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ghcr.io/nukib/misp
-    -
       name: Build and push
       if: github.event_name != 'pull_request'
       uses: docker/build-push-action@v2
@@ -74,4 +67,4 @@ jobs:
         context: .
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ghcr.io/nukib/misp:latest

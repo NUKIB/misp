@@ -4,7 +4,7 @@ services:
   mysql:
     image: mariadb:10.7
     restart: always
-    container_name: mysql-e
+    container_name: misp-mysql
     environment:
       MYSQL_DATABASE: 'misp'
       MYSQL_USER: 'misp'
@@ -14,17 +14,17 @@ services:
   redis:
     image: redis:6.2
     restart: always
-    container_name: redis-e
+    container_name: misp-redis
 
   misp-modules:
-    image:  ghcr.io/nukib/misp-modules:latest
+    image: ghcr.io/nukib/misp-modules:latest
     restart: always
-    container_name: misp-modules-e
+    container_name: misp-modules
 
   misp:
-    image: misp
+    image: ${MISP_IMAGE-ghcr.io/nukib/misp:latest}
     restart: always
-    container_name: misp-e
+    container_name: misp
     depends_on:
       - mysql
       - redis
@@ -37,7 +37,7 @@ services:
       MYSQL_DATABASE: misp
       REDIS_HOST: redis
       MISP_BASEURL: http://localhost:8081
-      MISP_UUID: 0a674a5a-c4cb-491d-80cf-5adb48b5c1cd  # Please modify
+      MISP_UUID: 0a674a5a-c4cb-491d-80cf-5adb48b5c1cd # Please modify
       MISP_ORG: Testing org
       MISP_MODULE_URL: "http://misp-modules"
       MISP_EMAIL: ahoj@example.com # Please modify
