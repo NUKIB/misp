@@ -27,7 +27,7 @@ RUN chmod u+x /tmp/misp_compile_php_extensions.sh && \
 FROM builder as jobber-build
 RUN mkdir /tmp/jobber && \
     cd /tmp/jobber && \
-    curl -L https://github.com/dshearer/jobber/archive/refs/tags/v1.4.4.tar.gz | tar zx --strip-components=1 && \
+    curl --proto '=https' --tlsv1.3 -sSL https://github.com/dshearer/jobber/archive/refs/tags/v1.4.4.tar.gz | tar zx --strip-components=1 && \
     dnf builddep --assumeyes packaging/rpm/*.spec && \
     make -C packaging/rpm pkg-local "DESTDIR=/tmp/"
 
