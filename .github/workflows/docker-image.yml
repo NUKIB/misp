@@ -30,9 +30,12 @@ jobs:
         context: .
         load: true
         tags: ${{ env.TEST_TAG }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
     -
       name: Test
       run: |
+        docker history ${{ env.TEST_TAG }}
         MISP_IMAGE=${{ env.TEST_TAG }} docker compose up --detach --quiet-pull
         sleep 10 # Wait until container is ready
         AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake userInit -q)
@@ -51,6 +54,8 @@ jobs:
         context: .
         platforms: linux/arm64
         tags: ${{ env.TEST_TAG }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max|
     -
       name: Login to DockerHub
       if: github.event_name != 'pull_request'
@@ -68,3 +73,5 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: ghcr.io/nukib/misp:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
