@@ -9,15 +9,16 @@ to update MISP from the user interface and instead, an admin should download a n
 
 ### Usage for testing
 
-Docker Compose file contains MISP, [MISP Modules](https://github.com/NUKIB/misp-modules), MariaDB and Redis, so everything you need to run MISP. Clone this repo and run:
+Docker Compose file contains MISP itself, [MISP Modules](https://github.com/NUKIB/misp-modules), MariaDB and Redis, so everything you need to run MISP. Just run:
 
+    curl --proto '=https' --tlsv1.3 -O https://raw.githubusercontent.com/NUKIB/misp/main/docker-compose.yml
     docker compose up -d
 
-Then you can access MISP in your browser by accessing `localhost:8080`. Default user after installation is `admin@admin.test` with password `admin`
+Then you can access MISP in your browser by accessing `localhost:8080`. Default user after installation is `admin@admin.test` with password `admin`.
 
 ### Updating
 
-If new MISP is released, also new image is created. For updating MISP, just download new images and recreate them:
+When new MISP is released, also new container image is created. For updating MISP and MISP Modules, just download new images and recreate them:
 
     docker compose pull
     docker compose up -d
