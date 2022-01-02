@@ -3,6 +3,9 @@
 set -e
 set -o xtrace
 
+# Check if PHP is properly configured
+php -v
+
 # Build test
 cd /var/www/MISP/tests/
 bash build-test.sh
