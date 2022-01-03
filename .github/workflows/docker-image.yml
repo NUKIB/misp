@@ -49,7 +49,7 @@ jobs:
         MISP_IMAGE=${{ env.TEST_TAG }} docker compose up --detach --quiet-pull
         sleep 10 # Wait until container is ready
         AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake userInit -q)
-        curl -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8081/servers/getVersion | jq
+        curl -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion | jq
         docker compose down
     -
       name: Container scan
