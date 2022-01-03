@@ -1,6 +1,6 @@
 # MISP Docker image
 
-[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on CentOS 8 Stream.
+[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on CentOS Stream 8.
 
 This image contains the latest version of MISP and the required dependencies. Image is intended as immutable, which means that it is not possible
 to update MISP from the user interface and instead, an admin should download a newer image.
