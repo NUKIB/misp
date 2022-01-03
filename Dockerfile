@@ -67,7 +67,7 @@ ARG CACHEBUST=1
 ARG MISP_VERSION=develop
 ENV MISP_VERSION $MISP_VERSION
 
-RUN dnf install -y /tmp/jobber*.rpm && \
+RUN rpm -i /tmp/jobber*.rpm && \
     pip3 install --disable-pip-version-check /wheels/* && \
     chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
     /usr/local/bin/misp_install.sh
