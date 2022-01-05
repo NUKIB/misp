@@ -11,7 +11,7 @@ to update MISP from the user interface and instead, an admin should download a n
 
 Docker Compose file contains MISP itself, [MISP Modules](https://github.com/NUKIB/misp-modules), MariaDB and Redis, so everything you need to run MISP. Just run:
 
-    curl --proto '=https' --tlsv1.3 -O https://raw.githubusercontent.com/NUKIB/misp/main/docker-compose.yml
+    curl --proto '=https' --tlsv1.2 -O https://raw.githubusercontent.com/NUKIB/misp/main/docker-compose.yml
     docker compose up -d
 
 Then you can access MISP in your browser by accessing `localhost:8080`. Default user after installation is `admin@admin.test` with password `admin`.
@@ -41,6 +41,10 @@ do that is export container images to compressed tar and transfer them to air-ga
 If you don't trust image build by GitHub Actions and stored in GitHub Container Registry or you want to build different MISP version, you can build this image by yourself:
 
     docker build --build-arg MISP_VERSION=v2.4.152 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
+
+If you don't like CentOS Stream, you can use as base image different distribution that is compatible with CentOS, like [AlmaLinux](https://hub.docker.com/_/almalinux) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
+
+    docker build --build-arg BASE_IMAGE=almalinux -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
 ### Automation
 
@@ -74,6 +78,7 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `REDIS_PASSWORD` (optional, string)
 
 #### Default Redis databases
+
 * `10` - ZeroMQ connector
 * `11` - SimpleBackgroundJobs
 * `12` - session data if `PHP_SESSIONS_IN_REDIS` is enabled
