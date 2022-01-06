@@ -17,10 +17,14 @@ jobs:
     -
       name: Checkout
       uses: actions/checkout@v2
-    - name: Docker Image meta
+    -
+      name: Docker Image meta
       run: python .github/workflows/container-tag.py
       id: meta
-    - name: debug
+      with:
+        image-name: ghcr.io/nukib/misp
+    -
+      name: debug
       run: |
        echo '::warning:: ${{ steps.meta.outputs.TEST }}'
     -
