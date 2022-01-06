@@ -17,6 +17,12 @@ jobs:
     -
       name: Checkout
       uses: actions/checkout@v2
+    - name: Docker Image meta
+      run: python .github/workflows/container-tag.py
+      id: meta
+    - name: debug
+      run: |
+       echo '::warning:: ${{ steps.meta.outputs.TEST }}'
     -
       name: Set up QEMU
       uses: docker/setup-qemu-action@v1
