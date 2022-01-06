@@ -21,7 +21,7 @@ jobs:
       name: Docker Image meta
       run: python .github/workflows/container-tag.py
       id: meta
-      end:
+      env:
         IMAGE_NAME: ghcr.io/nukib/misp
     -
       name: debug
