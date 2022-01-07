@@ -8,7 +8,7 @@ FILES_THAT_SHOULD_NOT_BE_WRITABLE = (
     "/etc/supervisord.d/misp.ini",
     "/etc/rsyslog.conf",
     "/etc/httpd/conf.d/misp.conf",
-    "/etc/php.d/snuffleupagus-default.rules",
+    "/etc/php.d/snuffleupagus-misp.rules",
     "/root/.jobber",
 )
 
