@@ -166,10 +166,14 @@ You can use a different provider for authentication in MISP. If you don't provid
 
 ### PHP config
 
-* `PHP_XDEBUG_ENABLED` (optional, boolean, default `false`) - enable Xdebug PHP extension for debugging purposes (do not enable on production environment)
-* `PHP_XDEBUG_PROFILER_TRIGGER` (optional, string) - secret value for `XDEBUG_PROFILE` GET/POST variable
 * `PHP_SESSIONS_IN_REDIS` (optional, boolean, default `true`) - when enabled, sessions information are stored in Redis. That provides better performance and sessions survives container restart
-* `PHP_SNUFFLEUPAGUS` (optional, boolean, default `true`) - enable PHP hardening by using [Snuffleupagus](https://snuffleupagus.readthedocs.io) PHP extension.
+* `PHP_SNUFFLEUPAGUS` (optional, boolean, default `true`) - enable PHP hardening by using [Snuffleupagus](https://snuffleupagus.readthedocs.io) PHP extension
+* `PHP_TIMEZONE` (optional, string, default `UTC`) - sets [date.timezone](https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone)
+* `PHP_MEMORY_LIMIT` (optional, string, default `2048M`) - sets [memory_limit](https://www.php.net/manual/en/ini.core.php#ini.memory-limit)
+* `PHP_MAX_EXECUTION_TIME` (optional, int, default `300`) - sets [max_execution_time](https://www.php.net/manual/en/info.configuration.php#ini.max-execution-time) (in seconds)
+* `PHP_UPLOAD_MAX_FILESIZE` (optional, string, default `50M`) - sets [upload_max_filesize](https://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize) and [post_max_size](https://www.php.net/manual/en/ini.core.php#ini.post-max-size)
+* `PHP_XDEBUG_ENABLED` (optional, boolean, default `false`) - enable [Xdebug](https://xdebug.org) PHP extension for debugging purposes (do not enable on production environment)
+* `PHP_XDEBUG_PROFILER_TRIGGER` (optional, string) - secret value for `XDEBUG_PROFILE` GET/POST variable
 
 ### Syslog
 
@@ -178,11 +182,6 @@ If enabled, all logs from the container are forwarded to a defined syslog server
 * `SYSLOG_TARGET` (optional, string)
 * `SYSLOG_PORT` (optional, integer, default `601`)
 * `SYSLOG_PROTOCOL` (optional, string, default `tcp`)
-
-## Default timeouts
-
-* PHP timeout: 300 seconds (defined in `/etc/php.ini`)
-* Apache timeout: 310 seconds (defined in `/etc/httpd/conf.d/misp.conf`)
 
 ## Log locations
 

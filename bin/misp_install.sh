@@ -17,17 +17,12 @@ redis.session.lock_wait_time = 50000
 redis.session.lock_retries = 30" > /etc/php.d/50-redis.ini
 
 # PHP-FPM config
-echo 'date.timezone = "UTC"' > /etc/php-fpm.d/timezone.ini # set default time zone
 echo 'pm.status_path = /fpm-status' >> /etc/php-fpm.d/www.conf # enable PHP-FPM status page
 echo 'listen.acl_users = apache' >> /etc/php-fpm.d/www.conf # `nginx` user doesn't exists
 echo 'access.log = /var/log/php-fpm/$pool.access.log' >> /etc/php-fpm.d/www.conf # enable PHP-FPM access log
 echo 'access.format = "%R %{HTTP_X_REQUEST_ID}e - %u %t \"%m %r%Q%q\" %s %{mili}d %{kilo}M %C%%"' >> /etc/php-fpm.d/www.conf # change log format
 
 # PHP config
-sed -e 's/max_execution_time = 30/max_execution_time = 300/' -i ${PHP_INI}
-sed -e 's/memory_limit = 128M/memory_limit = 2048M/' -i ${PHP_INI}
-sed -e 's/upload_max_filesize = 2M/upload_max_filesize = 50M/' -i ${PHP_INI}
-sed -e 's/post_max_size = 8M/post_max_size = 50M/' -i ${PHP_INI}
 sed -e 's/allow_url_fopen = On/allow_url_fopen = Off/' -i ${PHP_INI}
 sed -e 's/;assert.active = On/assert.active = Off/' -i ${PHP_INI}
 sed -e 's/expose_php = On/expose_php = Off/' -i ${PHP_INI}
