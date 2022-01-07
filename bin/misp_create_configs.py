@@ -11,17 +11,18 @@ from jinja2 import Template
 
 required_variables = (
     "MYSQL_HOST", "MYSQL_LOGIN", "MYSQL_DATABASE", "MISP_BASEURL", "SECURITY_SALT", "REDIS_HOST",
-    "MISP_ORG", "MISP_EMAIL", "MISP_UUID")
+    "MISP_ORG", "MISP_EMAIL", "MISP_UUID"
+)
 optional_variables = (
     "REDIS_PASSWORD", "MYSQL_PASSWORD", "PHP_XDEBUG_ENABLED", "PHP_XDEBUG_PROFILER_TRIGGER", "PHP_SESSIONS_IN_REDIS",
-    "GNUPG_PRIVATE_KEY_PASSWORD", "GNUPG_BODY_ONLY_ENCRYPTED", "PROXY_HOST", "PROXY_PORT", "PROXY_METHOD", "PROXY_USER", "PROXY_PASSWORD", "MISP_HOST_ORG_ID", "SECURITY_COOKIE_NAME",
-    "ZEROMQ_ENABLED", "OIDC_LOGIN", "OIDC_PROVIDER", "OIDC_PROVIDER_INNER",
+    "GNUPG_PRIVATE_KEY_PASSWORD", "GNUPG_BODY_ONLY_ENCRYPTED", "PROXY_HOST", "PROXY_PORT", "PROXY_METHOD", "PROXY_USER",
+    "PROXY_PASSWORD", "MISP_HOST_ORG_ID", "SECURITY_COOKIE_NAME", "ZEROMQ_ENABLED", "OIDC_LOGIN", "OIDC_PROVIDER", "OIDC_PROVIDER_INNER",
     "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER", "OIDC_PASSWORD_RESET",
     "OIDC_CLIENT_CRYPTO_PASS", "SYSLOG_TARGET", "SYSLOG_PORT", "SYSLOG_PROTOCOL", "MISP_EMAIL_REPLY_TO", "GNUPG_SIGN",
     "ZEROMQ_USERNAME", "ZEROMQ_PASSWORD", "SENTRY_DSN", "SMTP_HOST", "SMTP_USERNAME", "SMTP_PASSWORD",
     "MISP_MODULE_URL", "MISP_ATTACHMENT_SCAN_MODULE", "SECURITY_ADVANCED_AUTHKEYS", "SECURITY_HIDE_ORGS",
     "OIDC_DEFAULT_ORG", "SENTRY_ENVIRONMENT", "MISP_DEBUG", "SUPPORT_EMAIL", "PHP_SNUFFLEUPAGUS",
-    "SECURITY_ENCRYPTION_KEY",
+    "SECURITY_ENCRYPTION_KEY", "PHP_TIMEZONE", "PHP_MEMORY_LIMIT", "PHP_MAX_EXECUTION_TIME", "PHP_UPLOAD_MAX_FILESIZE",
 )
 bool_variables = (
     "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
@@ -31,7 +32,11 @@ bool_variables = (
 default_values = {
     "PHP_SESSIONS_IN_REDIS": "true",
     "PHP_SNUFFLEUPAGUS": "true",
+    "PHP_TIMEZONE": "UTC",
     "MISP_HOST_ORG_ID": "1",
+    "PHP_MEMORY_LIMIT": "2048M",
+    "PHP_MAX_EXECUTION_TIME": "300",
+    "PHP_UPLOAD_MAX_FILESIZE": "50M",
 }
 
 
@@ -40,8 +45,14 @@ def error(message: str):
     sys.exit(1)
 
 
-def convert_bool(input_string: str) -> bool:
-    return input_string.lower() in ("true", "1", "yes")
+def convert_bool(variable_name: str, input_string: str) -> bool:
+    value = input_string.lower()
+    if value in ("true", "1", "yes"):
+        return True
+    if value in ("false", "0", "no", ""):
+        return False
+
+    error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, input_string))
 
 
 def generate_apache_config(variables: dict):
@@ -124,11 +135,31 @@ action(type="omfwd" target="{syslog_target}" port="{syslog_port}" protocol="{sys
     open("/etc/rsyslog.d/forward.conf", "w+").write(config)
 
 
-def generate_error_messages(email):
+def generate_error_messages(email: str):
     for path in glob.glob('/var/www/html/*.html'):
-        template = Template(open(path, "r").read())
-        template = template.render({"SUPPORT_EMAIL": email})
-        open(path, "w").write(template)
+        generate_template(path, {"SUPPORT_EMAIL": email})
+
+
+def generate_php_config(variables: dict):
+    template = "date.timezone = '{timezone}'\n" \
+               "memory_limit = {memory_limit}\n" \
+               "max_execution_time = {max_execution_time}\n" \
+               "upload_max_filesize = {upload_max_filesize}\n" \
+               "post_max_size = {upload_max_filesize}\n"
+
+    template = template.format(
+        timezone=variables["PHP_TIMEZONE"],
+        memory_limit=variables["PHP_MEMORY_LIMIT"],
+        max_execution_time=variables["PHP_MAX_EXECUTION_TIME"],
+        upload_max_filesize=variables["PHP_UPLOAD_MAX_FILESIZE"],
+    )
+    open("/etc/php.d/99-misp.ini", "w").write(template)
+
+
+def generate_template(path: str, variables: dict):
+    template = Template(open(path, "r").read())
+    template = template.render(variables)
+    open(path, "w").write(template)
 
 
 if __name__ == "__main__":
@@ -147,10 +178,11 @@ if __name__ == "__main__":
             variables[variable] = default_values[variable] if variable in default_values else ""
 
     for bool_variable in bool_variables:
-        variables[bool_variable] = convert_bool(variables[bool_variable])
+        variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
 
     # Convert to int
     variables["MISP_HOST_ORG_ID"] = int(variables["MISP_HOST_ORG_ID"])
+    variables["PHP_MAX_EXECUTION_TIME"] = int(variables["PHP_MAX_EXECUTION_TIME"])
 
     baseurl = urlparse(variables["MISP_BASEURL"])
     if baseurl.scheme not in ("http", "https"):
@@ -185,10 +217,7 @@ if __name__ == "__main__":
 
     for template_name in ("database.php", "config.php", "email.php"):
         path = "/var/www/MISP/app/Config/{}".format(template_name)
-
-        template = Template(open(path, "r").read())
-        template = template.render(variables)
-        open(path, "w").write(template)
+        generate_template(path, variables)
 
     generate_xdebug_config(variables["PHP_XDEBUG_ENABLED"], variables["PHP_XDEBUG_PROFILER_TRIGGER"])
     generate_snuffleupagus_config(variables['PHP_SNUFFLEUPAGUS'])
@@ -196,3 +225,4 @@ if __name__ == "__main__":
     generate_apache_config(variables)
     generate_rsyslog_config(variables["SYSLOG_TARGET"], variables["SYSLOG_PORT"], variables["SYSLOG_PROTOCOL"])
     generate_error_messages(variables["SUPPORT_EMAIL"] if "SUPPORT_EMAIL" in variables["SUPPORT_EMAIL"] else "no@example.com")
+    generate_php_config(variables)
