@@ -1,11 +1,13 @@
 # Base image
 ARG BASE_IMAGE=quay.io/centos/centos:stream8
 FROM $BASE_IMAGE as base
+# RHEL ubi image doesn't contain epel-release package
+COPY epel/epel.repo /etc/yum.repos.d/
+COPY epel/RPM-GPG-KEY-EPEL-8 /etc/pki/rpm-gpg/
 
 # Some packages requires building, so use different stage for that
 FROM base as builder
-RUN dnf install -y epel-release && \
-    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc ssdeep-devel unzip make && \
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc ssdeep-devel unzip make && \
     useradd --create-home --system --user-group build
 # Build su-exec
 COPY su-exec.c /tmp/
@@ -39,8 +41,7 @@ FROM base as misp
 # Install required system and Python packages
 COPY packages /tmp/packages
 COPY requirements.txt /tmp/
-RUN dnf install -y --setopt=tsflags=nodocs epel-release && \
-    dnf module -y enable mod_auth_openidc php:7.4 python39 && \
+RUN dnf module -y enable mod_auth_openidc php:7.4 python39 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.9 && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
