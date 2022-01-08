@@ -15,8 +15,10 @@ if [ "$1" = 'supervisord' ]; then
     chown root:apache /var/www/MISP/app/Config/{config.php,database.php,email.php}
     chmod 440 /var/www/MISP/app/Config/{config.php,database.php,email.php}
 
-    # Check syntax errors in generated config file
+    # Check syntax errors in generated config files
     su-exec apache php -l /var/www/MISP/app/Config/config.php
+    su-exec apache php -l /var/www/MISP/app/Config/database.php
+    su-exec apache php -l /var/www/MISP/app/Config/email.php
 
     # Check if all permissions are OK
     su-exec apache misp_check_permissions.py
@@ -45,6 +47,9 @@ unset MYSQL_PASSWORD
 unset REDIS_PASSWORD
 unset SECURITY_SALT
 unset SECURITY_ENCRYPTION_KEY
+unset OIDC_CLIENT_SECRET_INNER
+unset OIDC_CLIENT_SECRET
+unset OIDC_CLIENT_CRYPTO_PASS
 
 # Create GPG homedir under apache user
 chown -R apache:apache /var/www/MISP/.gnupg
