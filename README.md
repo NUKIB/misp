@@ -5,6 +5,16 @@
 This image contains the latest version of MISP and the required dependencies. Image is intended as immutable, which means that it is not possible
 to update MISP from the user interface and instead, an admin should download a newer image.
 
+## Why to use this image?
+
+* ✅ Image is based on CentOS 8 Stream, so perfectly fits your infrastructure if you use CentOS or RHEL as a host system
+* ✅ Modern MISP features are enabled by default (like advanced audit log or storing setting in the database)
+* ✅ Integrated support for OpenID Connect (OIDC) authentication
+* ✅ PHP is by default protected by Snuffleupagus extensions with [rules](snuffleupagus-misp.rules) tailored to MISP
+* ✅ Optional extensions and configurations that will make MISP faster are enabled
+* ✅ Integrated support for logging exceptions to Sentry and forwarding logs to syslog server
+* ✅ Final image is automatically tested, so every release should work as expected
+ 
 ## Usage
 
 First, you have to install Docker. Follow [these manuals](https://docs.docker.com/engine/install/) how to install Docker on your machine. Windows, macOS, or Linux are supported.
