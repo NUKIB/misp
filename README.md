@@ -7,23 +7,26 @@ to update MISP from the user interface and instead, an admin should download a n
 
 ## Usage
 
+First, you have to install Docker. Follow [these manuals](https://docs.docker.com/engine/install/) how to install Docker on your machine. Windows, macOS, or Linux are supported.
+
 ### Usage for testing
 
-Docker Compose file contains MISP itself, [MISP Modules](https://github.com/NUKIB/misp-modules), MariaDB and Redis, so everything you need to run MISP. Just run:
+Docker Compose file defines MISP itself, [MISP Modules](https://github.com/NUKIB/misp-modules), MariaDB and Redis, so everything you need to run MISP. Just run:
 
     curl --proto '=https' --tlsv1.2 -O https://raw.githubusercontent.com/NUKIB/misp/main/docker-compose.yml
     docker compose up -d
 
-Then you can access MISP in your browser by accessing `localhost:8080`. Default user after installation is `admin@admin.test` with password `admin`.
+Then you can access MISP in your browser by accessing `http://localhost:8080`. Default user after installation is `admin@admin.test` with password `admin`.
 
 ### Updating
 
-When new MISP is released, also new container image is created. For updating MISP and MISP Modules, just download new images and recreate them:
+When a new MISP is released, also new container image is created. For updating MISP and MISP Modules, just run these commands in the folder that contains `docker-compose.yml` file.
+These commands will download the latest images and recreate containers:
 
     docker compose pull
     docker compose up -d
 
-### Usage in production environment
+### Usage in a production environment
 
 For production usage, please:
 * change passwords for MariaDB and Redis,
@@ -33,16 +36,16 @@ For production usage, please:
 
 ### Usage in air-gapped environment
 
-MISP by default do not require access to Internet. So it is possible to use MISP in air-gapped environment or with blocked outgoing connections. Easies way how to
+MISP by default does not require access to Internet. So it is possible to use MISP in air-gapped environment or with blocked outgoing connections. Easies way how to
 do that is export container images to compressed tar and transfer them to air-gapped system.
 
 ### Image building
 
-If you don't trust image build by GitHub Actions and stored in GitHub Container Registry or you want to build different MISP version, you can build this image by yourself:
+If you don't trust image built by GitHub Actions and stored in GitHub Container Registry or you want to build a different MISP version, you can build this image by yourself:
 
     docker build --build-arg MISP_VERSION=v2.4.152 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
-If you don't like CentOS Stream, you can use as base image different distribution that is compatible with CentOS, like [AlmaLinux](https://hub.docker.com/_/almalinux) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
+If you don't like CentOS Stream, you can use as a base image different distribution that is compatible with CentOS, like [AlmaLinux](https://hub.docker.com/_/almalinux) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
 
     docker build --build-arg BASE_IMAGE=almalinux -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
@@ -59,7 +62,7 @@ Default tasks:
 
 ## Environment variables
 
-By changing or defining these container environment variables, you can change container behaviour.
+By changing or defining these container environment variables, you can change container behavior.
 
 ### Database connection
 
@@ -98,9 +101,9 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `GNUPG_PRIVATE_KEY_PASSWORD` (optional, string) - password for PGP key that is used to sign e-mails send by MISP
 * `GNUPG_BODY_ONLY_ENCRYPTED` (optional, boolean, default `false`)
 
-If you want to generate new PGP keys for e-mail singing, you can do it by running this command in container:
+If you want to generate new PGP keys for e-mail signing, you can do it by running this command inside the container:
 
-`gpg --homedir /var/www/MISP/.gnupg --full-generate-key --pinentry-mode=loopback --passphrase "password"`
+    gpg --homedir /var/www/MISP/.gnupg --full-generate-key --pinentry-mode=loopback --passphrase "password"
 
 ### Application
 
@@ -145,7 +148,7 @@ If a request to MISP is made with  `Authorization` header, that contains an auth
 
 #### Inner
 
-You can use a different provider for authentication in MISP. If you don't provide these variables, they will be to set to same as for Apache.
+You can use a different provider for authentication in MISP. If you don't provide these variables, they will be set to the same as for Apache.
 
 * `OIDC_PROVIDER_INNER` (optional, string) - URL for OIDC provider in MISP
 * `OIDC_CLIENT_ID_INNER` (optional, string)
@@ -190,7 +193,7 @@ If enabled, all logs from the container are forwarded to a defined syslog server
 * `/var/log/php-fpm/` - PHP-FPM logs
 * `/var/www/MISP/app/tmp/logs/` - application logs (PHP)
 
-`X-Request-ID` HTTP header is logged in Apache, PHP-FPM and Sentry logs, so you can use these value to correlate requestes between logs.
+`X-Request-ID` HTTP header is logged in Apache, PHP-FPM and Sentry logs, so you can use this value to correlate requests between logs.
 
 ## Container volumes
 
