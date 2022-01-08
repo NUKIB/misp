@@ -45,6 +45,34 @@ def error(message: str):
     sys.exit(1)
 
 
+def collect() -> dict:
+    variables = {}
+
+    for variable in required_variables:
+        if variable not in os.environ:
+            error("Environment variable '{}' is required, but not set".format(variable))
+
+        variables[variable] = os.environ.get(variable)
+
+    for variable in optional_variables:
+        if variable in os.environ:
+            variables[variable] = os.environ.get(variable)
+        else:
+            variables[variable] = default_values[variable] if variable in default_values else ""
+
+    for bool_variable in bool_variables:
+        variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
+
+    return variables
+
+
+def convert_int(variable_name: str, input_string: str) -> int:
+    try:
+        return int(input_string)
+    except ValueError:
+        error("Environment variable '{}' must be integer, `{}` given".format(variable_name, input_string))
+
+
 def convert_bool(variable_name: str, input_string: str) -> bool:
     value = input_string.lower()
     if value in ("true", "1", "yes"):
@@ -55,17 +83,17 @@ def convert_bool(variable_name: str, input_string: str) -> bool:
     error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, input_string))
 
 
-def generate_apache_config(variables: dict):
-    path = "/etc/httpd/conf.d/misp.conf"
+def generate_template(path: str, variables: dict):
     template = Template(open(path, "r").read())
     template = template.render(variables)
     open(path, "w").write(template)
 
 
-def generate_xdebug_config(enabled: bool, profiler_trigger: str):
-    if profiler_trigger and not enabled:
-        error("Environment variable 'PHP_XDEBUG_PROFILER_TRIGGER' is set, but xdebug is not enabled")
+def generate_apache_config(variables: dict):
+    generate_template("/etc/httpd/conf.d/misp.conf", variables)
 
+
+def generate_xdebug_config(enabled: bool, profiler_trigger: str):
     xdebug_config_path = "/etc/php.d/15-xdebug.ini"
 
     if enabled:
@@ -156,33 +184,11 @@ def generate_php_config(variables: dict):
     open("/etc/php.d/99-misp.ini", "w").write(template)
 
 
-def generate_template(path: str, variables: dict):
-    template = Template(open(path, "r").read())
-    template = template.render(variables)
-    open(path, "w").write(template)
+def main():
+    variables = collect()
 
-
-if __name__ == "__main__":
-    variables = {}
-
-    for variable in required_variables:
-        if variable not in os.environ:
-            error("Environment variable '{}' is required, but not set.".format(variable))
-
-        variables[variable] = os.environ.get(variable)
-
-    for variable in optional_variables:
-        if variable in os.environ:
-            variables[variable] = os.environ.get(variable)
-        else:
-            variables[variable] = default_values[variable] if variable in default_values else ""
-
-    for bool_variable in bool_variables:
-        variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
-
-    # Convert to int
-    variables["MISP_HOST_ORG_ID"] = int(variables["MISP_HOST_ORG_ID"])
-    variables["PHP_MAX_EXECUTION_TIME"] = int(variables["PHP_MAX_EXECUTION_TIME"])
+    variables["MISP_HOST_ORG_ID"] = convert_int("MISP_HOST_ORG_ID", variables["MISP_HOST_ORG_ID"])
+    variables["PHP_MAX_EXECUTION_TIME"] = convert_int("PHP_MAX_EXECUTION_TIME", variables["PHP_MAX_EXECUTION_TIME"])
 
     baseurl = urlparse(variables["MISP_BASEURL"])
     if baseurl.scheme not in ("http", "https"):
@@ -197,9 +203,9 @@ if __name__ == "__main__":
         error("Environment variable 'MISP_MODULE_URL' must start with 'http://' or 'https://'")
 
     if len(variables["SECURITY_SALT"]) < 32:
-        print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long.", file=sys.stderr)
+        print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long", file=sys.stderr)
 
-    # if security cookie name is not set, generate it by using SECURITY_SALT and MISP_UUID so it will survive container restart
+    # if security cookie name is not set, generate it by using SECURITY_SALT and MISP_UUID, so it will survive container restart
     if len(variables["SECURITY_COOKIE_NAME"]) == 0:
         uniq = hashlib.sha256("{}|{}".format(variables["SECURITY_SALT"], variables["MISP_UUID"]).encode()).hexdigest()
         variables["SECURITY_COOKIE_NAME"] = "MISP-session-{}".format(uniq[0:5])
@@ -207,13 +213,18 @@ if __name__ == "__main__":
     try:
         uuid.UUID(variables["MISP_UUID"])
     except TypeError:
-        error("MISP_UUID is not valid UUID.")
+        error("Environment variable 'MISP_UUID' is not valid UUID.")
 
     variables["MISP_UUID"] = variables["MISP_UUID"].lower()
 
     for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER"):
         if variables[var] == "":
             variables[var] = variables[var.replace("_INNER", "")]
+
+    if variables["OIDC_LOGIN"]:
+        for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):
+            if variables[var] == "":
+                error("OIDC login is enabled, but '{}' environment variable is not set".format(var))
 
     for template_name in ("database.php", "config.php", "email.php"):
         path = "/var/www/MISP/app/Config/{}".format(template_name)
@@ -226,3 +237,7 @@ if __name__ == "__main__":
     generate_rsyslog_config(variables["SYSLOG_TARGET"], variables["SYSLOG_PORT"], variables["SYSLOG_PROTOCOL"])
     generate_error_messages(variables["SUPPORT_EMAIL"] if "SUPPORT_EMAIL" in variables["SUPPORT_EMAIL"] else "no@example.com")
     generate_php_config(variables)
+
+
+if __name__ == "__main__":
+    main()
