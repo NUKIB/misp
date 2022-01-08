@@ -4,9 +4,8 @@ FROM $BASE_IMAGE as base
 
 # Some packages requires building, so use different stage for that
 FROM base as builder
-RUN dnf module enable -y php:7.4 && \
-    dnf install -y epel-release && \
-    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc ssdeep-devel unzip make rpmdevtools yum-utils && \
+RUN dnf install -y epel-release && \
+    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc ssdeep-devel unzip make && \
     useradd --create-home --system --user-group build
 # Build su-exec
 COPY su-exec.c /tmp/
@@ -22,21 +21,17 @@ RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False pyth
 # Build PHP extensions
 FROM builder as php-build
 COPY bin/misp_compile_php_extensions.sh /tmp/
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel && \
+RUN dnf module enable -y php:7.4 && \
+    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel && \
     chmod u+x /tmp/misp_compile_php_extensions.sh && \
     /tmp/misp_compile_php_extensions.sh && \
     dnf history undo -y 0
 
 # Build jobber, that is not released for arm64 arch
 FROM builder as jobber-build
-RUN mkdir /tmp/jobber && \
-    cd /tmp/jobber && \
-    curl --proto '=https' --tlsv1.3 -sSL https://github.com/dshearer/jobber/archive/refs/tags/v1.4.4.tar.gz | tar zx --strip-components=1 && \
-    dnf builddep -y packaging/rpm/*.spec && \
-    make -C packaging/rpm pkg-local "DESTDIR=/tmp/" && \
-    dnf history undo -y 0 && \
-    cd /tmp && \
-    rm -rf /tmp/jobber
+COPY bin/misp_compile_jobber.sh /tmp/
+RUN chmod u+x /tmp/misp_compile_jobber.sh && \
+    /tmp/misp_compile_jobber.sh
 
 # MISP image
 FROM base as misp
