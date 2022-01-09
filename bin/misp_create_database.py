@@ -3,6 +3,7 @@
 import os
 import sys
 import time
+import logging
 import argparse
 import pymysql.cursors
 from pymysql.constants import CLIENT
@@ -23,9 +24,9 @@ def wait_for_connection(host: str, user: str, password: Optional[str]) -> Connec
             return connect(host, user, password)
         except Exception as e:
             last_exception = e
-            print("Waiting for database connection...", file=sys.stderr)
+            logging.info("Waiting for database connection...")
             time.sleep(1)
-    print("ERROR: Could not connect to database", file=sys.stderr)
+    logging.error("Could not connect to database")
     print(last_exception, file=sys.stderr)
     sys.exit(1)
 
@@ -43,6 +44,8 @@ def create_schema(connection: Connection, file):
 
 
 def main():
+    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("host")
     parser.add_argument("user")
@@ -55,21 +58,21 @@ def main():
     connection = wait_for_connection(args.host, args.user, password)
 
     if is_schema_created(connection, args.database):
-        print("Database schema is already created.", file=sys.stderr)
+        logging.info("Database schema is already created.")
         connection.close()
         sys.exit(0)
 
     try:
         connection.select_db(args.database)
     except Exception as e:
-        print("ERROR: Could not connect to database", file=sys.stderr)
+        logging.error("Could not connect to database")
         print(e, file=sys.stderr)
         connection.close()
         sys.exit(1)
 
-    print("Creating database schema...", file=sys.stderr)
+    logging.info("Creating database schema...")
     create_schema(connection, args.schema_file)
-    print("Database schema created.", file=sys.stderr)
+    logging.info("Database schema created.")
 
     connection.close()
 
