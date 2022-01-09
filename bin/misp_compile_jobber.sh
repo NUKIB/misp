@@ -18,8 +18,7 @@ download_and_check https://github.com/dshearer/jobber/archive/refs/tags/v1.4.4.t
 dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False rpmdevtools yum-utils
 dnf builddep -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False packaging/rpm/*.spec
 
-make -C packaging/rpm pkg-local "DESTDIR=/tmp/"
+make -C packaging/rpm pkg-local "DESTDIR=/build/"
 
 # Cleanup
 dnf history rollback -y last-2
-rm -rf /tmp/jobber

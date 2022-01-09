@@ -11,7 +11,7 @@ download_and_check () {
   rm -f package.tar.gz
 }
 
-mkdir /tmp/php-modules/
+mkdir /build/php-modules/
 
 # Compile igbinary
 mkdir /tmp/igbinary
@@ -21,7 +21,7 @@ phpize
 ./configure --silent CFLAGS="-O2 -g" --enable-igbinary
 make -j2
 make install # `make install` is necessary, so redis extension can be compiled with `--enable-redis-igbinary`
-mv modules/*.so /tmp/php-modules/
+mv modules/*.so /build/php-modules/
 
 # Compile redis
 mkdir /tmp/redis
@@ -30,7 +30,7 @@ download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/5.3.5.
 phpize
 ./configure --silent --enable-redis-igbinary
 make -j2
-mv modules/*.so /tmp/php-modules/
+mv modules/*.so /build/php-modules/
 
 # Compile ssdeep
 mkdir /tmp/ssdeep
@@ -39,7 +39,7 @@ download_and_check https://github.com/php/pecl-text-ssdeep/archive/refs/tags/1.1
 phpize
 ./configure --silent --with-ssdeep=/usr --with-libdir=lib64
 make -j2
-mv modules/*.so /tmp/php-modules/
+mv modules/*.so /build/php-modules/
 
 # Compile brotli
 mkdir /tmp/brotli
@@ -48,7 +48,7 @@ download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.1
 phpize
 ./configure --silent --with-libbrotli
 make -j2
-mv modules/*.so /tmp/php-modules/
+mv modules/*.so /build/php-modules/
 
 # Compile snuffleupagus
 mkdir /tmp/snuffleupagus
@@ -58,8 +58,4 @@ cd src
 phpize
 ./configure --silent --enable-snuffleupagus
 make -j2
-mv modules/*.so /tmp/php-modules/
-
-# Cleanup
-cd /tmp
-rm -rf /tmp/igbinary /tmp/redis /tmp/ssdeep /tmp/brotli /tmp/snuffleupagus
+mv modules/*.so /build/php-modules/
