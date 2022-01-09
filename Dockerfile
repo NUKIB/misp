@@ -22,18 +22,18 @@ RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False pyth
 
 # Build PHP extensions that are not included in packages
 FROM builder as php-build
-COPY bin/misp_compile_php_extensions.sh /tmp/
-RUN dnf module enable -y php:7.4 && \
+COPY bin/misp_compile_php_extensions.sh /build/
+RUN --mount=type=tmpfs,target=/tmp dnf module enable -y php:7.4 && \
     dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel && \
-    chmod u+x /tmp/misp_compile_php_extensions.sh && \
-    /tmp/misp_compile_php_extensions.sh && \
+    chmod u+x /build/misp_compile_php_extensions.sh && \
+    /build/misp_compile_php_extensions.sh && \
     dnf history undo -y 0
 
 # Build jobber, that is not released for arm64 arch
 FROM builder as jobber-build
-COPY bin/misp_compile_jobber.sh /tmp/
-RUN chmod u+x /tmp/misp_compile_jobber.sh && \
-    /tmp/misp_compile_jobber.sh
+COPY bin/misp_compile_jobber.sh /build/
+RUN --mount=type=tmpfs,target=/tmp chmod u+x /build/misp_compile_jobber.sh && \
+    /build/misp_compile_jobber.sh
 
 # MISP image
 FROM base as misp
@@ -49,8 +49,8 @@ RUN dnf module -y enable mod_auth_openidc php:7.4 python39 && \
 
 COPY --from=builder /usr/local/bin/su-exec /usr/local/bin/
 COPY --from=python-build /tmp/wheels /wheels
-COPY --from=php-build /tmp/php-modules/* /usr/lib64/php/modules/
-COPY --from=jobber-build /tmp/jobber*.rpm /tmp
+COPY --from=php-build /build/php-modules/* /usr/lib64/php/modules/
+COPY --from=jobber-build /build/jobber*.rpm /tmp
 COPY bin/ /usr/local/bin/
 COPY misp.conf /etc/httpd/conf.d/misp.conf
 COPY httpd-errors/* /var/www/html/
