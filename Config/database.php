@@ -6,7 +6,7 @@ class DATABASE_CONFIG {
         'persistent' => false,
         'host' => '{{ MYSQL_HOST }}',
         'login' => '{{ MYSQL_LOGIN }}',
-        'port' => 3306, // MySQL & MariaDB
+        'port' => {{ MYSQL_PORT }},
         'password' => '{{ MYSQL_PASSWORD }}',
         'database' => '{{ MYSQL_DATABASE }}',
         'prefix' => '',
