@@ -20,7 +20,7 @@ RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False pyth
     su-exec build pip3 wheel pydeep -w /tmp/wheels && \
     dnf history undo -y 0
 
-# Build PHP extensions
+# Build PHP extensions that are not included in packages
 FROM builder as php-build
 COPY bin/misp_compile_php_extensions.sh /tmp/
 RUN dnf module enable -y php:7.4 && \
