@@ -5,11 +5,13 @@ services:
     image: mariadb:10.7
     restart: always
     container_name: misp-mysql
+    tmpfs:
+      - /tmp
     environment:
-      MYSQL_DATABASE: 'misp'
-      MYSQL_USER: 'misp'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: misp
+      MYSQL_USER: misp
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
 
   redis:
     image: redis:6.2
@@ -33,15 +35,15 @@ services:
     environment:
       MYSQL_HOST: mysql
       MYSQL_LOGIN: misp
-      MYSQL_PASSWORD: password
+      MYSQL_PASSWORD: password # Please change for production
       MYSQL_DATABASE: misp
       REDIS_HOST: redis
       MISP_BASEURL: http://localhost:8080
-      MISP_UUID: 0a674a5a-c4cb-491d-80cf-5adb48b5c1cd # Please modify
-      MISP_ORG: Testing org
-      MISP_MODULE_URL: "http://misp-modules"
-      MISP_EMAIL: ahoj@example.com # Please modify
-      SECURITY_SALT: abcd
+      MISP_UUID: 0a674a5a-c4cb-491d-80cf-5adb48b5c1cd # Please change for production
+      MISP_ORG: Testing org # Please change for production
+      MISP_MODULE_URL: http://misp-modules
+      MISP_EMAIL: ahoj@example.com # Please change for production
+      SECURITY_SALT: PleaseChangeForProduction # Please change for production
       ZEROMQ_ENABLED: "yes"
     ports:
       - 127.0.0.1:8080:80

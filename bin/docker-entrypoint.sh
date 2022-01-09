@@ -7,7 +7,6 @@ if [ "$1" = 'supervisord' ]; then
     echo "MISP $MISP_VERSION container image provided by National Cyber and Information Security Agency of the Czech Republic"
     echo "In case of any problem with this image, please fill issue at https://github.com/NUKIB/misp/issues"
     echo "======================================"
-    echo
 
     misp_create_configs.py
 
