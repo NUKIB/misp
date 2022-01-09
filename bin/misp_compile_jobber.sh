@@ -4,7 +4,7 @@ set -e
 set -o xtrace
 
 download_and_check () {
-  curl --proto '=https' --tlsv1.3 -sSL -o package.tar.gz $1
+  curl --proto '=https' --tlsv1.3 -sS --location --fail -o package.tar.gz $1
   echo "$2 package.tar.gz" | sha256sum -c
   tar zxf package.tar.gz --strip-components=1
   rm -f package.tar.gz
