@@ -15,8 +15,12 @@ cd /tmp/jobber
 
 download_and_check https://github.com/dshearer/jobber/archive/refs/tags/v1.4.4.tar.gz fd88a217a413c5218316664fab5510ace941f4fdb68dcb5428385ff09c68dcc2
 
-dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False rpmdevtools yum-utils
+dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False rpmdevtools
 dnf builddep -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False packaging/rpm/*.spec
+# Required for jobber makefile
+echo '#!/usr/bin/env bash
+dnf builddep $*' > /usr/local/bin/yum-builddep
+chmod u+x /usr/local/bin/yum-builddep
 
 make -C packaging/rpm pkg-local "DESTDIR=/build/"
 
