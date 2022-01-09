@@ -82,9 +82,9 @@ def convert_int(variable_name: str, input_string: str) -> int:
 
 def convert_bool(variable_name: str, input_string: str) -> bool:
     value = input_string.lower()
-    if value in ("true", "1", "yes"):
+    if value in ("true", "1", "yes", "on"):
         return True
-    if value in ("false", "0", "no", ""):
+    if value in ("false", "0", "no", "off", ""):
         return False
 
     error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, input_string))
