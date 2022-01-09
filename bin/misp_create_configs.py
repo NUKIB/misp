@@ -23,6 +23,7 @@ optional_variables = (
     "MISP_MODULE_URL", "MISP_ATTACHMENT_SCAN_MODULE", "SECURITY_ADVANCED_AUTHKEYS", "SECURITY_HIDE_ORGS",
     "OIDC_DEFAULT_ORG", "SENTRY_ENVIRONMENT", "MISP_DEBUG", "SUPPORT_EMAIL", "PHP_SNUFFLEUPAGUS",
     "SECURITY_ENCRYPTION_KEY", "PHP_TIMEZONE", "PHP_MEMORY_LIMIT", "PHP_MAX_EXECUTION_TIME", "PHP_UPLOAD_MAX_FILESIZE",
+    "MYSQL_PORT",
 )
 bool_variables = (
     "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
@@ -37,6 +38,7 @@ default_values = {
     "PHP_MEMORY_LIMIT": "2048M",
     "PHP_MAX_EXECUTION_TIME": "300",
     "PHP_UPLOAD_MAX_FILESIZE": "50M",
+    "MYSQL_PORT": "3306",
 }
 
 
@@ -62,6 +64,9 @@ def collect() -> dict:
 
     for bool_variable in bool_variables:
         variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
+
+    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT"):
+        variables[int_variable] = convert_int(int_variable, variables[int_variable])
 
     return variables
 
@@ -186,9 +191,6 @@ def generate_php_config(variables: dict):
 
 def main():
     variables = collect()
-
-    variables["MISP_HOST_ORG_ID"] = convert_int("MISP_HOST_ORG_ID", variables["MISP_HOST_ORG_ID"])
-    variables["PHP_MAX_EXECUTION_TIME"] = convert_int("PHP_MAX_EXECUTION_TIME", variables["PHP_MAX_EXECUTION_TIME"])
 
     baseurl = urlparse(variables["MISP_BASEURL"])
     if baseurl.scheme not in ("http", "https"):
