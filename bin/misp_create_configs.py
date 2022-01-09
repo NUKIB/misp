@@ -39,6 +39,8 @@ default_values = {
     "PHP_MAX_EXECUTION_TIME": "300",
     "PHP_UPLOAD_MAX_FILESIZE": "50M",
     "MYSQL_PORT": "3306",
+    "SYSLOG_PORT": "601",
+    "SYSLOG_PROTOCOL": "tcp",
 }
 
 
@@ -65,7 +67,7 @@ def collect() -> dict:
     for bool_variable in bool_variables:
         variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
 
-    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT"):
+    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT"):
         variables[int_variable] = convert_int(int_variable, variables[int_variable])
 
     return variables
@@ -145,16 +147,9 @@ php_value[session.save_path]    = "{redis_path}"
     open(config_path, "w").write(config)
 
 
-def generate_rsyslog_config(syslog_target: Optional[str], syslog_port: Optional[str] = None,
-                            syslog_protocol: Optional[str] = None):
+def generate_rsyslog_config(syslog_target: Optional[str], syslog_port: int, syslog_protocol: str):
     if not syslog_target:
         return
-
-    if not syslog_port:
-        syslog_port = 601
-
-    if not syslog_protocol:
-        syslog_protocol = "tcp"
 
     # Recommended setting from https://github.com/grafana/loki/blob/master/docs/clients/promtail/scraping.md#rsyslog-output-configuration
     config_template = """
