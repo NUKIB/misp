@@ -24,7 +24,7 @@ RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False pyth
 FROM builder as php-build
 COPY bin/misp_compile_php_extensions.sh /build/
 RUN --mount=type=tmpfs,target=/tmp dnf module enable -y php:7.4 && \
-    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel && \
+    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils && \
     chmod u+x /build/misp_compile_php_extensions.sh && \
     /build/misp_compile_php_extensions.sh && \
     dnf history undo -y 0
