@@ -237,7 +237,7 @@ def main():
     generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_PASSWORD"])
     generate_apache_config(variables)
     generate_rsyslog_config(variables["SYSLOG_TARGET"], variables["SYSLOG_PORT"], variables["SYSLOG_PROTOCOL"])
-    generate_error_messages(variables["SUPPORT_EMAIL"] if "SUPPORT_EMAIL" in variables["SUPPORT_EMAIL"] else "no@example.com")
+    generate_error_messages(variables["SUPPORT_EMAIL"])
     generate_php_config(variables)
 
 
