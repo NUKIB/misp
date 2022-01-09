@@ -10,11 +10,14 @@ php -v
 cd /var/www/MISP/tests/
 bash build-test.sh
 
-# Validate syntax of config.php template
-python3 -c 'import sys, jinja2; env = jinja2.Environment(); template = open("/var/www/MISP/app/Config/config.php"); env.parse(template.read()); sys.exit(0)'
+check_jinja_template () {
+  python3 -c 'import sys, jinja2; env = jinja2.Environment(); template = open(sys.argv[1]).read(); env.parse(template); sys.exit(0)' $1
+}
 
-# Validate syntax of Apache config template
-python3 -c 'import sys, jinja2; env = jinja2.Environment(); template = open("/etc/httpd/conf.d/misp.conf"); env.parse(template.read()); sys.exit(0)'
+check_jinja_template /var/www/MISP/app/Config/config.php
+check_jinja_template /var/www/MISP/app/Config/database.php
+check_jinja_template /var/www/MISP/app/Config/email.php
+check_jinja_template /etc/httpd/conf.d/misp.conf
 
 # Check installed Python packages for vulnerabilities
 safety check --full-report || true # ignore output for now
