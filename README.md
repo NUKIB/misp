@@ -47,8 +47,7 @@ For production usage, please:
 
 ### Usage in air-gapped environment
 
-MISP by default does not require access to Internet. So it is possible to use MISP in air-gapped environment or an environment with blocked outgoing connections. Easies way how to
-do that is export container images to compressed tar and transfer them to air-gapped system.
+MISP by default does not require access to Internet. So it is possible to use MISP in air-gapped environment or an environment with blocked outgoing connections. Check [AIR-GAP.md](AIR-GAP.md) for more information.
 
 ### Image building
 
