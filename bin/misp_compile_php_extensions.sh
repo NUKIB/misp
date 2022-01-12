@@ -23,12 +23,26 @@ make -j2
 make install # `make install` is necessary, so redis extension can be compiled with `--enable-redis-igbinary`
 mv modules/*.so /build/php-modules/
 
+# Compile zstd library and zstd extension
+mkdir /tmp/zstd
+cd /tmp/zstd
+download_and_check https://github.com/kjdev/php-ext-zstd/archive/bf7931996aac9d14ba550783c12070442445d6f2.tar.gz 64d8000c6580ea97d675fc43db6a2a1229e9ad06185c24c60fd4b07e73852fce
+cd zstd
+download_and_check https://github.com/facebook/zstd/archive/refs/tags/v1.5.1.tar.gz dc05773342b28f11658604381afd22cb0a13e8ba17ff2bd7516df377060c18dd
+make lib-release
+make install # `make install` is necessary, so redis extension can be compiled with `--enable-redis-zstd`
+cd ..
+phpize
+./configure --silent
+make --silent -j2
+mv modules/*.so /build/php-modules/
+
 # Compile redis
 mkdir /tmp/redis
 cd /tmp/redis
 download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/5.3.5.tar.gz 88d8c7e93bfd9576fb5a51e28e8f9cc62e3515af5a3bca5486a76e70657213f2
 phpize
-./configure --silent --enable-redis-igbinary
+./configure --silent --enable-redis-igbinary --enable-redis-zstd
 make -j2
 mv modules/*.so /build/php-modules/
 
