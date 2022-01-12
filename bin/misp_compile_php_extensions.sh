@@ -73,3 +73,6 @@ phpize
 ./configure --silent --enable-snuffleupagus
 make -j2
 mv modules/*.so /build/php-modules/
+
+# Remove debug from binaries
+strip /build/php-modules/*.so
