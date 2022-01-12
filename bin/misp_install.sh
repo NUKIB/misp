@@ -7,6 +7,7 @@ set -o xtrace
 
 # PHP custom build extensions configuration
 echo 'extension = brotli.so' > /etc/php.d/40-brotli.ini
+echo 'extension = zstd.so' > /etc/php.d/40-zstd.ini
 echo 'extension = igbinary.so' > /etc/php.d/40-igbinary.ini
 echo 'extension = ssdeep.so' > /etc/php.d/40-ssdeep.ini
 echo "extension = redis.so
