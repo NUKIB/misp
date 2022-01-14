@@ -134,6 +134,7 @@ $config = array (
   array (
     'force_https' => {{ 'true' if MISP_BASEURL.startswith('https://') else 'false' }},
     'csp_enforce' => true,
+    'require_password_confirmation' => true,
     'syslog' => true,
     'syslog_to_stderr' => false,
     'syslog_ident' => 'misp-audit',
