@@ -7,24 +7,18 @@ COPY epel/RPM-GPG-KEY-EPEL-8 /etc/pki/rpm-gpg/
 
 # Some packages requires building, so use different stage for that
 FROM base as builder
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc ssdeep-devel unzip make && \
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc unzip make && \
     useradd --create-home --system --user-group build
 # Build su-exec
 COPY su-exec.c /tmp/
 RUN gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c && \
     chmod u+x /usr/local/bin/su-exec
 
-# Build Python packages
-FROM builder as python-build
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False python39-devel python39-pip python39-wheel && \
-    su-exec build pip3 wheel pydeep -w /tmp/wheels && \
-    dnf history undo -y 0
-
 # Build PHP extensions that are not included in packages
 FROM builder as php-build
 COPY bin/misp_compile_php_extensions.sh /build/
 RUN --mount=type=tmpfs,target=/tmp dnf module enable -y php:7.4 && \
-    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file libzstd-devel && \
+    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file libzstd-devel ssdeep-devel && \
     chmod u+x /build/misp_compile_php_extensions.sh && \
     /build/misp_compile_php_extensions.sh && \
     dnf history undo -y 0
@@ -48,7 +42,6 @@ RUN dnf module -y enable mod_auth_openidc php:7.4 python39 && \
     rm -rf /var/cache/dnf /tmp/packages
 
 COPY --from=builder /usr/local/bin/su-exec /usr/local/bin/
-COPY --from=python-build /tmp/wheels /wheels
 COPY --from=php-build /build/php-modules/* /usr/lib64/php/modules/
 COPY --from=jobber-build /build/jobber*.rpm /tmp
 COPY bin/ /usr/local/bin/
@@ -64,7 +57,6 @@ ARG MISP_VERSION=develop
 ENV MISP_VERSION $MISP_VERSION
 
 RUN rpm -i /tmp/jobber*.rpm && \
-    pip3 install --disable-pip-version-check /wheels/* && \
     chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
     /usr/local/bin/misp_install.sh
 COPY Config/* /var/www/MISP/app/Config/
