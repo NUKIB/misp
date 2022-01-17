@@ -20,22 +20,18 @@ Both machines can be any system that is supported by Docker, so Windows, macOS, 
 
   `docker compose pull`
 
-* Export all images to files:
-    * `docker save -o mariadb.tar mariadb:10.7`
-    * `docker save -o redis.tar redis:6.2`
-    * `docker save -o misp-modules.tar ghcr.io/nukib/misp-modules:latest`
-    * `docker save -o misp.tar ghcr.io/nukib/misp:latest`
+* Export all images to `misp.tar` file:
+  
+  `docker save -o misp.tar mariadb:10.7 redis:6.2 ghcr.io/nukib/misp-modules:latest ghcr.io/nukib/misp:latest`
 
-* Transfer whole directory (tar files and `docker-compose.yml` file) to air gapped system
+* Transfer whole directory (`misp.tar` and `docker-compose.yml` files) to air gapped system
 
 ### On a machine without internet connection
 
 * [Install Docker](https://docs.docker.com/get-docker/)
-* In a working directory transferred from previous machine, import images
-    * `docker load -i mariadb.tar`
-    * `docker load -i redis.tar`
-    * `docker load -i misp-modules.tar`
-    * `docker load -i misp.tar`
+* In a working directory transferred from previous machine, import images:
+    
+  `docker load -i misp.tar`
 * Start all containers:
 
   `docker compose up -d`
