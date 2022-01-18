@@ -16,7 +16,7 @@ mkdir /build/php-modules/
 # Compile igbinary
 mkdir /tmp/igbinary
 cd /tmp/igbinary
-download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.6.tar.gz 87cf65d8a003a3f972c0da08f9aec65b2bf3cb0dc8ac8b8cbd9524d581661250
+download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.7.tar.gz 21863908348f90a8a895c8e92e0ec83c9cf9faffcfd70118b06fe2dca30eaa96
 phpize
 ./configure --silent CFLAGS="-O2 -g" --enable-igbinary
 make -j2
