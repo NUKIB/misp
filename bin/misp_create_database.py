@@ -11,22 +11,24 @@ from pymysql.connections import Connection
 from typing import Optional
 
 
-def connect(host: str, user: str, password: Optional[str]) -> pymysql.connections.Connection:
-    connection = pymysql.connect(host=host, user=user, password=password, connect_timeout=1, client_flag=CLIENT.MULTI_STATEMENTS)
+def connect(host: str, port: int, user: str, password: Optional[str]) -> pymysql.connections.Connection:
+    connection = pymysql.connect(host=host, port=port, user=user, password=password, connect_timeout=1, client_flag=CLIENT.MULTI_STATEMENTS)
     connection.ping()
     return connection
 
 
-def wait_for_connection(host: str, user: str, password: Optional[str]) -> Connection:
+def wait_for_connection(host: str, port: int, user: str, password: Optional[str]) -> Connection:
+    logging.info(f"Connectiong to MySQL server {host}:{port}")
     last_exception = None
     for i in range(1, 10):
         try:
-            return connect(host, user, password)
+            return connect(host, port, user, password)
         except Exception as e:
-            last_exception = e
-            logging.info("Waiting for database connection...")
+            last_exception = e            
+            logging.info("Waiting for database connection...")            
+            logging.info(e)
             time.sleep(1)
-    logging.error("Could not connect to database")
+    logging.error(f"Could not connect to database server {host}:{port}")
     print(last_exception, file=sys.stderr)
     sys.exit(1)
 
@@ -48,6 +50,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("host")
+    parser.add_argument("port", type=int)
     parser.add_argument("user")
     parser.add_argument("database")
     parser.add_argument("schema_file", type=argparse.FileType("r"))
@@ -55,7 +58,7 @@ def main():
 
     password = os.environ.get("MYSQL_PASSWORD")
 
-    connection = wait_for_connection(args.host, args.user, password)
+    connection = wait_for_connection(args.host, args.port, args.user, password)
 
     if is_schema_created(connection, args.database):
         logging.info("Database schema is already created.")
