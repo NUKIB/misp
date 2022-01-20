@@ -23,7 +23,7 @@ optional_variables = (
     "MISP_MODULE_URL", "MISP_ATTACHMENT_SCAN_MODULE", "SECURITY_ADVANCED_AUTHKEYS", "SECURITY_HIDE_ORGS",
     "OIDC_DEFAULT_ORG", "SENTRY_ENVIRONMENT", "MISP_DEBUG", "SUPPORT_EMAIL", "PHP_SNUFFLEUPAGUS",
     "SECURITY_ENCRYPTION_KEY", "PHP_TIMEZONE", "PHP_MEMORY_LIMIT", "PHP_MAX_EXECUTION_TIME", "PHP_UPLOAD_MAX_FILESIZE",
-    "MYSQL_PORT",
+    "MYSQL_PORT", "SECURITY_CRYPTO_POLICY",
 )
 bool_variables = (
     "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
@@ -41,6 +41,7 @@ default_values = {
     "MYSQL_PORT": "3306",
     "SYSLOG_PORT": "601",
     "SYSLOG_PROTOCOL": "tcp",
+    "SECURITY_CRYPTO_POLICY": "DEFAULT:NO-SHA1",
 }
 
 
@@ -184,6 +185,11 @@ def generate_php_config(variables: dict):
     open("/etc/php.d/99-misp.ini", "w").write(template)
 
 
+def generate_crypto_policies(crypto_policy: Optional[str]):
+    if crypto_policy:
+        open("/etc/crypto-policies/config", "w").write(crypto_policy)
+
+
 def main():
     variables = collect()
 
@@ -234,6 +240,7 @@ def main():
     generate_rsyslog_config(variables["SYSLOG_TARGET"], variables["SYSLOG_PORT"], variables["SYSLOG_PROTOCOL"])
     generate_error_messages(variables["SUPPORT_EMAIL"])
     generate_php_config(variables)
+    generate_crypto_policies(variables["SECURITY_CRYPTO_POLICY"])
 
 
 if __name__ == "__main__":

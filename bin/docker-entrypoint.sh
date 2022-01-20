@@ -10,6 +10,8 @@ if [ "$1" = 'supervisord' ]; then
 
     misp_create_configs.py
 
+    update-crypto-policies
+
     # Make config files not readable by others
     chown root:apache /var/www/MISP/app/Config/{config.php,database.php,email.php}
     chmod 440 /var/www/MISP/app/Config/{config.php,database.php,email.php}
