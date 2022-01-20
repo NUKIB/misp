@@ -132,6 +132,7 @@ If you want to generate new PGP keys for email signing, you can do it by running
 * `SECURITY_ADVANCED_AUTHKEYS` (optional, boolean, default `false`) - enable advanced auth keys support
 * `SECURITY_HIDE_ORGS` (optional, boolean, default `false`) - hide org names for normal users
 * `SECURITY_ENCRYPTION_KEY` (optional, string) - encryption key with at least 32 chars that will be used to encrypt sensitive information stored in database
+* `SECURITY_CRYPTO_POLICY` (optional, string, default: `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8).
 
 ### Outgoing proxy
 
