@@ -120,7 +120,7 @@ $config = array (
   'Proxy' =>
   array (
     'host' => '{{ PROXY_HOST }}',
-    'port' => '{{ PROXY_PORT }}',
+    'port' => {{ PROXY_PORT if PROXY_PORT else null }},
     'method' => '{{ PROXY_METHOD }}',
     'user' => '{{ PROXY_USER }}',
     'password' => '{{ PROXY_PASSWORD }}',
