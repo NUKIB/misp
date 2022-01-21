@@ -42,10 +42,9 @@ $plugin['CustomAuth_custom_password_reset'] = "{{ OIDC_PASSWORD_RESET }}";
 $oidcAuth = NULL;
 {% endif %}
 
-$config = array (
+$config = [
   'debug' => {{ 1 if MISP_DEBUG else 0}},
-  'MISP' =>
-  array (
+  'MISP' => [
     'baseurl' => '{{ MISP_BASEURL }}',
     'org' => '{{ MISP_ORG }}',
     'showorg' => true,
@@ -54,9 +53,7 @@ $config = array (
     'log_new_audit' => true,
     'log_new_audit_compress' => true,
     'event_alert_metadata_only' => true,
-    {% if MISP_EMAIL_REPLY_TO %}
     'email_reply_to' => '{{ MISP_EMAIL_REPLY_TO }}',
-    {% endif %}
     'background_jobs' => true,
     'email' => '{{ MISP_EMAIL }}',
     'email_from_name' => '{{ MISP_ORG }} MISP',
@@ -92,7 +89,9 @@ $config = array (
     'disable_cached_exports' => true,
     'allow_disabling_correlation' => true,
     'system_setting_db' => true,
-  ),
+    {% if MISP_TERMS_FILE %}'terms_files' => '{{ MISP_TERMS_FILE }}',{% endif %}
+    {% if MISP_FOOTER_LOGO %}'footer_logo' => '{{ MISP_FOOTER_LOGO }}',{% endif %}
+  ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
     'redis_host' => '{{ REDIS_HOST }}',
@@ -104,37 +103,32 @@ $config = array (
     'supervisor_host' => 'unix:/run/supervisor/supervisor.sock',
     'supervisor_port' => 9001,
   ],
-  'GnuPG' =>
-  array (
+  'GnuPG' => [
     'onlyencrypted' => false,
     'email' => '{{ MISP_EMAIL }}',
     'homedir' => '/var/www/MISP/.gnupg',
     'password' => '{{ GNUPG_PRIVATE_KEY_PASSWORD }}',
     'bodyonlyencrypted' => {{ 'true' if GNUPG_BODY_ONLY_ENCRYPTED else 'false' }},
     'sign' => {{ 'true' if GNUPG_SIGN else 'false' }},
-  ),
-  'SMIME' =>
-  array (
+  ],
+  'SMIME' => [
     'enabled' => false,
-  ),
-  'Proxy' =>
-  array (
+  ],
+  'Proxy' => [
     'host' => '{{ PROXY_HOST }}',
     'port' => {{ PROXY_PORT if PROXY_PORT else null }},
     'method' => '{{ PROXY_METHOD }}',
     'user' => '{{ PROXY_USER }}',
     'password' => '{{ PROXY_PASSWORD }}',
-  ),
-  'SecureAuth' =>
-  array (
+  ],
+  'SecureAuth' => [
     'amount' => 5,
     'expire' => 300,
-  ),
-  'Security' =>
-  array (
+  ],
+  'Security' => [
     'force_https' => {{ 'true' if MISP_BASEURL.startswith('https://') else 'false' }},
     'csp_enforce' => true,
-    'min_tls_version' => 'tls1_2',
+    'min_tls_version' => 'tlsv1_2',
     'require_password_confirmation' => true,
     'syslog' => true,
     'syslog_to_stderr' => false,
@@ -153,10 +147,10 @@ $config = array (
     'hide_organisations_in_sharing_groups' => {{ 'true' if SECURITY_HIDE_ORGS else 'false' }},
     'advanced_authkeys' => {{ 'true' if SECURITY_ADVANCED_AUTHKEYS else 'false' }},
     {% if OIDC_LOGIN %}
-    'auth' => array('OidcAuth.Oidc'),
+    'auth' => ['OidcAuth.Oidc'],
     'auth_enforced' => true,
     {% endif %}
-  ),
+  ],
   'Session' => [
     'defaults' => 'php',
     'timeout' => 60,
@@ -167,7 +161,7 @@ $config = array (
   ],
   'Plugin' => $plugin,
   'OidcAuth' => $oidcAuth,
-);
+];
 
 {% if SENTRY_DSN %}
 // NUKIB custom variable

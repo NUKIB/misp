@@ -23,7 +23,7 @@ optional_variables = (
     "MISP_MODULE_URL", "MISP_ATTACHMENT_SCAN_MODULE", "SECURITY_ADVANCED_AUTHKEYS", "SECURITY_HIDE_ORGS",
     "OIDC_DEFAULT_ORG", "SENTRY_ENVIRONMENT", "MISP_DEBUG", "SUPPORT_EMAIL", "PHP_SNUFFLEUPAGUS",
     "SECURITY_ENCRYPTION_KEY", "PHP_TIMEZONE", "PHP_MEMORY_LIMIT", "PHP_MAX_EXECUTION_TIME", "PHP_UPLOAD_MAX_FILESIZE",
-    "MYSQL_PORT", "SECURITY_CRYPTO_POLICY",
+    "MYSQL_PORT", "SECURITY_CRYPTO_POLICY", "MISP_TERMS_FILE", "MISP_FOOTER_LOGO",
 )
 bool_variables = (
     "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
@@ -91,14 +91,14 @@ def convert_bool(variable_name: str, input_string: str) -> bool:
     error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, input_string))
 
 
-def generate_template(path: str, variables: dict):
-    template = Template(open(path, "r").read())
+def render_jinja_template(path: str, variables: dict):
+    template = Template(open(path, "r").read(), trim_blocks=True, lstrip_blocks=True)
     template = template.render(variables)
     open(path, "w").write(template)
 
 
 def generate_apache_config(variables: dict):
-    generate_template("/etc/httpd/conf.d/misp.conf", variables)
+    render_jinja_template("/etc/httpd/conf.d/misp.conf", variables)
 
 
 def generate_xdebug_config(enabled: bool, profiler_trigger: str):
@@ -166,7 +166,7 @@ action(type="omfwd" target="{syslog_target}" port="{syslog_port}" protocol="{sys
 
 def generate_error_messages(email: str):
     for path in glob.glob('/var/www/html/*.html'):
-        generate_template(path, {"SUPPORT_EMAIL": email})
+        render_jinja_template(path, {"SUPPORT_EMAIL": email})
 
 
 def generate_php_config(variables: dict):
@@ -231,7 +231,7 @@ def main():
 
     for template_name in ("database.php", "config.php", "email.php"):
         path = "/var/www/MISP/app/Config/{}".format(template_name)
-        generate_template(path, variables)
+        render_jinja_template(path, variables)
 
     generate_xdebug_config(variables["PHP_XDEBUG_ENABLED"], variables["PHP_XDEBUG_PROFILER_TRIGGER"])
     generate_snuffleupagus_config(variables['PHP_SNUFFLEUPAGUS'])
