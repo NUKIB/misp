@@ -6,11 +6,11 @@ $plugin = ['Sightings_policy' => 3];
 $plugin['ZeroMQ_enable'] = true;
 {% if ZEROMQ_USERNAME %}
 $plugin['ZeroMQ_username'] = '{{ ZEROMQ_USERNAME }}';
-$plugin['ZeroMQ_password'] = '{{ ZEROMQ_PASSWORD }}';
+$plugin['ZeroMQ_password'] = {{ ZEROMQ_PASSWORD | str }};
 {% endif %}
 $plugin['ZeroMQ_redis_host'] = '{{ REDIS_HOST }}';
 $plugin['ZeroMQ_redis_port'] = 6379;
-$plugin['ZeroMQ_redis_password'] = '{{ REDIS_PASSWORD }}';
+$plugin['ZeroMQ_redis_password'] = {{ REDIS_PASSWORD | str }};
 $plugin['ZeroMQ_redis_database'] = 10;
 {% endif %}
 
@@ -37,7 +37,7 @@ $oidcAuth = [
     'unblock' => true,
 ];
 $plugin['CustomAuth_custom_logout'] = "{{ MISP_BASEURL }}/oauth2callback?logout={{ MISP_BASEURL | urlencode }}";
-$plugin['CustomAuth_custom_password_reset'] = "{{ OIDC_PASSWORD_RESET }}";
+$plugin['CustomAuth_custom_password_reset'] = {{ OIDC_PASSWORD_RESET | str }};
 {% else %}
 $oidcAuth = NULL;
 {% endif %}
@@ -53,7 +53,7 @@ $config = [
     'log_new_audit' => true,
     'log_new_audit_compress' => true,
     'event_alert_metadata_only' => true,
-    'email_reply_to' => '{{ MISP_EMAIL_REPLY_TO }}',
+    'email_reply_to' => {{ MISP_EMAIL_REPLY_TO | str }},
     'background_jobs' => true,
     'email' => '{{ MISP_EMAIL }}',
     'email_from_name' => '{{ MISP_ORG }} MISP',
@@ -72,16 +72,16 @@ $config = [
     'redis_host' => '{{ REDIS_HOST }}',
     'redis_port' => 6379,
     'redis_database' => 13,
-    'redis_password' => '{{ REDIS_PASSWORD }}',
+    'redis_password' => {{ REDIS_PASSWORD | str }},
     'log_client_ip' => true,
     'language' => 'eng',
     'attachments_dir' => '/var/www/MISP/app/attachments',
     'live' => true,
     'title_text' => 'MISP {{ MISP_ORG }}',
     'ca_path' => '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem',
-    'disable_user_login_change' => {{ 'true' if OIDC_LOGIN else 'false' }},
-    'disable_user_password_change' => {{ 'true' if OIDC_LOGIN else 'false' }},
-    'disable_user_add' => {{ 'true' if OIDC_LOGIN else 'false' }},
+    'disable_user_login_change' => {{ OIDC_LOGIN | bool }},
+    'disable_user_password_change' => {{ OIDC_LOGIN | bool }},
+    'disable_user_add' => {{ OIDC_LOGIN | bool }},
     'download_gpg_from_homedir' => true,
     'enable_advanced_correlations' => true,
     'log_user_ips' => true,
@@ -89,14 +89,14 @@ $config = [
     'disable_cached_exports' => true,
     'allow_disabling_correlation' => true,
     'system_setting_db' => true,
-    {% if MISP_TERMS_FILE %}'terms_files' => '{{ MISP_TERMS_FILE }}',{% endif %}
-    {% if MISP_FOOTER_LOGO %}'footer_logo' => '{{ MISP_FOOTER_LOGO }}',{% endif %}
+    'terms_files' => {{ MISP_TERMS_FILE | str }},
+    'footer_logo' => {{ MISP_FOOTER_LOGO | str }},
   ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
     'redis_host' => '{{ REDIS_HOST }}',
     'redis_port' => 6379,
-    'redis_password' => '{{ REDIS_PASSWORD }}',
+    'redis_password' => {{ REDIS_PASSWORD | str }},
     'redis_database' => 11,
     'redis_namespace' => 'background_jobs',
     'max_job_history_ttl' => 86400,
@@ -107,20 +107,22 @@ $config = [
     'onlyencrypted' => false,
     'email' => '{{ MISP_EMAIL }}',
     'homedir' => '/var/www/MISP/.gnupg',
-    'password' => '{{ GNUPG_PRIVATE_KEY_PASSWORD }}',
-    'bodyonlyencrypted' => {{ 'true' if GNUPG_BODY_ONLY_ENCRYPTED else 'false' }},
-    'sign' => {{ 'true' if GNUPG_SIGN else 'false' }},
+    'password' => {{ GNUPG_PRIVATE_KEY_PASSWORD | str }},
+    'bodyonlyencrypted' => {{ GNUPG_BODY_ONLY_ENCRYPTED | bool }},
+    'sign' => {{ GNUPG_SIGN | bool }},
   ],
   'SMIME' => [
     'enabled' => false,
   ],
+  {% if PROXY_HOST %}
   'Proxy' => [
-    'host' => '{{ PROXY_HOST }}',
+    'host' => {{ PROXY_HOST | str }},
     'port' => {{ PROXY_PORT if PROXY_PORT else null }},
-    'method' => '{{ PROXY_METHOD }}',
-    'user' => '{{ PROXY_USER }}',
-    'password' => '{{ PROXY_PASSWORD }}',
+    'method' => {{ PROXY_METHOD | str }},
+    'user' => {{ PROXY_USER | str }},
+    'password' => {{ PROXY_PASSWORD | str }},
   ],
+  {% endif %}
   'SecureAuth' => [
     'amount' => 5,
     'expire' => 300,
@@ -135,7 +137,7 @@ $config = [
     'syslog_ident' => 'misp-audit',
     'level' => 'medium',
     'salt' => '{{ SECURITY_SALT }}',
-    'encryption_key' => '{{ SECURITY_ENCRYPTION_KEY }}',
+    'encryption_key' => {{ SECURITY_ENCRYPTION_KEY | str }},
     'authkey_keep_session' => true,
     'do_not_log_authkeys' => true,
     'disable_browser_cache' => true,
@@ -143,9 +145,9 @@ $config = [
     'rest_client_baseurl' => 'http://localhost',
     'advanced_authkeys_validity' => 547,
     'user_monitoring_enabled' => true,
-    'hide_organisation_index_from_users' => {{ 'true' if SECURITY_HIDE_ORGS else 'false' }},
-    'hide_organisations_in_sharing_groups' => {{ 'true' if SECURITY_HIDE_ORGS else 'false' }},
-    'advanced_authkeys' => {{ 'true' if SECURITY_ADVANCED_AUTHKEYS else 'false' }},
+    'hide_organisation_index_from_users' => {{ SECURITY_HIDE_ORGS | bool }},
+    'hide_organisations_in_sharing_groups' => {{ SECURITY_HIDE_ORGS | bool }},
+    'advanced_authkeys' => {{ SECURITY_ADVANCED_AUTHKEYS | bool }},
     {% if OIDC_LOGIN %}
     'auth' => ['OidcAuth.Oidc'],
     'auth_enforced' => true,

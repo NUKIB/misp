@@ -4,11 +4,11 @@ class EmailConfig
 {
     public $default = [
         'transport' => 'Smtp',
-        'host' => '{{ SMTP_HOST }}',
+        'host' => {{ SMTP_HOST | str }},
         'port' => 25,
         'timeout' => 30,
-        'username' => '{{ SMTP_USERNAME }}',
-        'password' => '{{ SMTP_PASSWORD }}',
+        'username' => {{ SMTP_USERNAME | str }},
+        'password' => {{ SMTP_PASSWORD | str }},
         'client' => null,
         'log' => false,
         'tls' => true,
