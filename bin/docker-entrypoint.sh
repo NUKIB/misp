@@ -2,10 +2,6 @@
 # Copyright (C) 2022 National Cyber and Information Security Agency of the Czech Republic
 set -e
 
-if [ -z $MYSQL_PORT ]; then
-    MYSQL_PORT=3306
-fi
-
 if [ "$1" = 'supervisord' ]; then
     echo "======================================"
     echo "MISP $MISP_VERSION container image provided by National Cyber and Information Security Agency of the Czech Republic"
@@ -33,7 +29,7 @@ if [ "$1" = 'supervisord' ]; then
     php-fpm --test
 
     # Create database schema
-    su-exec apache misp_create_database.py $MYSQL_HOST $MYSQL_PORT $MYSQL_LOGIN $MYSQL_DATABASE /var/www/MISP/INSTALL/MYSQL.sql
+    su-exec apache misp_create_database.py $MYSQL_HOST $MYSQL_LOGIN $MYSQL_DATABASE /var/www/MISP/INSTALL/MYSQL.sql
 
     # Update database to latest version
     su-exec apache /var/www/MISP/app/Console/cake Admin runUpdates || true

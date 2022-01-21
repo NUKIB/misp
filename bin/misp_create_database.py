@@ -50,15 +50,19 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("host")
-    parser.add_argument("port", type=int)
     parser.add_argument("user")
     parser.add_argument("database")
     parser.add_argument("schema_file", type=argparse.FileType("r"))
     args = parser.parse_args()
 
     password = os.environ.get("MYSQL_PASSWORD")
+    port = os.environ.get("MYSQL_PORT")
+    if port is not None:
+        port = int(port)
+    else:
+        port = 3306
 
-    connection = wait_for_connection(args.host, args.port, args.user, password)
+    connection = wait_for_connection(args.host, port, args.user, password)
 
     if is_schema_created(connection, args.database):
         logging.info("Database schema is already created.")
