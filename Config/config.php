@@ -134,6 +134,7 @@ $config = array (
   array (
     'force_https' => {{ 'true' if MISP_BASEURL.startswith('https://') else 'false' }},
     'csp_enforce' => true,
+    'min_tls_version' => 'tls1_2',
     'require_password_confirmation' => true,
     'syslog' => true,
     'syslog_to_stderr' => false,
