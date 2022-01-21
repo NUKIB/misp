@@ -7,7 +7,7 @@ import glob
 import uuid
 from urllib.parse import urlparse
 from typing import Optional
-from jinja2 import Template
+from jinja2 import Environment
 
 required_variables = (
     "MYSQL_HOST", "MYSQL_LOGIN", "MYSQL_DATABASE", "MISP_BASEURL", "SECURITY_SALT", "REDIS_HOST",
@@ -45,6 +45,17 @@ default_values = {
 }
 
 
+def str_filter(value: Optional[str]) -> str:
+    if value is None:
+        return 'null'
+    return "'" + value.replace("'", "\\'") + "'"
+
+
+jinja_env = Environment(trim_blocks=True, lstrip_blocks=True)
+jinja_env.filters["str"] = str_filter
+jinja_env.filters["bool"] = lambda x: 'true' if x else 'false'
+
+
 def error(message: str):
     print("ERROR: " + message, file=sys.stderr)
     sys.exit(1)
@@ -63,7 +74,7 @@ def collect() -> dict:
         if variable in os.environ:
             variables[variable] = os.environ.get(variable)
         else:
-            variables[variable] = default_values[variable] if variable in default_values else ""
+            variables[variable] = default_values[variable] if variable in default_values else None
 
     for bool_variable in bool_variables:
         variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
@@ -74,25 +85,30 @@ def collect() -> dict:
     return variables
 
 
-def convert_int(variable_name: str, input_string: str) -> int:
+def convert_int(variable_name: str, value: Optional[str]) -> Optional[int]:
+    if value is None:
+        return None
     try:
-        return int(input_string)
+        return int(value)
     except ValueError:
-        error("Environment variable '{}' must be integer, `{}` given".format(variable_name, input_string))
+        error("Environment variable '{}' must be integer, `{}` given".format(variable_name, value))
 
 
-def convert_bool(variable_name: str, input_string: str) -> bool:
-    value = input_string.lower()
+def convert_bool(variable_name: str, value: Optional[str]) -> bool:
+    if value is None:
+        return False
+
+    value = value.lower()
     if value in ("true", "1", "yes", "on"):
         return True
     if value in ("false", "0", "no", "off", ""):
         return False
 
-    error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, input_string))
+    error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, value))
 
 
 def render_jinja_template(path: str, variables: dict):
-    template = Template(open(path, "r").read(), trim_blocks=True, lstrip_blocks=True)
+    template = jinja_env.from_string(open(path, "r").read())
     template = template.render(variables)
     open(path, "w").write(template)
 
@@ -197,7 +213,7 @@ def main():
     if baseurl.scheme not in ("http", "https"):
         error("Environment variable 'MISP_BASEURL' must start with 'http://' or 'https://'")
 
-    if baseurl.netloc == "":
+    if not baseurl.netloc:
         error("Environment variable 'MISP_BASEURL' must be valid URL")
 
     variables["SERVER_NAME"] = baseurl.netloc
@@ -209,7 +225,7 @@ def main():
         print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long", file=sys.stderr)
 
     # if security cookie name is not set, generate it by using SECURITY_SALT and MISP_UUID, so it will survive container restart
-    if len(variables["SECURITY_COOKIE_NAME"]) == 0:
+    if not variables["SECURITY_COOKIE_NAME"]:
         uniq = hashlib.sha256("{}|{}".format(variables["SECURITY_SALT"], variables["MISP_UUID"]).encode()).hexdigest()
         variables["SECURITY_COOKIE_NAME"] = "MISP-session-{}".format(uniq[0:5])
 
@@ -221,12 +237,12 @@ def main():
     variables["MISP_UUID"] = variables["MISP_UUID"].lower()
 
     for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER"):
-        if variables[var] == "":
+        if not variables[var]:
             variables[var] = variables[var.replace("_INNER", "")]
 
     if variables["OIDC_LOGIN"]:
         for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):
-            if variables[var] == "":
+            if not variables[var]:
                 error("OIDC login is enabled, but '{}' environment variable is not set".format(var))
 
     for template_name in ("database.php", "config.php", "email.php"):

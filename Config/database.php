@@ -7,7 +7,7 @@ class DATABASE_CONFIG {
         'host' => '{{ MYSQL_HOST }}',
         'login' => '{{ MYSQL_LOGIN }}',
         'port' => {{ MYSQL_PORT }},
-        'password' => '{{ MYSQL_PASSWORD }}',
+        'password' => {{ MYSQL_PASSWORD | str }},
         'database' => '{{ MYSQL_DATABASE }}',
         'prefix' => '',
         'encoding' => 'utf8',
