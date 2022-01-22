@@ -1,3 +1,27 @@
+#!/usr/bin/env bash
+# Copyright (C) 2022 National Cyber and Information Security Agency of the Czech Republic
+# RHEL ubi image doesn't contain epel-release package, so this script will create required files
+# Also if base image already contains `/etc/yum.repos.d/epel.repo` file, it will not overwrite the files
+set -e
+
+if [ -f "/etc/yum.repos.d/epel.repo" ]; then
+    echo "epel repository is already enabled." >&2
+    exit
+fi
+
+cat >/etc/yum.repos.d/epel.repo <<'EOL'
+[epel]
+name=Extra Packages for Enterprise Linux $releasever - $basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place its address here.
+#baseurl=https://download.example/pub/epel/$releasever/Everything/$basearch
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-$releasever&arch=$basearch&infra=$infra&content=$contentdir
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+EOL
+
+cat >/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8 <<'EOL'
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQINBFz3zvsBEADJOIIWllGudxnpvJnkxQz2CtoWI7godVnoclrdl83kVjqSQp+2
@@ -26,3 +50,4 @@ n7L7y5LhJ8HOCMsY/Z7/7HUs+t/A1MI4g7Q5g5UuSZdgi0zxukiWuCkLeAiAP4y7
 zKK4OjJ644NDcWCHa36znwVmkz3ixL8Q0auR15Oqq2BjR/fyog==
 =84m8
 -----END PGP PUBLIC KEY BLOCK-----
+EOL

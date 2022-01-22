@@ -1,9 +1,6 @@
 # Base image
 ARG BASE_IMAGE=quay.io/centos/centos:stream8
 FROM $BASE_IMAGE as base
-# RHEL ubi image doesn't contain epel-release package
-COPY epel/epel.repo /etc/yum.repos.d/
-COPY epel/RPM-GPG-KEY-EPEL-8 /etc/pki/rpm-gpg/
 
 # Some packages requires building, so use different stage for that
 FROM base as builder
@@ -16,11 +13,11 @@ RUN gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c && \
 
 # Build PHP extensions that are not included in packages
 FROM builder as php-build
-COPY bin/misp_compile_php_extensions.sh /build/
+COPY bin/misp_compile_php_extensions.sh bin/misp_enable_epel.sh /build/
 RUN --mount=type=tmpfs,target=/tmp dnf module enable -y php:7.4 && \
+    bash /build/misp_enable_epel.sh && \
     dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file libzstd-devel ssdeep-devel && \
-    chmod u+x /build/misp_compile_php_extensions.sh && \
-    /build/misp_compile_php_extensions.sh && \
+    bash /build/misp_compile_php_extensions.sh && \
     dnf history undo -y 0
 
 # Build jobber, that is not released for arm64 arch
@@ -35,7 +32,9 @@ FROM base as misp
 # Install required system and Python packages
 COPY packages /tmp/packages
 COPY requirements.txt /tmp/
-RUN dnf module -y enable mod_auth_openidc php:7.4 python39 && \
+COPY bin/misp_enable_epel.sh /tmp/
+RUN bash /tmp/misp_enable_epel.sh && \
+    dnf module -y enable mod_auth_openidc php:7.4 python39 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.9 && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
