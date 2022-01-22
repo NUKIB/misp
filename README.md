@@ -47,7 +47,7 @@ For production usage, please:
 
 ### Usage in air-gapped environment
 
-MISP by default does not require access to Internet. So it is possible to use MISP in air-gapped environment or an environment with blocked outgoing connections. Check [AIR-GAP.md](AIR-GAP.md) for more information.
+MISP by default does not require access to Internet. So it is possible to use MISP in air-gapped environment or an environment with blocked outgoing connections. Check [AIR-GAP.md](docs/AIR-GAP.md) for more information.
 
 ### Image building
 
@@ -106,8 +106,8 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `MISP_HOST_ORG_ID` (optional, int, default `1`) - MISP default organisation ID
 * `MISP_MODULE_URL` (optional, string) - full URL to MISP modules
 * `MISP_DEBUG` (optional, boolean, default `false`) - enable debug mode (do not enable on production environment)
-* `MISP_TERMS_FILE` (optional, string) - filename from `/var/www/MISP/app/files/terms/` directory
-* `MISP_FOOTER_LOGO` (optional, string) - filename from `/var/www/MISP/app/webroot/img/custom/` directory
+
+[Check more variables that allows MISP customisation.](docs/CUSTOMISATION.md)
 
 ### Email setting
 
