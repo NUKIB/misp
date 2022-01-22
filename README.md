@@ -134,14 +134,14 @@ If you want to generate new PGP keys for email signing, you can do it by running
 * `SECURITY_ADVANCED_AUTHKEYS` (optional, boolean, default `false`) - enable advanced auth keys support
 * `SECURITY_HIDE_ORGS` (optional, boolean, default `false`) - hide org names for normal users
 * `SECURITY_ENCRYPTION_KEY` (optional, string) - encryption key with at least 32 chars that will be used to encrypt sensitive information stored in database
-* `SECURITY_CRYPTO_POLICY` (optional, string, default: `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8).
+* `SECURITY_CRYPTO_POLICY` (optional, string, default `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8). Use empty string to keep container default value.
 
 ### Outgoing proxy
 
 For pulling events from another MISP or fetching feeds MISP requires access to Internet. Set these variables to use HTTP proxy for outgoing connections from MISP.
 
 * `PROXY_HOST` (optional, string) - The hostname of an HTTP proxy for outgoing sync requests. Leave empty to not use a proxy.
-* `PROXY_PORT` (optional, int) - The TCP port for the HTTP proxy.
+* `PROXY_PORT` (optional, int, default `3128`) - The TCP port for the HTTP proxy.
 * `PROXY_METHOD` (optional, string) - The authentication method for the HTTP proxy. Currently, supported are Basic or Digest. Leave empty for no proxy authentication.
 * `PROXY_USER` (optional, string) - The authentication username for the HTTP proxy.
 * `PROXY_PASSWORD` (optional, string) - The authentication password for the HTTP proxy.
@@ -153,7 +153,7 @@ That means that unauthenticated users will stop right on Apache.
 
 If a request to MISP is made with  `Authorization` header, that contains an authentication key in MISP format, OIDC is not used. Instead, Apache checks if a key is valid.
 
-* `OIDC_LOGIN` (optional, bool, default `false`)
+* `OIDC_LOGIN` (optional, bool, default `false`) - set to `true` to enable OIDC login
 * `OIDC_PROVIDER` (optional, string) - URL for OIDC provider in Apache
 * `OIDC_CLIENT_ID` (optional, string)
 * `OIDC_CLIENT_SECRET` (optional, string)
