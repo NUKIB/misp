@@ -7,7 +7,7 @@ COPY epel/RPM-GPG-KEY-EPEL-8 /etc/pki/rpm-gpg/
 
 # Some packages requires building, so use different stage for that
 FROM base as builder
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc unzip make && \
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc make && \
     useradd --create-home --system --user-group build
 # Build su-exec
 COPY su-exec.c /tmp/
