@@ -90,7 +90,9 @@ $config = [
     'allow_disabling_correlation' => true,
     'system_setting_db' => true,
     'terms_files' => {{ MISP_TERMS_FILE | str }},
+    'home_logo' => {{ MISP_HOME_LOGO | str }},
     'footer_logo' => {{ MISP_FOOTER_LOGO | str }},
+    'custom_css' => {{ MISP_CUSTOM_CSS | str }},
   ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
