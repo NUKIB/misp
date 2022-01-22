@@ -14,7 +14,8 @@ RUN gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c && \
 # Build PHP extensions that are not included in packages
 FROM builder as php-build
 COPY bin/misp_compile_php_extensions.sh bin/misp_enable_epel.sh /build/
-RUN --mount=type=tmpfs,target=/tmp dnf module enable -y php:7.4 && \
+RUN --mount=type=tmpfs,target=/tmp \
+    dnf module enable -y php:7.4 && \
     bash /build/misp_enable_epel.sh && \
     dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file libzstd-devel ssdeep-devel && \
     bash /build/misp_compile_php_extensions.sh && \
@@ -23,8 +24,7 @@ RUN --mount=type=tmpfs,target=/tmp dnf module enable -y php:7.4 && \
 # Build jobber, that is not released for arm64 arch
 FROM builder as jobber-build
 COPY bin/misp_compile_jobber.sh /build/
-RUN --mount=type=tmpfs,target=/tmp chmod u+x /build/misp_compile_jobber.sh && \
-    /build/misp_compile_jobber.sh
+RUN --mount=type=tmpfs,target=/tmp bash /build/misp_compile_jobber.sh
 
 # MISP image
 FROM base as misp
@@ -32,8 +32,8 @@ FROM base as misp
 # Install required system and Python packages
 COPY packages /tmp/packages
 COPY requirements.txt /tmp/
-COPY bin/misp_enable_epel.sh /tmp/
-RUN bash /tmp/misp_enable_epel.sh && \
+COPY bin/misp_enable_epel.sh /usr/local/bin/
+RUN bash /usr/local/bin/misp_enable_epel.sh && \
     dnf module -y enable mod_auth_openidc php:7.4 python39 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.9 && \
