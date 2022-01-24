@@ -159,7 +159,7 @@ If a request to MISP is made with  `Authorization` header, that contains an auth
 * `OIDC_CLIENT_SECRET` (optional, string)
 * `OIDC_PASSWORD_RESET` (optional, string) - URL to password reset page
 * `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
-* `OIDC_DEFAULT_ORG` (optional, bool, default `false`) - for new user without use `MISP_ORG`
+* `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for new user that don't have organisation name in `organization` claim. If not provided `MISP_ORG` will be used.
 
 #### Inner
 

@@ -33,7 +33,7 @@ $oidcAuth = [
         'misp-api-access' => 'User with API access',
         'misp-access' => 3, // User
     ],
-    'default_org' => '{{ MISP_ORG if OIDC_DEFAULT_ORG else null }}',
+    'default_org' => '{{ OIDC_DEFAULT_ORG if OIDC_DEFAULT_ORG else MISP_ORG }}',
     'unblock' => true,
 ];
 $plugin['CustomAuth_custom_logout'] = "{{ MISP_BASEURL }}/oauth2callback?logout={{ MISP_BASEURL | urlencode }}";
