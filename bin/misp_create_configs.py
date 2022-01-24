@@ -116,6 +116,11 @@ def convert_bool(variable_name: str, value: Optional[str]) -> bool:
     error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, value))
 
 
+def check_is_url(variable_name: str, value: Optional[str]):
+    if value and not (value.startswith("http://") or value.startswith("https://")):
+        error("Environment variable '{}' must start with 'http://' or 'https://'".format(variable_name))
+
+
 def render_jinja_template(path: str, variables: dict):
     template = jinja_env.from_string(open(path, "r").read())
     template = template.render(variables)
@@ -230,8 +235,7 @@ def main():
 
     variables["SERVER_NAME"] = baseurl.netloc
 
-    if variables["MISP_MODULE_URL"] and not (variables["MISP_MODULE_URL"].startswith("http://") or variables["MISP_MODULE_URL"].startswith("https://")):
-        error("Environment variable 'MISP_MODULE_URL' must start with 'http://' or 'https://'")
+    check_is_url("MISP_MODULE_URL", variables["MISP_MODULE_URL"])
 
     if len(variables["SECURITY_SALT"]) < 32:
         print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long", file=sys.stderr)
@@ -256,6 +260,8 @@ def main():
         for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):
             if not variables[var]:
                 error("OIDC login is enabled, but '{}' environment variable is not set".format(var))
+        check_is_url("OIDC_PROVIDER", variables["OIDC_PROVIDER"])
+        check_is_url("OIDC_PROVIDER_INNER", variables["OIDC_PROVIDER_INNER"])
 
     for template_name in ("database.php", "config.php", "email.php"):
         path = "/var/www/MISP/app/Config/{}".format(template_name)
