@@ -25,6 +25,7 @@ $oidcAuth = [
     'provider_url' => '{{ OIDC_PROVIDER_INNER }}',
     'client_id' => '{{ OIDC_CLIENT_ID_INNER }}',
     'client_secret' => '{{ OIDC_CLIENT_SECRET_INNER }}',
+    'authentication_method' => {{ OIDC_AUTHENTICATION_METHOD_INNER | str }},
     'role_mapper' => [
         'misp-admin-access' => 1, // Admin
         'misp-org-admin-access' => 2, // Org Admin

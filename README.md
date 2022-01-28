@@ -157,6 +157,7 @@ If a request to MISP is made with  `Authorization` header, that contains an auth
 * `OIDC_PROVIDER` (optional, string) - URL for OIDC provider in Apache
 * `OIDC_CLIENT_ID` (optional, string)
 * `OIDC_CLIENT_SECRET` (optional, string)
+* `OIDC_AUTHENTICATION_METHOD` (optional, string, default `client_secret_basic`) - should be set to `client_secret_jwt` if remote server supports that method, because it is more secure
 * `OIDC_PASSWORD_RESET` (optional, string) - URL to password reset page
 * `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
 * `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for new user that don't have organisation name in `organization` claim. If not provided `MISP_ORG` will be used.
@@ -165,9 +166,10 @@ If a request to MISP is made with  `Authorization` header, that contains an auth
 
 You can use a different provider for authentication in MISP. If you don't provide these variables, they will be set to the same as for Apache.
 
-* `OIDC_PROVIDER_INNER` (optional, string) - URL for OIDC provider in MISP
-* `OIDC_CLIENT_ID_INNER` (optional, string)
-* `OIDC_CLIENT_SECRET_INNER` (optional, string)
+* `OIDC_PROVIDER_INNER` (optional, string, default value from `OIDC_PROVIDER`) - URL for OIDC provider in MISP
+* `OIDC_CLIENT_ID_INNER` (optional, string, default value from `OIDC_CLIENT_ID`)
+* `OIDC_CLIENT_SECRET_INNER` (optional, string, default value from `OIDC_CLIENT_SECRET`)
+* `OIDC_AUTHENTICATION_METHOD_INNER` (optional, string, default value from `OIDC_AUTHENTICATION_METHOD`)
 
 ### Sentry
 
