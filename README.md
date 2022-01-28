@@ -19,6 +19,8 @@ to update MISP from the user interface and instead, an admin should download a n
 ## Usage
 
 First, you have to install Docker. Follow [these manuals](https://docs.docker.com/engine/install/) how to install Docker on your machine. Windows, macOS, or Linux are supported.
+For Linux, you also need to install [Docker Compose V2](https://docs.docker.com/compose/cli-command/), on macOS or Windows is already included in Docker itself.
+Or you can use Docker Compose V1, but then you have to use all commands with a dash (so `docker-compose` instead of `docker compose`). 
 
 ### Usage for testing
 
