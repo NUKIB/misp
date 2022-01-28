@@ -7,7 +7,7 @@ import glob
 import uuid
 from urllib.parse import urlparse
 from typing import Optional
-from jinja2 import Template
+from jinja2 import Environment
 
 required_variables = (
     "MYSQL_HOST", "MYSQL_LOGIN", "MYSQL_DATABASE", "MISP_BASEURL", "SECURITY_SALT", "REDIS_HOST",
@@ -23,7 +23,7 @@ optional_variables = (
     "MISP_MODULE_URL", "MISP_ATTACHMENT_SCAN_MODULE", "SECURITY_ADVANCED_AUTHKEYS", "SECURITY_HIDE_ORGS",
     "OIDC_DEFAULT_ORG", "SENTRY_ENVIRONMENT", "MISP_DEBUG", "SUPPORT_EMAIL", "PHP_SNUFFLEUPAGUS",
     "SECURITY_ENCRYPTION_KEY", "PHP_TIMEZONE", "PHP_MEMORY_LIMIT", "PHP_MAX_EXECUTION_TIME", "PHP_UPLOAD_MAX_FILESIZE",
-    "MYSQL_PORT",
+    "MYSQL_PORT", "SECURITY_CRYPTO_POLICY", "MISP_TERMS_FILE", "MISP_FOOTER_LOGO",
 )
 bool_variables = (
     "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
@@ -41,7 +41,19 @@ default_values = {
     "MYSQL_PORT": "3306",
     "SYSLOG_PORT": "601",
     "SYSLOG_PROTOCOL": "tcp",
+    "SECURITY_CRYPTO_POLICY": "DEFAULT:NO-SHA1",
 }
+
+
+def str_filter(value: Optional[str]) -> str:
+    if value is None:
+        return 'null'
+    return "'" + value.replace("'", "\\'") + "'"
+
+
+jinja_env = Environment(trim_blocks=True, lstrip_blocks=True)
+jinja_env.filters["str"] = str_filter
+jinja_env.filters["bool"] = lambda x: 'true' if x else 'false'
 
 
 def error(message: str):
@@ -62,42 +74,47 @@ def collect() -> dict:
         if variable in os.environ:
             variables[variable] = os.environ.get(variable)
         else:
-            variables[variable] = default_values[variable] if variable in default_values else ""
+            variables[variable] = default_values[variable] if variable in default_values else None
 
     for bool_variable in bool_variables:
         variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
 
-    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT"):
+    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT", "PROXY_PORT"):
         variables[int_variable] = convert_int(int_variable, variables[int_variable])
 
     return variables
 
 
-def convert_int(variable_name: str, input_string: str) -> int:
+def convert_int(variable_name: str, value: Optional[str]) -> Optional[int]:
+    if value is None:
+        return None
     try:
-        return int(input_string)
+        return int(value)
     except ValueError:
-        error("Environment variable '{}' must be integer, `{}` given".format(variable_name, input_string))
+        error("Environment variable '{}' must be integer, `{}` given".format(variable_name, value))
 
 
-def convert_bool(variable_name: str, input_string: str) -> bool:
-    value = input_string.lower()
+def convert_bool(variable_name: str, value: Optional[str]) -> bool:
+    if value is None:
+        return False
+
+    value = value.lower()
     if value in ("true", "1", "yes", "on"):
         return True
     if value in ("false", "0", "no", "off", ""):
         return False
 
-    error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, input_string))
+    error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, value))
 
 
-def generate_template(path: str, variables: dict):
-    template = Template(open(path, "r").read())
+def render_jinja_template(path: str, variables: dict):
+    template = jinja_env.from_string(open(path, "r").read())
     template = template.render(variables)
     open(path, "w").write(template)
 
 
 def generate_apache_config(variables: dict):
-    generate_template("/etc/httpd/conf.d/misp.conf", variables)
+    render_jinja_template("/etc/httpd/conf.d/misp.conf", variables)
 
 
 def generate_xdebug_config(enabled: bool, profiler_trigger: str):
@@ -165,7 +182,7 @@ action(type="omfwd" target="{syslog_target}" port="{syslog_port}" protocol="{sys
 
 def generate_error_messages(email: str):
     for path in glob.glob('/var/www/html/*.html'):
-        generate_template(path, {"SUPPORT_EMAIL": email})
+        render_jinja_template(path, {"SUPPORT_EMAIL": email})
 
 
 def generate_php_config(variables: dict):
@@ -184,6 +201,11 @@ def generate_php_config(variables: dict):
     open("/etc/php.d/99-misp.ini", "w").write(template)
 
 
+def generate_crypto_policies(crypto_policy: Optional[str]):
+    if crypto_policy:
+        open("/etc/crypto-policies/config", "w").write(crypto_policy)
+
+
 def main():
     variables = collect()
 
@@ -191,7 +213,7 @@ def main():
     if baseurl.scheme not in ("http", "https"):
         error("Environment variable 'MISP_BASEURL' must start with 'http://' or 'https://'")
 
-    if baseurl.netloc == "":
+    if not baseurl.netloc:
         error("Environment variable 'MISP_BASEURL' must be valid URL")
 
     variables["SERVER_NAME"] = baseurl.netloc
@@ -203,7 +225,7 @@ def main():
         print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long", file=sys.stderr)
 
     # if security cookie name is not set, generate it by using SECURITY_SALT and MISP_UUID, so it will survive container restart
-    if len(variables["SECURITY_COOKIE_NAME"]) == 0:
+    if not variables["SECURITY_COOKIE_NAME"]:
         uniq = hashlib.sha256("{}|{}".format(variables["SECURITY_SALT"], variables["MISP_UUID"]).encode()).hexdigest()
         variables["SECURITY_COOKIE_NAME"] = "MISP-session-{}".format(uniq[0:5])
 
@@ -215,17 +237,17 @@ def main():
     variables["MISP_UUID"] = variables["MISP_UUID"].lower()
 
     for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER"):
-        if variables[var] == "":
+        if not variables[var]:
             variables[var] = variables[var.replace("_INNER", "")]
 
     if variables["OIDC_LOGIN"]:
         for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):
-            if variables[var] == "":
+            if not variables[var]:
                 error("OIDC login is enabled, but '{}' environment variable is not set".format(var))
 
     for template_name in ("database.php", "config.php", "email.php"):
         path = "/var/www/MISP/app/Config/{}".format(template_name)
-        generate_template(path, variables)
+        render_jinja_template(path, variables)
 
     generate_xdebug_config(variables["PHP_XDEBUG_ENABLED"], variables["PHP_XDEBUG_PROFILER_TRIGGER"])
     generate_snuffleupagus_config(variables['PHP_SNUFFLEUPAGUS'])
@@ -234,6 +256,7 @@ def main():
     generate_rsyslog_config(variables["SYSLOG_TARGET"], variables["SYSLOG_PORT"], variables["SYSLOG_PROTOCOL"])
     generate_error_messages(variables["SUPPORT_EMAIL"])
     generate_php_config(variables)
+    generate_crypto_policies(variables["SECURITY_CRYPTO_POLICY"])
 
 
 if __name__ == "__main__":

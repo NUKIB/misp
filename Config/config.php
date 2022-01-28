@@ -6,11 +6,11 @@ $plugin = ['Sightings_policy' => 3];
 $plugin['ZeroMQ_enable'] = true;
 {% if ZEROMQ_USERNAME %}
 $plugin['ZeroMQ_username'] = '{{ ZEROMQ_USERNAME }}';
-$plugin['ZeroMQ_password'] = '{{ ZEROMQ_PASSWORD }}';
+$plugin['ZeroMQ_password'] = {{ ZEROMQ_PASSWORD | str }};
 {% endif %}
 $plugin['ZeroMQ_redis_host'] = '{{ REDIS_HOST }}';
 $plugin['ZeroMQ_redis_port'] = 6379;
-$plugin['ZeroMQ_redis_password'] = '{{ REDIS_PASSWORD }}';
+$plugin['ZeroMQ_redis_password'] = {{ REDIS_PASSWORD | str }};
 $plugin['ZeroMQ_redis_database'] = 10;
 {% endif %}
 
@@ -37,15 +37,14 @@ $oidcAuth = [
     'unblock' => true,
 ];
 $plugin['CustomAuth_custom_logout'] = "{{ MISP_BASEURL }}/oauth2callback?logout={{ MISP_BASEURL | urlencode }}";
-$plugin['CustomAuth_custom_password_reset'] = "{{ OIDC_PASSWORD_RESET }}";
+$plugin['CustomAuth_custom_password_reset'] = {{ OIDC_PASSWORD_RESET | str }};
 {% else %}
 $oidcAuth = NULL;
 {% endif %}
 
-$config = array (
+$config = [
   'debug' => {{ 1 if MISP_DEBUG else 0}},
-  'MISP' =>
-  array (
+  'MISP' => [
     'baseurl' => '{{ MISP_BASEURL }}',
     'org' => '{{ MISP_ORG }}',
     'showorg' => true,
@@ -54,9 +53,7 @@ $config = array (
     'log_new_audit' => true,
     'log_new_audit_compress' => true,
     'event_alert_metadata_only' => true,
-    {% if MISP_EMAIL_REPLY_TO %}
-    'email_reply_to' => '{{ MISP_EMAIL_REPLY_TO }}',
-    {% endif %}
+    'email_reply_to' => {{ MISP_EMAIL_REPLY_TO | str }},
     'background_jobs' => true,
     'email' => '{{ MISP_EMAIL }}',
     'email_from_name' => '{{ MISP_ORG }} MISP',
@@ -75,16 +72,16 @@ $config = array (
     'redis_host' => '{{ REDIS_HOST }}',
     'redis_port' => 6379,
     'redis_database' => 13,
-    'redis_password' => '{{ REDIS_PASSWORD }}',
+    'redis_password' => {{ REDIS_PASSWORD | str }},
     'log_client_ip' => true,
     'language' => 'eng',
     'attachments_dir' => '/var/www/MISP/app/attachments',
     'live' => true,
     'title_text' => 'MISP {{ MISP_ORG }}',
     'ca_path' => '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem',
-    'disable_user_login_change' => {{ 'true' if OIDC_LOGIN else 'false' }},
-    'disable_user_password_change' => {{ 'true' if OIDC_LOGIN else 'false' }},
-    'disable_user_add' => {{ 'true' if OIDC_LOGIN else 'false' }},
+    'disable_user_login_change' => {{ OIDC_LOGIN | bool }},
+    'disable_user_password_change' => {{ OIDC_LOGIN | bool }},
+    'disable_user_add' => {{ OIDC_LOGIN | bool }},
     'download_gpg_from_homedir' => true,
     'enable_advanced_correlations' => true,
     'log_user_ips' => true,
@@ -92,55 +89,55 @@ $config = array (
     'disable_cached_exports' => true,
     'allow_disabling_correlation' => true,
     'system_setting_db' => true,
-  ),
+    'terms_files' => {{ MISP_TERMS_FILE | str }},
+    'footer_logo' => {{ MISP_FOOTER_LOGO | str }},
+  ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
     'redis_host' => '{{ REDIS_HOST }}',
     'redis_port' => 6379,
-    'redis_password' => '{{ REDIS_PASSWORD }}',
+    'redis_password' => {{ REDIS_PASSWORD | str }},
     'redis_database' => 11,
     'redis_namespace' => 'background_jobs',
     'max_job_history_ttl' => 86400,
     'supervisor_host' => 'unix:/run/supervisor/supervisor.sock',
     'supervisor_port' => 9001,
   ],
-  'GnuPG' =>
-  array (
+  'GnuPG' => [
     'onlyencrypted' => false,
     'email' => '{{ MISP_EMAIL }}',
     'homedir' => '/var/www/MISP/.gnupg',
-    'password' => '{{ GNUPG_PRIVATE_KEY_PASSWORD }}',
-    'bodyonlyencrypted' => {{ 'true' if GNUPG_BODY_ONLY_ENCRYPTED else 'false' }},
-    'sign' => {{ 'true' if GNUPG_SIGN else 'false' }},
-  ),
-  'SMIME' =>
-  array (
+    'password' => {{ GNUPG_PRIVATE_KEY_PASSWORD | str }},
+    'bodyonlyencrypted' => {{ GNUPG_BODY_ONLY_ENCRYPTED | bool }},
+    'sign' => {{ GNUPG_SIGN | bool }},
+  ],
+  'SMIME' => [
     'enabled' => false,
-  ),
-  'Proxy' =>
-  array (
-    'host' => '{{ PROXY_HOST }}',
-    'port' => '{{ PROXY_PORT }}',
-    'method' => '{{ PROXY_METHOD }}',
-    'user' => '{{ PROXY_USER }}',
-    'password' => '{{ PROXY_PASSWORD }}',
-  ),
-  'SecureAuth' =>
-  array (
+  ],
+  {% if PROXY_HOST %}
+  'Proxy' => [
+    'host' => {{ PROXY_HOST | str }},
+    'port' => {{ PROXY_PORT if PROXY_PORT else null }},
+    'method' => {{ PROXY_METHOD | str }},
+    'user' => {{ PROXY_USER | str }},
+    'password' => {{ PROXY_PASSWORD | str }},
+  ],
+  {% endif %}
+  'SecureAuth' => [
     'amount' => 5,
     'expire' => 300,
-  ),
-  'Security' =>
-  array (
+  ],
+  'Security' => [
     'force_https' => {{ 'true' if MISP_BASEURL.startswith('https://') else 'false' }},
     'csp_enforce' => true,
+    'min_tls_version' => 'tlsv1_2',
     'require_password_confirmation' => true,
     'syslog' => true,
     'syslog_to_stderr' => false,
     'syslog_ident' => 'misp-audit',
     'level' => 'medium',
     'salt' => '{{ SECURITY_SALT }}',
-    'encryption_key' => '{{ SECURITY_ENCRYPTION_KEY }}',
+    'encryption_key' => {{ SECURITY_ENCRYPTION_KEY | str }},
     'authkey_keep_session' => true,
     'do_not_log_authkeys' => true,
     'disable_browser_cache' => true,
@@ -148,14 +145,14 @@ $config = array (
     'rest_client_baseurl' => 'http://localhost',
     'advanced_authkeys_validity' => 547,
     'user_monitoring_enabled' => true,
-    'hide_organisation_index_from_users' => {{ 'true' if SECURITY_HIDE_ORGS else 'false' }},
-    'hide_organisations_in_sharing_groups' => {{ 'true' if SECURITY_HIDE_ORGS else 'false' }},
-    'advanced_authkeys' => {{ 'true' if SECURITY_ADVANCED_AUTHKEYS else 'false' }},
+    'hide_organisation_index_from_users' => {{ SECURITY_HIDE_ORGS | bool }},
+    'hide_organisations_in_sharing_groups' => {{ SECURITY_HIDE_ORGS | bool }},
+    'advanced_authkeys' => {{ SECURITY_ADVANCED_AUTHKEYS | bool }},
     {% if OIDC_LOGIN %}
-    'auth' => array('OidcAuth.Oidc'),
+    'auth' => ['OidcAuth.Oidc'],
     'auth_enforced' => true,
     {% endif %}
-  ),
+  ],
   'Session' => [
     'defaults' => 'php',
     'timeout' => 60,
@@ -166,7 +163,7 @@ $config = array (
   ],
   'Plugin' => $plugin,
   'OidcAuth' => $oidcAuth,
-);
+];
 
 {% if SENTRY_DSN %}
 // NUKIB custom variable

@@ -61,7 +61,7 @@ If you don't like CentOS Stream, you can use as a base image different distribut
 
 ### Automation
 
-Automation tasks are run by [jobber](https://github.com/dshearer/jobber) application, which is managed by `supervisor`. Check `.jobber` file for tasks definition.
+Automation tasks are run by [jobber](https://github.com/dshearer/jobber) application, which is managed by `supervisor`. Check [`.jobber`](.jobber) file for tasks definition.
 
 Default tasks:
 * `CacheFeeds` - cache feeds with caching enabled every day at 7, 9, 11, 13, 15, 17, 19
@@ -106,6 +106,8 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `MISP_HOST_ORG_ID` (optional, int, default `1`) - MISP default organisation ID
 * `MISP_MODULE_URL` (optional, string) - full URL to MISP modules
 * `MISP_DEBUG` (optional, boolean, default `false`) - enable debug mode (do not enable on production environment)
+* `MISP_TERMS_FILE` (optional, string) - filename from `/var/www/MISP/app/files/terms/` directory
+* `MISP_FOOTER_LOGO` (optional, string) - filename from `/var/www/MISP/app/webroot/img/custom/` directory
 
 ### Email setting
 
@@ -132,6 +134,7 @@ If you want to generate new PGP keys for email signing, you can do it by running
 * `SECURITY_ADVANCED_AUTHKEYS` (optional, boolean, default `false`) - enable advanced auth keys support
 * `SECURITY_HIDE_ORGS` (optional, boolean, default `false`) - hide org names for normal users
 * `SECURITY_ENCRYPTION_KEY` (optional, string) - encryption key with at least 32 chars that will be used to encrypt sensitive information stored in database
+* `SECURITY_CRYPTO_POLICY` (optional, string, default: `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8).
 
 ### Outgoing proxy
 
