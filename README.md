@@ -109,7 +109,7 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `MISP_MODULE_URL` (optional, string) - full URL to MISP modules
 * `MISP_DEBUG` (optional, boolean, default `false`) - enable debug mode (do not enable on production environment)
 
-[Check more variables that allows MISP customisation.](docs/CUSTOMISATION.md)
+[Check more variables that allows MISP customization.](docs/CUSTOMIZATION.md)
 
 ### Email setting
 
