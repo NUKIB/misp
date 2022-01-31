@@ -87,7 +87,7 @@ def collect() -> dict:
     for bool_variable in bool_variables:
         variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
 
-    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT", "PROXY_PORT"):
+    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT", "PROXY_PORT", "JOBBER_USER_ID"):
         variables[int_variable] = convert_int(int_variable, variables[int_variable])
 
     return variables
