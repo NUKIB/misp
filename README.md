@@ -201,6 +201,17 @@ If enabled, all logs from the container are forwarded to a defined syslog server
 * `SYSLOG_PORT` (optional, integer, default `601`)
 * `SYSLOG_PROTOCOL` (optional, string, default `tcp`)
 
+### Jobber
+
+Configuration for [Jobber tasks](#Automation).
+
+* `JOBBER_USER_ID` (optional, integer, default `1`) - MISP user ID which is used in scheduled tasks by Jobber (1 is the user ID of the initial created admin@admin.test user)
+* `JOBBER_CACHE_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for cache feeds task scheduling
+* `JOBBER_FETCH_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for cache fetch task scheduling
+* `JOBBER_PULL_SERVERS_TIME` (optional, string, default `0 R0-10 6,10,15`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for pull servers task scheduling
+* `JOBBER_SCAN_ATTACHMENT_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for scan attachment task scheduling
+* `JOBBER_LOG_ROTATE_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for log rotate task scheduling
+
 ## Log locations
 
 * `/var/log/messages` - all logs captured by rsyslog (see [rsyslog.conf](rsyslog.conf) for definition)
