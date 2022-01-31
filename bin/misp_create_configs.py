@@ -265,6 +265,10 @@ def main():
         check_is_url("OIDC_PROVIDER", variables["OIDC_PROVIDER"])
         check_is_url("OIDC_PROVIDER_INNER", variables["OIDC_PROVIDER_INNER"])
 
+        # mod_auth_openidc require full URL to metadata
+        if "/.well-known/openid-configuration" not in variables["OIDC_PROVIDER"]:
+            variables["OIDC_PROVIDER"] = variables["OIDC_PROVIDER"].rstrip("/") + "/.well-known/openid-configuration"
+
     for template_name in ("database.php", "config.php", "email.php"):
         path = "/var/www/MISP/app/Config/{}".format(template_name)
         render_jinja_template(path, variables)
