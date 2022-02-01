@@ -28,7 +28,7 @@ mkdir /tmp/zstd
 cd /tmp/zstd
 download_and_check https://github.com/kjdev/php-ext-zstd/archive/bf7931996aac9d14ba550783c12070442445d6f2.tar.gz 64d8000c6580ea97d675fc43db6a2a1229e9ad06185c24c60fd4b07e73852fce
 cd zstd
-download_and_check https://github.com/facebook/zstd/archive/refs/tags/v1.5.1.tar.gz dc05773342b28f11658604381afd22cb0a13e8ba17ff2bd7516df377060c18dd
+download_and_check https://github.com/facebook/zstd/archive/refs/tags/v1.5.2.tar.gz f7de13462f7a82c29ab865820149e778cbfe01087b3a55b5332707abf9db4a6e
 cd ..
 phpize
 ./configure --silent
