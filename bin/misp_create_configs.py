@@ -24,6 +24,8 @@ optional_variables = (
     "OIDC_DEFAULT_ORG", "SENTRY_ENVIRONMENT", "MISP_DEBUG", "SUPPORT_EMAIL", "PHP_SNUFFLEUPAGUS",
     "SECURITY_ENCRYPTION_KEY", "PHP_TIMEZONE", "PHP_MEMORY_LIMIT", "PHP_MAX_EXECUTION_TIME", "PHP_UPLOAD_MAX_FILESIZE",
     "MYSQL_PORT", "SECURITY_CRYPTO_POLICY", "MISP_TERMS_FILE", "MISP_FOOTER_LOGO",
+    "JOBBER_USER_ID", "JOBBER_CACHE_FEEDS_TIME", "JOBBER_FETCH_FEEDS_TIME", "JOBBER_PULL_SERVERS_TIME",
+    "JOBBER_SCAN_ATTACHMENT_TIME", "JOBBER_LOG_ROTATE_TIME"
 )
 bool_variables = (
     "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
@@ -42,6 +44,12 @@ default_values = {
     "SYSLOG_PORT": "601",
     "SYSLOG_PROTOCOL": "tcp",
     "SECURITY_CRYPTO_POLICY": "DEFAULT:NO-SHA1",
+    "JOBBER_USER_ID": "1",
+    "JOBBER_CACHE_FEEDS_TIME": "0 R0-10 6,8,10,12,14,16,18",
+    "JOBBER_FETCH_FEEDS_TIME": "0 R0-10 6,8,10,12,14,16,18",
+    "JOBBER_PULL_SERVERS_TIME": "0 R0-10 6,10,15",
+    "JOBBER_SCAN_ATTACHMENT_TIME": "0 R0-10 6",
+    "JOBBER_LOG_ROTATE_TIME": "0 0 5",
 }
 
 
@@ -79,7 +87,7 @@ def collect() -> dict:
     for bool_variable in bool_variables:
         variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
 
-    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT", "PROXY_PORT"):
+    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT", "PROXY_PORT", "JOBBER_USER_ID"):
         variables[int_variable] = convert_int(int_variable, variables[int_variable])
 
     return variables
@@ -115,6 +123,9 @@ def render_jinja_template(path: str, variables: dict):
 
 def generate_apache_config(variables: dict):
     render_jinja_template("/etc/httpd/conf.d/misp.conf", variables)
+
+def generate_jobber_config(variables: dict):
+    render_jinja_template("/root/.jobber", variables)
 
 
 def generate_xdebug_config(enabled: bool, profiler_trigger: str):
@@ -257,6 +268,7 @@ def main():
     generate_error_messages(variables["SUPPORT_EMAIL"])
     generate_php_config(variables)
     generate_crypto_policies(variables["SECURITY_CRYPTO_POLICY"])
+    generate_jobber_config(variables)
 
 
 if __name__ == "__main__":

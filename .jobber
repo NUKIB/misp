@@ -10,26 +10,26 @@ prefs:
 
 jobs:
   CacheFeeds:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server cacheFeed 1 all 2>/dev/null
-    time: 0 R0-10 6,8,10,12,14,16,18
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server cacheFeed {{ JOBBER_USER_ID }} all 2>/dev/null
+    time: {{ JOBBER_CACHE_FEEDS_TIME }}
     onError: Backoff
 
   FetchFeeds:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server fetchFeed 1 all 2>/dev/null
-    time: 0 R0-10 6,8,10,12,14,16,18
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server fetchFeed {{ JOBBER_USER_ID }} all 2>/dev/null
+    time: {{ JOBBER_FETCH_FEEDS_TIME }}
     onError: Backoff
 
   PullServers:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server pullAll 1
-    time: 0 R0-10 6,10,15
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server pullAll {{ JOBBER_USER_ID }}
+    time: {{ JOBBER_PULL_SERVERS_TIME }}
     onError: Backoff
 
   ScanAttachment:
     cmd: su-exec apache /var/www/MISP/app/Console/cake admin scanAttachment all
-    time: 0 R0-10 6
+    time: {{ JOBBER_SCAN_ATTACHMENT_TIME }}
     onError: Backoff
 
   LogRotate:
     cmd: logrotate /etc/logrotate.conf
-    time: 0 0 5
+    time: {{ JOBBER_LOG_ROTATE_TIME }}
     onError: Backoff
