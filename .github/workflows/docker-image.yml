@@ -64,12 +64,13 @@ jobs:
         VERSION=$(curl --fail -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion)
         echo $VERSION | jq
         docker compose down
-    -
-      name: Container scan
-      uses: azure/container-scan@v0
-      with:
-        image-name: ${{ env.TEST_TAG }}
-        severity-threshold: CRITICAL
+# Disable for now: https://github.com/Azure/container-scan/issues/122
+#    -
+#      name: Container scan
+#      uses: azure/container-scan@v0
+#      with:
+#        image-name: ${{ env.TEST_TAG }}
+#        severity-threshold: CRITICAL
     -
       name: Build Docker for linux/arm64
       uses: docker/build-push-action@v2
