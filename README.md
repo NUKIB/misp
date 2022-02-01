@@ -61,17 +61,6 @@ If you don't like CentOS Stream, you can use as a base image different distribut
 
     docker build --build-arg BASE_IMAGE=almalinux -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
-### Automation
-
-Automation tasks are run by [jobber](https://github.com/dshearer/jobber) application, which is managed by `supervisor`. Check [`.jobber`](.jobber) file for tasks definition.
-
-Default tasks:
-* `CacheFeeds` - cache feeds with caching enabled every day at 7, 9, 11, 13, 15, 17, 19
-* `FetchFeeds` - fetch enabled feeds every day at 7, 9, 11, 13, 15, 17, 19
-* `PullServers` - pull events from remote servers every day at 7, 11, 16
-* `ScanAttachment` - every day at 6
-* `LogRotate` - rotate logs every day at 5
-
 ## Environment variables
 
 By changing or defining these container environment variables, you can change container behavior.
@@ -207,11 +196,13 @@ If enabled, all logs from the container are forwarded to a defined syslog server
 
 ### Jobber
 
-Configuration for [Jobber tasks](#Automation).
+Automation tasks are run by [jobber](https://github.com/dshearer/jobber) application, which is managed by `supervisor`. Check [`.jobber`](.jobber) file for tasks definition.
+
+You can change default configuration by modifying these environment variables:
 
 * `JOBBER_USER_ID` (optional, integer, default `1`) - MISP user ID which is used in scheduled tasks by Jobber (1 is the user ID of the initial created admin@admin.test user)
 * `JOBBER_CACHE_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for cache feeds task scheduling
-* `JOBBER_FETCH_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for cache fetch task scheduling
+* `JOBBER_FETCH_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for fetch feeds task scheduling
 * `JOBBER_PULL_SERVERS_TIME` (optional, string, default `0 R0-10 6,10,15`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for pull servers task scheduling
 * `JOBBER_SCAN_ATTACHMENT_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for scan attachment task scheduling
 * `JOBBER_LOG_ROTATE_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for log rotate task scheduling
