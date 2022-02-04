@@ -196,9 +196,9 @@ Configure::write('Session', array(
 	'defaults'       => 'php',
 	'autoRegenerate' => false,
 	'checkAgent' => false,
-    'ini' => [
+    /*'ini' => [
         'session.cookie_samesite' => 'Strict',
-    ],
+    ],*/
 ));
 
 /**
