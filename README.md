@@ -9,7 +9,7 @@ to update MISP from the user interface and instead, an admin should download a n
 
 * 🎩 Image is based on CentOS Stream 8, so perfectly fits your infrastructure if you use CentOS or RHEL as a host system
 * ✅ Modern MISP features are enabled by default (like advanced audit log or storing setting in the database)
-* 👩‍💻 Integrated support for OpenID Connect (OIDC) authentication
+* 👩‍💻 Integrated support for [OpenID Connect (OIDC) authentication](docs/OIDC.md)
 * 🔒️ PHP is by default protected by Snuffleupagus extensions with [rules](snuffleupagus-misp.rules) tailored to MISP
 * 🚀 Optional extensions and configurations that will make MISP faster are enabled
 * 📓 Integrated support for logging exceptions to Sentry and forwarding logs to syslog server
@@ -139,28 +139,7 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 
 ### OpenID Connect (OIDC) login
 
-This Docker image is prepared to use OIDC for login into MISP. To enhance security, OIDC is implemented right into Apache by [mod_auth_openidc](https://github.com/zmartzone/mod_auth_openidc) and then in MISP itself.   
-That means that unauthenticated users will stop right on Apache.
-
-If a request to MISP is made with  `Authorization` header, that contains an authentication key in MISP format, OIDC is not used. Instead, Apache checks if a key is valid.
-
-* `OIDC_LOGIN` (optional, bool, default `false`) - set to `true` to enable OIDC login
-* `OIDC_PROVIDER` (optional, string) - URL for OIDC provider in Apache
-* `OIDC_CLIENT_ID` (optional, string)
-* `OIDC_CLIENT_SECRET` (optional, string)
-* `OIDC_AUTHENTICATION_METHOD` (optional, string, default `client_secret_basic`) - should be set to `client_secret_jwt` if remote server supports that method, because it is more secure
-* `OIDC_PASSWORD_RESET` (optional, string) - URL to password reset page
-* `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
-* `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for new user that don't have organisation name in `organization` claim. If not provided `MISP_ORG` will be used.
-
-#### Inner
-
-You can use a different provider for authentication in MISP. If you don't provide these variables, they will be set to the same as for Apache.
-
-* `OIDC_PROVIDER_INNER` (optional, string, default value from `OIDC_PROVIDER`) - URL for OIDC provider in MISP
-* `OIDC_CLIENT_ID_INNER` (optional, string, default value from `OIDC_CLIENT_ID`)
-* `OIDC_CLIENT_SECRET_INNER` (optional, string, default value from `OIDC_CLIENT_SECRET`)
-* `OIDC_AUTHENTICATION_METHOD_INNER` (optional, string, default value from `OIDC_AUTHENTICATION_METHOD`)
+[Check detailed manual how to configure OIDC login](docs/OIDC.md)
 
 ### Sentry
 
@@ -227,4 +206,4 @@ You can change default configuration by modifying these environment variables:
 
 This software is licensed under GNU General Public License version 3. MISP is licensed under GNU Affero General Public License version 3.
 
-* Copyright (C) 2022 [National Cyber and Information Security Agency of the Czech Republic (NÚKIB)](https://www.nukib.cz/en/)
+* Copyright (C) 2022 [National Cyber and Information Security Agency of the Czech Republic (NÚKIB)](https://www.nukib.cz/en/) 🇨🇿
