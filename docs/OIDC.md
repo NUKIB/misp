@@ -12,7 +12,8 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 * `OIDC_PROVIDER` (optional, string) - URL for OIDC provider in Apache
 * `OIDC_CLIENT_ID` (optional, string)
 * `OIDC_CLIENT_SECRET` (optional, string)
-* `OIDC_AUTHENTICATION_METHOD` (optional, string, default `client_secret_basic`) - should be set to `client_secret_jwt` if remote server supports that method, because it is more secure
+* `OIDC_AUTHENTICATION_METHOD` (optional, string, default `client_secret_basic`) - should be set to `client_secret_jwt` if identity provider supports that method, because it is more secure
+* `OIDC_CODE_CHALLENGE_METHOD` (optional, string) - can be set to `plain` or `S256`, but this method must be supported by identity provider
 * `OIDC_PASSWORD_RESET` (optional, string) - URL to password reset page
 * `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
 * `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for new user that don't have organisation name in `organization` claim. If not provided `MISP_ORG` will be used.
@@ -25,6 +26,7 @@ You can use a different provider for authentication in MISP. If you don't provid
 * `OIDC_CLIENT_ID_INNER` (optional, string, default value from `OIDC_CLIENT_ID`)
 * `OIDC_CLIENT_SECRET_INNER` (optional, string, default value from `OIDC_CLIENT_SECRET`)
 * `OIDC_AUTHENTICATION_METHOD_INNER` (optional, string, default value from `OIDC_AUTHENTICATION_METHOD`)
+* `OIDC_CODE_CHALLENGE_METHOD_INNER` (optional, string, default value from `OIDC_CODE_CHALLENGE_METHOD_INNER`)
 
 ## User Roles
 
@@ -77,5 +79,6 @@ OIDC_PROVIDER=https://<keycloak>/auth/realms/<realm>/
 OIDC_CLIENT_ID=misp
 OIDC_CLIENT_SECRET=<client_secret>
 OIDC_AUTHENTICATION_METHOD=client_secret_jwt
+OIDC_CODE_CHALLENGE_METHOD=S256
 OIDC_CLIENT_CRYPTO_PASS=<random string>
 ```
