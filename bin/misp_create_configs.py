@@ -26,7 +26,8 @@ optional_variables = (
     "MYSQL_PORT", "SECURITY_CRYPTO_POLICY", "MISP_TERMS_FILE", "MISP_HOME_LOGO", "MISP_FOOTER_LOGO", "MISP_CUSTOM_CSS",
     "OIDC_AUTHENTICATION_METHOD", "OIDC_AUTHENTICATION_METHOD_INNER",
     "JOBBER_USER_ID", "JOBBER_CACHE_FEEDS_TIME", "JOBBER_FETCH_FEEDS_TIME", "JOBBER_PULL_SERVERS_TIME",
-    "JOBBER_SCAN_ATTACHMENT_TIME", "JOBBER_LOG_ROTATE_TIME", "PHP_SESSIONS_COOKIE_SAMESITE",
+    "JOBBER_SCAN_ATTACHMENT_TIME", "JOBBER_LOG_ROTATE_TIME", "PHP_SESSIONS_COOKIE_SAMESITE", "OIDC_CODE_CHALLENGE_METHOD",
+    "OIDC_CODE_CHALLENGE_METHOD_INNER",
 )
 bool_variables = (
     "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
@@ -265,7 +266,7 @@ def main():
 
     variables["MISP_UUID"] = variables["MISP_UUID"].lower()
 
-    for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER", "OIDC_AUTHENTICATION_METHOD_INNER"):
+    for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER", "OIDC_AUTHENTICATION_METHOD_INNER", "OIDC_CODE_CHALLENGE_METHOD_INNER"):
         if not variables[var]:
             variables[var] = variables[var.replace("_INNER", "")]
 
@@ -275,6 +276,10 @@ def main():
                 error("OIDC login is enabled, but '{}' environment variable is not set".format(var))
         check_is_url("OIDC_PROVIDER", variables["OIDC_PROVIDER"])
         check_is_url("OIDC_PROVIDER_INNER", variables["OIDC_PROVIDER_INNER"])
+
+        for var in ("OIDC_CODE_CHALLENGE_METHOD", "OIDC_CODE_CHALLENGE_METHOD_INNER"):
+            if variables[var] not in ("S256", "plain", "", None):
+                error("Environment variable '{}' value is not valid".format(var))
 
         # mod_auth_openidc require full URL to metadata
         if "/.well-known/openid-configuration" not in variables["OIDC_PROVIDER"]:
