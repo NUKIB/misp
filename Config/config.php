@@ -95,6 +95,7 @@ $config = [
     'home_logo' => {{ MISP_HOME_LOGO | str }},
     'footer_logo' => {{ MISP_FOOTER_LOGO | str }},
     'custom_css' => {{ MISP_CUSTOM_CSS | str }},
+    'tmpdir' => '/tmp',
   ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
