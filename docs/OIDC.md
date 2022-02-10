@@ -16,7 +16,7 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 * `OIDC_CODE_CHALLENGE_METHOD` (optional, string) - can be set to `plain` or `S256`, but this method must be supported by identity provider
 * `OIDC_PASSWORD_RESET` (optional, string) - URL to password reset page
 * `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
-* `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for new user that don't have organisation name in `organization` claim. If not provided `MISP_ORG` will be used.
+* `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for user that don't have organisation name in claim defined by `OIDC_ORGANISATION_PROPERTY` variable. If not provided `MISP_ORG` will be used.
 * `OIDC_ORGANISATION_PROPERTY` (optional, string, default `organization`) - ID token claim that will be used as organisation in MISP
 
 ### Inner
