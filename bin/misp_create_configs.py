@@ -6,54 +6,104 @@ import sys
 import glob
 import uuid
 from urllib.parse import urlparse
-from typing import Optional
+from typing import Optional, Type
 from jinja2 import Environment
 
-required_variables = (
-    "MYSQL_HOST", "MYSQL_LOGIN", "MYSQL_DATABASE", "MISP_BASEURL", "SECURITY_SALT", "REDIS_HOST",
-    "MISP_ORG", "MISP_EMAIL", "MISP_UUID"
-)
-optional_variables = (
-    "REDIS_PASSWORD", "MYSQL_PASSWORD", "PHP_XDEBUG_ENABLED", "PHP_XDEBUG_PROFILER_TRIGGER", "PHP_SESSIONS_IN_REDIS",
-    "GNUPG_PRIVATE_KEY_PASSWORD", "GNUPG_BODY_ONLY_ENCRYPTED", "PROXY_HOST", "PROXY_PORT", "PROXY_METHOD", "PROXY_USER",
-    "PROXY_PASSWORD", "MISP_HOST_ORG_ID", "SECURITY_COOKIE_NAME", "ZEROMQ_ENABLED", "OIDC_LOGIN", "OIDC_PROVIDER", "OIDC_PROVIDER_INNER",
-    "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER", "OIDC_PASSWORD_RESET",
-    "OIDC_CLIENT_CRYPTO_PASS", "SYSLOG_TARGET", "SYSLOG_PORT", "SYSLOG_PROTOCOL", "MISP_EMAIL_REPLY_TO", "GNUPG_SIGN",
-    "ZEROMQ_USERNAME", "ZEROMQ_PASSWORD", "SENTRY_DSN", "SMTP_HOST", "SMTP_USERNAME", "SMTP_PASSWORD",
-    "MISP_MODULE_URL", "MISP_ATTACHMENT_SCAN_MODULE", "SECURITY_ADVANCED_AUTHKEYS", "SECURITY_HIDE_ORGS",
-    "OIDC_DEFAULT_ORG", "SENTRY_ENVIRONMENT", "MISP_DEBUG", "SUPPORT_EMAIL", "PHP_SNUFFLEUPAGUS",
-    "SECURITY_ENCRYPTION_KEY", "PHP_TIMEZONE", "PHP_MEMORY_LIMIT", "PHP_MAX_EXECUTION_TIME", "PHP_UPLOAD_MAX_FILESIZE",
-    "MYSQL_PORT", "SECURITY_CRYPTO_POLICY", "MISP_TERMS_FILE", "MISP_HOME_LOGO", "MISP_FOOTER_LOGO", "MISP_CUSTOM_CSS",
-    "OIDC_AUTHENTICATION_METHOD", "OIDC_AUTHENTICATION_METHOD_INNER",
-    "JOBBER_USER_ID", "JOBBER_CACHE_FEEDS_TIME", "JOBBER_FETCH_FEEDS_TIME", "JOBBER_PULL_SERVERS_TIME",
-    "JOBBER_SCAN_ATTACHMENT_TIME", "JOBBER_LOG_ROTATE_TIME", "PHP_SESSIONS_COOKIE_SAMESITE", "OIDC_CODE_CHALLENGE_METHOD",
-    "OIDC_CODE_CHALLENGE_METHOD_INNER",
-)
-bool_variables = (
-    "PHP_XDEBUG_ENABLED", "PHP_SESSIONS_IN_REDIS", "ZEROMQ_ENABLED", "OIDC_LOGIN",
-    "GNUPG_BODY_ONLY_ENCRYPTED", "GNUPG_SIGN", "SECURITY_ADVANCED_AUTHKEYS", "SECURITY_HIDE_ORGS",
-    "OIDC_DEFAULT_ORG", "MISP_DEBUG",  "PHP_SNUFFLEUPAGUS"
-)
-default_values = {
-    "PHP_SESSIONS_IN_REDIS": "true",
-    "PHP_SNUFFLEUPAGUS": "true",
-    "PHP_TIMEZONE": "UTC",
-    "MISP_HOST_ORG_ID": 1,
-    "PHP_MEMORY_LIMIT": "2048M",
-    "PHP_MAX_EXECUTION_TIME": 300,
-    "PHP_UPLOAD_MAX_FILESIZE": "50M",
-    "PROXY_PORT": 3128,
-    "MYSQL_PORT": 3306,
-    "SYSLOG_PORT": 601,
-    "SYSLOG_PROTOCOL": "tcp",
-    "SECURITY_CRYPTO_POLICY": "DEFAULT:NO-SHA1",
-    "OIDC_AUTHENTICATION_METHOD": "client_secret_basic",
-    "JOBBER_USER_ID": "1",
-    "JOBBER_CACHE_FEEDS_TIME": "0 R0-10 6,8,10,12,14,16,18",
-    "JOBBER_FETCH_FEEDS_TIME": "0 R0-10 6,8,10,12,14,16,18",
-    "JOBBER_PULL_SERVERS_TIME": "0 R0-10 6,10,15",
-    "JOBBER_SCAN_ATTACHMENT_TIME": "0 R0-10 6",
-    "JOBBER_LOG_ROTATE_TIME": "0 0 5",
+
+class Option:
+    def __init__(self, required: bool = False, typ: Type = str, default=None):
+        self.required = required
+        self.typ = typ
+        self.default = default
+
+
+VARIABLES = {
+    # MySQL
+    "MYSQL_HOST": Option(required=True),
+    "MYSQL_PORT": Option(typ=int, default=3306),
+    "MYSQL_LOGIN": Option(required=True),
+    "MYSQL_PASSWORD": Option(),
+    "MYSQL_DATABASE": Option(required=True),
+    # Redis
+    "REDIS_HOST": Option(required=True),
+    "REDIS_PASSWORD": Option(),
+    # Proxy
+    "PROXY_HOST": Option(),
+    "PROXY_PORT": Option(typ=int, default=3128),
+    "PROXY_METHOD": Option(),
+    "PROXY_USER": Option(),
+    "PROXY_PASSWORD": Option(),
+    # OIDC
+    "OIDC_LOGIN": Option(typ=bool),
+    "OIDC_PROVIDER": Option(),
+    "OIDC_PROVIDER_INNER": Option(),
+    "OIDC_CLIENT_ID": Option(),
+    "OIDC_CLIENT_ID_INNER": Option(),
+    "OIDC_CLIENT_SECRET": Option(),
+    "OIDC_CLIENT_SECRET_INNER": Option(),
+    "OIDC_CODE_CHALLENGE_METHOD": Option(),
+    "OIDC_CODE_CHALLENGE_METHOD_INNER": Option(),
+    "OIDC_AUTHENTICATION_METHOD": Option(default="client_secret_basic"),
+    "OIDC_AUTHENTICATION_METHOD_INNER": Option(),
+    "OIDC_CLIENT_CRYPTO_PASS": Option(),
+    "OIDC_DEFAULT_ORG": Option(typ=bool),
+    "OIDC_PASSWORD_RESET": Option(),
+    # Logging
+    "SYSLOG_TARGET": Option(),
+    "SYSLOG_PORT": Option(typ=int, default=601),
+    "SYSLOG_PROTOCOL": Option(default="tcp"),
+    "SENTRY_DSN": Option(),
+    "SENTRY_ENVIRONMENT": Option(),
+    # ZeroMQ
+    "ZEROMQ_ENABLED": Option(typ=bool, default=False),
+    "ZEROMQ_USERNAME": Option(),
+    "ZEROMQ_PASSWORD": Option(),
+    # SMTP
+    "SMTP_HOST": Option(),
+    "SMTP_USERNAME": Option(),
+    "SMTP_PASSWORD": Option(),
+    "SUPPORT_EMAIL": Option(),
+    # MISP
+    "MISP_BASEURL": Option(required=True),
+    "MISP_ORG": Option(required=True),
+    "MISP_EMAIL": Option(required=True),
+    "MISP_UUID": Option(required=True),
+    "MISP_MODULE_URL": Option(),
+    "MISP_ATTACHMENT_SCAN_MODULE": Option(),
+    "MISP_EMAIL_REPLY_TO": Option(),
+    "MISP_HOST_ORG_ID": Option(typ=int, default=1),
+    "MISP_DEBUG": Option(typ=bool, default=False),
+    "MISP_TERMS_FILE": Option(),
+    "MISP_HOME_LOGO": Option(),
+    "MISP_FOOTER_LOGO": Option(),
+    "MISP_CUSTOM_CSS": Option(),
+    # Security
+    "GNUPG_SIGN": Option(typ=bool, default=False),
+    "GNUPG_PRIVATE_KEY_PASSWORD": Option(),
+    "GNUPG_BODY_ONLY_ENCRYPTED": Option(typ=bool, default=False),
+    "SECURITY_ADVANCED_AUTHKEYS": Option(typ=bool, default=False),
+    "SECURITY_HIDE_ORGS": Option(typ=bool, default=False),
+    "SECURITY_SALT": Option(required=True),
+    "SECURITY_CRYPTO_POLICY": Option(default="DEFAULT:NO-SHA1"),
+    "SECURITY_ENCRYPTION_KEY": Option(),
+    "SECURITY_COOKIE_NAME": Option(),
+    # PHP
+    "PHP_XDEBUG_ENABLED": Option(typ=bool, default=False),
+    "PHP_XDEBUG_PROFILER_TRIGGER": Option(),
+    "PHP_SESSIONS_IN_REDIS": Option(typ=bool, default=True),
+    "PHP_SNUFFLEUPAGUS": Option(typ=bool, default=True),
+    "PHP_TIMEZONE": Option(default="UTC"),
+    "PHP_MEMORY_LIMIT": Option(default="2048M"),
+    "PHP_MAX_EXECUTION_TIME": Option(typ=int, default=300),
+    "PHP_UPLOAD_MAX_FILESIZE": Option(default="50M"),
+    "PHP_SESSIONS_COOKIE_SAMESITE": Option(),
+    # Jobber
+    "JOBBER_USER_ID": Option(typ=int, default=1),
+    "JOBBER_CACHE_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
+    "JOBBER_FETCH_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
+    "JOBBER_PULL_SERVERS_TIME": Option(default="0 R0-10 6,10,15"),
+    "JOBBER_SCAN_ATTACHMENT_TIME": Option(default="0 R0-10 6"),
+    "JOBBER_LOG_ROTATE_TIME": Option(default="0 0 5"),
 }
 
 
@@ -76,23 +126,22 @@ def error(message: str):
 def collect() -> dict:
     variables = {}
 
-    for variable in required_variables:
+    for variable, option in VARIABLES.items():
         if variable not in os.environ:
-            error("Environment variable '{}' is required, but not set".format(variable))
-
-        variables[variable] = os.environ.get(variable)
-
-    for variable in optional_variables:
-        if variable in os.environ:
-            variables[variable] = os.environ.get(variable)
+            if option.required:
+                error("Environment variable '{}' is required, but not set".format(variable))
+            elif option.default is not None:
+                value = option.default
+            else:
+                value = None
         else:
-            variables[variable] = default_values[variable] if variable in default_values else None
+            value = os.environ.get(variable)
+            if option.typ == int:
+                value = convert_int(variable, value)
+            elif option.typ == bool:
+                value = convert_bool(variable, value)
 
-    for bool_variable in bool_variables:
-        variables[bool_variable] = convert_bool(bool_variable, variables[bool_variable])
-
-    for int_variable in ("MISP_HOST_ORG_ID", "PHP_MAX_EXECUTION_TIME", "MYSQL_PORT", "SYSLOG_PORT", "PROXY_PORT", "JOBBER_USER_ID"):
-        variables[int_variable] = convert_int(int_variable, variables[int_variable])
+        variables[variable] = value
 
     return variables
 
