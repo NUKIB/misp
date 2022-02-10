@@ -35,6 +35,7 @@ $oidcAuth = [
         'misp-api-access' => 'User with API access',
         'misp-access' => 3, // User
     ],
+    'organisation_property' => {{ OIDC_ORGANISATION_PROPERTY | str }},
     'default_org' => '{{ OIDC_DEFAULT_ORG if OIDC_DEFAULT_ORG else MISP_ORG }}',
     'unblock' => true,
 ];
