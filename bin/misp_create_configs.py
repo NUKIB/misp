@@ -46,7 +46,7 @@ VARIABLES = {
     "OIDC_AUTHENTICATION_METHOD": Option(default="client_secret_basic"),
     "OIDC_AUTHENTICATION_METHOD_INNER": Option(),
     "OIDC_CLIENT_CRYPTO_PASS": Option(),
-    "OIDC_DEFAULT_ORG": Option(typ=bool),
+    "OIDC_DEFAULT_ORG": Option(),
     "OIDC_PASSWORD_RESET": Option(),
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
     # Logging
