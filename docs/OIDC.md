@@ -50,6 +50,18 @@ assigned to `misp-access` role.
 You can provide OIDC claim `organization` to user, that can contains organisation name or UUID. If this claim exists, 
 MISP will assign user to that organisation.
 
+## Problems
+
+### Logout
+
+The problem with OpenID Connect is that if a user logout from one service, he will still be logged in to another service.
+This can be fixed by Backchannel logout, but currently is not supported in this image.
+
+### User blocking
+
+When a user is blocked in identity provider, he will be not blocked in MISP. That means that he could not logout, but
+an authentication key will still work and also notification e-mail will be still sent to his e-mail address.
+
 ## Example usage with [Keycloak](https://www.keycloak.org)
 
 ### Configure new client in Keycloak
