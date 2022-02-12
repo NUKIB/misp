@@ -6,15 +6,63 @@ import sys
 import glob
 import uuid
 from urllib.parse import urlparse
-from typing import Optional, Type
+from typing import Optional, Type, Callable, Any, NoReturn
 from jinja2 import Environment
 
 
 class Option:
-    def __init__(self, required: bool = False, typ: Type = str, default=None):
+    def __init__(self, required: bool = False, typ: Type = str, default: Any = None, validation: Callable[[str, Any], NoReturn] = None):
         self.required = required
         self.typ = typ
         self.default = default
+        self.validation = validation
+
+    def get_value(self, env_name: str) -> Any:
+        if env_name not in os.environ:
+            if self.required:
+                raise ValueError("Environment variable '{}' is required, but not set".format(env_name))
+            elif self.default is not None:
+                value = self.default
+            else:
+                value = None
+        else:
+            value = os.environ.get(env_name)
+            if self.typ == int:
+                value = self.convert_int(env_name, value)
+            elif self.typ == bool:
+                value = self.convert_bool(env_name, value)
+
+            if self.validation:
+                self.validation(env_name, value)
+
+        return value
+
+    @staticmethod
+    def convert_int(variable_name: str, value: str) -> int:
+        try:
+            return int(value)
+        except ValueError:
+            raise ValueError("Environment variable '{}' must be integer, `{}` given".format(variable_name, value))
+
+
+    @staticmethod
+    def convert_bool(variable_name: str, value: str) -> bool:
+        value = value.lower()
+        if value in ("true", "1", "yes", "on"):
+            return True
+        if value in ("false", "0", "no", "off", ""):
+            return False
+
+        raise ValueError("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, value))
+
+
+def check_is_url(variable_name: str, value: str):
+    baseurl = urlparse(value)
+    if baseurl.scheme not in ("http", "https"):
+        raise ValueError("Environment variable '{}' must start with 'http://' or 'https://'".format(variable_name))
+
+    if not baseurl.netloc:
+        raise ValueError("Environment variable '{}' must be valid URL".format(variable_name))
 
 
 VARIABLES = {
@@ -35,8 +83,8 @@ VARIABLES = {
     "PROXY_PASSWORD": Option(),
     # OIDC
     "OIDC_LOGIN": Option(typ=bool),
-    "OIDC_PROVIDER": Option(),
-    "OIDC_PROVIDER_INNER": Option(),
+    "OIDC_PROVIDER": Option(validation=check_is_url),
+    "OIDC_PROVIDER_INNER": Option(validation=check_is_url),
     "OIDC_CLIENT_ID": Option(),
     "OIDC_CLIENT_ID_INNER": Option(),
     "OIDC_CLIENT_SECRET": Option(),
@@ -47,13 +95,13 @@ VARIABLES = {
     "OIDC_AUTHENTICATION_METHOD_INNER": Option(),
     "OIDC_CLIENT_CRYPTO_PASS": Option(),
     "OIDC_DEFAULT_ORG": Option(),
-    "OIDC_PASSWORD_RESET": Option(),
+    "OIDC_PASSWORD_RESET": Option(validation=check_is_url),
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
     # Logging
     "SYSLOG_TARGET": Option(),
     "SYSLOG_PORT": Option(typ=int, default=601),
     "SYSLOG_PROTOCOL": Option(default="tcp"),
-    "SENTRY_DSN": Option(),
+    "SENTRY_DSN": Option(validation=check_is_url),
     "SENTRY_ENVIRONMENT": Option(),
     # ZeroMQ
     "ZEROMQ_ENABLED": Option(typ=bool, default=False),
@@ -69,7 +117,7 @@ VARIABLES = {
     "MISP_ORG": Option(required=True),
     "MISP_EMAIL": Option(required=True),
     "MISP_UUID": Option(required=True),
-    "MISP_MODULE_URL": Option(),
+    "MISP_MODULE_URL": Option(validation=check_is_url),
     "MISP_ATTACHMENT_SCAN_MODULE": Option(),
     "MISP_EMAIL_REPLY_TO": Option(),
     "MISP_HOST_ORG_ID": Option(typ=int, default=1),
@@ -128,56 +176,18 @@ def collect() -> dict:
     variables = {}
 
     for variable, option in VARIABLES.items():
-        if variable not in os.environ:
-            if option.required:
-                error("Environment variable '{}' is required, but not set".format(variable))
-            elif option.default is not None:
-                value = option.default
-            else:
-                value = None
-        else:
-            value = os.environ.get(variable)
-            if option.typ == int:
-                value = convert_int(variable, value)
-            elif option.typ == bool:
-                value = convert_bool(variable, value)
-
-        variables[variable] = value
+        try:
+            variables[variable] = option.get_value(variable)
+        except ValueError as e:
+            error(str(e))
 
     return variables
 
 
-def convert_int(variable_name: str, value: Optional[str]) -> Optional[int]:
-    if value is None:
-        return None
-    try:
-        return int(value)
-    except ValueError:
-        error("Environment variable '{}' must be integer, `{}` given".format(variable_name, value))
-
-
-def convert_bool(variable_name: str, value: Optional[str]) -> bool:
-    if value is None:
-        return False
-
-    value = value.lower()
-    if value in ("true", "1", "yes", "on"):
-        return True
-    if value in ("false", "0", "no", "off", ""):
-        return False
-
-    error("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, value))
-
-
-def check_is_url(variable_name: str, value: Optional[str]):
-    if value and not (value.startswith("http://") or value.startswith("https://")):
-        error("Environment variable '{}' must start with 'http://' or 'https://'".format(variable_name))
-
-
 def render_jinja_template(path: str, variables: dict):
     template = jinja_env.from_string(open(path, "r").read())
-    template = template.render(variables)
-    open(path, "w").write(template)
+    rendered = template.render(variables)
+    open(path, "w").write(rendered)
 
 
 def generate_apache_config(variables: dict):
@@ -206,15 +216,17 @@ xdebug.remote_enable=1
 
 
 def generate_snuffleupagus_config(enabled: bool):
-    if enabled:
-        config = """
+    if not enabled:
+        return
+
+    config = """
 ; Enable 'snuffleupagus' extension module
 extension = snuffleupagus.so
 
 ; Path to rules configuration files, glob or comma separated list
 sp.configuration_file = '/etc/php.d/snuffleupagus-*.rules'
-        """
-        open("/etc/php.d/40-snuffleupagus.ini", "w").write(config)
+    """
+    open("/etc/php.d/40-snuffleupagus.ini", "w").write(config)
 
 
 def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_password: Optional[str] = None):
@@ -292,8 +304,6 @@ def main():
 
     variables["SERVER_NAME"] = baseurl.netloc
 
-    check_is_url("MISP_MODULE_URL", variables["MISP_MODULE_URL"])
-
     if len(variables["SECURITY_SALT"]) < 32:
         print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long", file=sys.stderr)
 
@@ -324,8 +334,6 @@ def main():
         for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):
             if not variables[var]:
                 error("OIDC login is enabled, but '{}' environment variable is not set".format(var))
-        check_is_url("OIDC_PROVIDER", variables["OIDC_PROVIDER"])
-        check_is_url("OIDC_PROVIDER_INNER", variables["OIDC_PROVIDER_INNER"])
 
         for var in ("OIDC_CODE_CHALLENGE_METHOD", "OIDC_CODE_CHALLENGE_METHOD_INNER"):
             if variables[var] not in ("S256", "plain", "", None):
