@@ -97,6 +97,8 @@ VARIABLES = {
     "OIDC_DEFAULT_ORG": Option(),
     "OIDC_PASSWORD_RESET": Option(validation=check_is_url),
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
+    "OIDC_OFFLINE_ACCESS": Option(typ=bool, default=False),
+    "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0),
     # Logging
     "SYSLOG_TARGET": Option(),
     "SYSLOG_PORT": Option(typ=int, default=601),

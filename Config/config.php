@@ -38,6 +38,8 @@ $oidcAuth = [
     'organisation_property' => {{ OIDC_ORGANISATION_PROPERTY | str }},
     'default_org' => '{{ OIDC_DEFAULT_ORG if OIDC_DEFAULT_ORG else MISP_ORG }}',
     'unblock' => true,
+    'offline_access' => {{ OIDC_OFFLINE_ACCESS | bool }},
+    'check_user_validity' => {{ OIDC_CHECK_USER_VALIDITY }},
 ];
 $plugin['CustomAuth_custom_logout'] = "{{ MISP_BASEURL }}/oauth2callback?logout={{ MISP_BASEURL | urlencode }}";
 $plugin['CustomAuth_custom_password_reset'] = {{ OIDC_PASSWORD_RESET | str }};
