@@ -38,7 +38,7 @@ mv modules/*.so /build/php-modules/
 # Compile redis
 mkdir /tmp/redis
 cd /tmp/redis
-download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/5.3.6.tar.gz 4273c1340d0080b91fe38354fdf16ff4a56e9677bf42461ddf616832ce46f332
+download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz 6f5cda93aac8c1c4bafa45255460292571fb2f029b0ac4a5a4dc66987a9529e6
 phpize
 ./configure --silent --enable-redis-igbinary --enable-redis-zstd
 make -j2
