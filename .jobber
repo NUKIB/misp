@@ -33,3 +33,10 @@ jobs:
     cmd: logrotate /etc/logrotate.conf
     time: {{ JOBBER_LOG_ROTATE_TIME }}
     onError: Backoff
+
+  {% if OIDC_LOGIN and OIDC_OFFLINE_ACCESS and OIDC_CHECK_USER_VALIDITY %}
+  BlockInvalidUsers:
+     cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --block_invalid
+     time: {{ JOBBER_BLOCK_INVALID_USERS_TIME }}
+     onError: Backoff
+  {% endif %)
