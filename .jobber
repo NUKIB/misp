@@ -9,34 +9,44 @@ prefs:
     maxHistories: 2
 
 jobs:
+  {% if JOBBER_CACHE_FEEDS_TIME %}
   CacheFeeds:
     cmd: su-exec apache /var/www/MISP/app/Console/cake Server cacheFeed {{ JOBBER_USER_ID }} all 2>/dev/null
     time: {{ JOBBER_CACHE_FEEDS_TIME }}
     onError: Backoff
+  {% endif %}
 
+  {% if JOBBER_FETCH_FEEDS_TIME %}
   FetchFeeds:
     cmd: su-exec apache /var/www/MISP/app/Console/cake Server fetchFeed {{ JOBBER_USER_ID }} all 2>/dev/null
     time: {{ JOBBER_FETCH_FEEDS_TIME }}
     onError: Backoff
+  {% endif %}
 
+  {% if JOBBER_PULL_SERVERS_TIME %}
   PullServers:
     cmd: su-exec apache /var/www/MISP/app/Console/cake Server pullAll {{ JOBBER_USER_ID }}
     time: {{ JOBBER_PULL_SERVERS_TIME }}
     onError: Backoff
+  {% endif %}
 
+  {% if JOBBER_SCAN_ATTACHMENT_TIME %}
   ScanAttachment:
     cmd: su-exec apache /var/www/MISP/app/Console/cake admin scanAttachment all
     time: {{ JOBBER_SCAN_ATTACHMENT_TIME }}
     onError: Backoff
+  {% endif %}
 
+  {% if JOBBER_LOG_ROTATE_TIME %}
   LogRotate:
     cmd: logrotate /etc/logrotate.conf
     time: {{ JOBBER_LOG_ROTATE_TIME }}
     onError: Backoff
+  {% endif %}
 
-  {% if OIDC_LOGIN and OIDC_OFFLINE_ACCESS and OIDC_CHECK_USER_VALIDITY %}
+  {% if JOBBER_BLOCK_INVALID_USERS_TIME and OIDC_LOGIN and OIDC_OFFLINE_ACCESS and OIDC_CHECK_USER_VALIDITY %}
   BlockInvalidUsers:
      cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --block_invalid
      time: {{ JOBBER_BLOCK_INVALID_USERS_TIME }}
      onError: Backoff
-  {% endif %)
+  {% endif %}

@@ -185,7 +185,10 @@ You can change default configuration by modifying these environment variables:
 * `JOBBER_FETCH_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for fetch feeds task scheduling
 * `JOBBER_PULL_SERVERS_TIME` (optional, string, default `0 R0-10 6,10,15`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for pull servers task scheduling
 * `JOBBER_SCAN_ATTACHMENT_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for scan attachment task scheduling
-* `JOBBER_LOG_ROTATE_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for log rotate task scheduling
+* `JOBBER_LOG_ROTATE_TIME` (optional, string, default `0 0 5`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for log rotate task scheduling
+* `JOBBER_BLOCK_INVALID_USERS_TIME` (optional, string, default `0 0 5`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for blocking invalid users (makes sense only if `OIDC_OFFLINE_ACCESS` and `OIDC_CHECK_USER_VALIDITY` is set)
+
+If provided time string is empty, job will be disabled.
 
 ## Log locations
 
