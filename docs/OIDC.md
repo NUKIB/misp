@@ -8,7 +8,7 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 
 ## Environment variables
 
-* `OIDC_LOGIN` (optional, bool, default `false`) - set to `true` to enable OIDC login
+* `OIDC_LOGIN` (optional, boolean, default `false`) - set to `true` to enable OIDC login
 * `OIDC_PROVIDER` (optional, string) - URL for OIDC provider in Apache
 * `OIDC_CLIENT_ID` (optional, string)
 * `OIDC_CLIENT_SECRET` (optional, string)
@@ -18,7 +18,7 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 * `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
 * `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for a user that doesn't have organisation name in claim defined by `OIDC_ORGANISATION_PROPERTY` variable. If not provided `MISP_ORG` will be used.
 * `OIDC_ORGANISATION_PROPERTY` (optional, string, default `organization`) - ID token or user info claim that will be used as an organisation in MISP
-* `OIDC_OFFLINE_ACCESS` (optional, bool, default `false`) - if true, offline access token will be requested for user
+* `OIDC_OFFLINE_ACCESS` (optional, boolean, default `false`) - if true, offline access token will be requested for user
 * `OIDC_CHECK_USER_VALIDITY` (optional, int, default `0`)
 
 ### Inner
