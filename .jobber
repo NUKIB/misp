@@ -44,9 +44,9 @@ jobs:
     onError: Backoff
   {% endif %}
 
-  {% if JOBBER_BLOCK_INVALID_USERS_TIME and OIDC_LOGIN and OIDC_OFFLINE_ACCESS and OIDC_CHECK_USER_VALIDITY %}
-  BlockInvalidUsers:
-     cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --block_invalid
-     time: {{ JOBBER_BLOCK_INVALID_USERS_TIME }}
+  {% if JOBBER_USER_CHECK_VALIDITY_TIME and OIDC_LOGIN and OIDC_OFFLINE_ACCESS %}
+  UserCheckValidity:
+     cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --update {% if OIDC_CHECK_USER_VALIDITY %}--block_invalid{% endif %}
+     time: {{ JOBBER_USER_CHECK_VALIDITY_TIME }}
      onError: Backoff
   {% endif %}
