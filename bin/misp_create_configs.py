@@ -155,7 +155,7 @@ VARIABLES = {
     "JOBBER_PULL_SERVERS_TIME": Option(default="0 R0-10 6,10,15"),
     "JOBBER_SCAN_ATTACHMENT_TIME": Option(default="0 R0-10 6"),
     "JOBBER_LOG_ROTATE_TIME": Option(default="0 0 5"),
-    "JOBBER_BLOCK_INVALID_USERS_TIME": Option(default="0 0 5"),
+    "JOBBER_USER_CHECK_VALIDITY_TIME": Option(default="0 0 5"),
 }
 
 
