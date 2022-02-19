@@ -46,7 +46,11 @@ jobs:
 
   {% if JOBBER_USER_CHECK_VALIDITY_TIME and OIDC_LOGIN and OIDC_OFFLINE_ACCESS %}
   UserCheckValidity:
-     cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --update {% if OIDC_CHECK_USER_VALIDITY %}--block_invalid{% endif %}
-     time: {{ JOBBER_USER_CHECK_VALIDITY_TIME }}
-     onError: Backoff
+    {% if OIDC_CHECK_USER_VALIDITY %}
+    cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --update --block_invalid
+    {% else %}
+    cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --update
+    {% endif %}
+    time: {{ JOBBER_USER_CHECK_VALIDITY_TIME }}
+    onError: Backoff
   {% endif %}
