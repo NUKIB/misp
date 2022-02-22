@@ -107,6 +107,7 @@ $config = [
     'redis_password' => {{ REDIS_PASSWORD | str }},
     'redis_database' => 11,
     'redis_namespace' => 'background_jobs',
+    'redis_read_timeout' => 60.0,
     'max_job_history_ttl' => 86400,
     'supervisor_host' => 'unix:/run/supervisor/supervisor.sock',
     'supervisor_port' => 9001,
