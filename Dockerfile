@@ -50,6 +50,7 @@ COPY rsyslog.conf /etc/
 COPY snuffleupagus-misp.rules /etc/php.d/
 COPY .jobber /root/
 COPY supervisor.ini /etc/supervisord.d/misp.ini
+COPY logrotate/* /etc/logrotate.d/
 
 ARG CACHEBUST=1
 ARG MISP_VERSION=develop
@@ -64,6 +65,7 @@ RUN chmod u=r,g=r,o=r /var/www/MISP/app/Config/* && \
     chmod 644 /etc/rsyslog.conf && \
     chmod 644 /etc/httpd/conf.d/misp.conf && \
     chmod 644 /etc/php.d/snuffleupagus-misp.rules && \
+    chmod 644 /etc/logrotate.d/* && \
     chmod 644 /root/.jobber && \
     mkdir /run/php-fpm
 
