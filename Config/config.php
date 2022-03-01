@@ -94,6 +94,7 @@ $config = [
     'disable_cached_exports' => true,
     'allow_disabling_correlation' => true,
     'system_setting_db' => true,
+    'event_alert_default_enabled' => {{ MISP_EVENT_ALERT_DEFAULT_ENABLED | bool }},
     'terms_files' => {{ MISP_TERMS_FILE | str }},
     'home_logo' => {{ MISP_HOME_LOGO | str }},
     'footer_logo' => {{ MISP_FOOTER_LOGO | str }},
