@@ -40,7 +40,7 @@ MISP must be assigned to `misp-access` role.
 [
    'misp-admin-access' => 1, // Admin
    'misp-org-admin-access' => 2, // Org Admin
-   'misp-sync' => 5, // Sync user
+   'misp-sync-access' => 5, // Sync user
    'misp-publisher-access' => 4, // Publisher
    'misp-api-access' => 'User with API access',
    'misp-access' => 3, // User
