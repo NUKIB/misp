@@ -48,7 +48,7 @@ $oidcAuth = NULL;
 {% endif %}
 
 $config = [
-  'debug' => {{ 1 if MISP_DEBUG else 0}},
+  'debug' => {{ 1 if MISP_DEBUG else 0 }},
   'MISP' => [
     'baseurl' => '{{ MISP_BASEURL }}',
     'org' => '{{ MISP_ORG }}',

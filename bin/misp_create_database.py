@@ -8,7 +8,7 @@ import argparse
 import pymysql.cursors
 from pymysql.constants import CLIENT
 from pymysql.connections import Connection
-from typing import Optional
+from typing import Optional, TextIO
 
 
 def connect(host: str, port: int, user: str, password: Optional[str]) -> pymysql.connections.Connection:
@@ -18,7 +18,7 @@ def connect(host: str, port: int, user: str, password: Optional[str]) -> pymysql
 
 
 def wait_for_connection(host: str, port: int, user: str, password: Optional[str]) -> Connection:
-    logging.info(f"Connectiong to MySQL server {host}:{port}")
+    logging.info(f"Connecting to MySQL server {host}:{port}")
     last_exception = None
     for i in range(1, 10):
         try:
@@ -39,9 +39,10 @@ def is_schema_created(connection: Connection, database: str) -> bool:
         return bool(cursor.fetchone()[0])
 
 
-def create_schema(connection: Connection, file):
+def create_schema(connection: Connection, schema_file: TextIO):
+    schema = schema_file.read()
     with connection.cursor() as cursor:
-        cursor.execute(file.read())
+        cursor.execute(schema)
     connection.commit()
 
 
@@ -57,10 +58,7 @@ def main():
 
     password = os.environ.get("MYSQL_PASSWORD")
     port = os.environ.get("MYSQL_PORT")
-    if port is not None:
-        port = int(port)
-    else:
-        port = 3306
+    port = 3306 if port is None else int(port)
 
     connection = wait_for_connection(args.host, port, args.user, password)
 
@@ -72,7 +70,7 @@ def main():
     try:
         connection.select_db(args.database)
     except Exception as e:
-        logging.error("Could not connect to database")
+        logging.error(f"Could not select database {args.database}")
         print(e, file=sys.stderr)
         connection.close()
         sys.exit(1)
@@ -82,7 +80,6 @@ def main():
     logging.info("Database schema created.")
 
     connection.close()
-
     sys.exit(0)
 
 
