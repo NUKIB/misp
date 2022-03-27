@@ -6,16 +6,18 @@ import sys
 import glob
 import uuid
 from urllib.parse import urlparse
-from typing import Optional, Type, Callable, Any, NoReturn
+from typing import Optional, Type, Callable, Any, NoReturn, List, Union, Tuple
 from jinja2 import Environment
 
 
 class Option:
-    def __init__(self, required: bool = False, typ: Type = str, default: Any = None, validation: Callable[[str, Any], NoReturn] = None):
+    def __init__(self, required: bool = False, typ: Type = str, default: Any = None,
+                 validation: Callable[[str, Any], NoReturn] = None, options: Optional[Union[List, Tuple]] = None):
         self.required = required
         self.typ = typ
         self.default = default
         self.validation = validation
+        self.options = options
 
     def get_value(self, env_name: str) -> Any:
         if env_name not in os.environ:
@@ -34,6 +36,10 @@ class Option:
 
             if self.validation:
                 self.validation(env_name, value)
+
+            if self.options and value not in self.options:
+                options = ", ".join(["`{}`".format(option) for option in self.options])
+                raise ValueError("Environment variable '{}' value `{}` is invalid, must be one of: {}".format(env_name, value, options))
 
         return value
 
@@ -103,6 +109,7 @@ VARIABLES = {
     "SYSLOG_TARGET": Option(),
     "SYSLOG_PORT": Option(typ=int, default=601),
     "SYSLOG_PROTOCOL": Option(default="tcp"),
+    "SYSLOG_FILE_FORMAT": Option(default="text-tradition", options=("text-traditional", "text", "json")),
     "SENTRY_DSN": Option(validation=check_is_url),
     "SENTRY_ENVIRONMENT": Option(),
     # ZeroMQ
@@ -176,6 +183,14 @@ def error(message: str):
     sys.exit(1)
 
 
+def write(path: str, content: str):
+    try:
+        with open(path, "w") as f:
+            f.write(content)
+    except OSError as e:
+        error(f"Could not write content to {path}: {e}")
+
+
 def collect() -> dict:
     variables = {}
 
@@ -191,7 +206,7 @@ def collect() -> dict:
 def render_jinja_template(path: str, variables: dict):
     template = jinja_env.from_string(open(path, "r").read())
     rendered = template.render(variables)
-    open(path, "w").write(rendered)
+    write(path, rendered)
 
 
 def generate_apache_config(variables: dict):
@@ -216,7 +231,7 @@ xdebug.remote_enable=1
         xdebug_config = xdebug_config_template.format(profiler_enabled=1 if profiler_trigger else 0,
                                                       profiler_trigger=profiler_trigger)
 
-        open(xdebug_config_path, "w").write(xdebug_config)
+        write(xdebug_config_path, xdebug_config)
 
 
 def generate_snuffleupagus_config(enabled: bool):
@@ -230,7 +245,7 @@ extension = snuffleupagus.so
 ; Path to rules configuration files, glob or comma separated list
 sp.configuration_file = '/etc/php.d/snuffleupagus-*.rules'
     """
-    open("/etc/php.d/40-snuffleupagus.ini", "w").write(config)
+    write("/etc/php.d/40-snuffleupagus.ini", config)
 
 
 def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_password: Optional[str] = None):
@@ -248,23 +263,38 @@ php_value[session.save_handler] = redis
 php_value[session.save_path]    = "{redis_path}"
 """
     config = config_template.format(redis_path=redis_path)
-    open(config_path, "w").write(config)
+    write(config_path, config)
 
 
-def generate_rsyslog_config(syslog_target: Optional[str], syslog_port: int, syslog_protocol: str):
-    if not syslog_target:
-        return
-
+def generate_rsyslog_config(variables: dict):
     # Recommended setting from https://github.com/grafana/loki/blob/master/docs/clients/promtail/scraping.md#rsyslog-output-configuration
-    config_template = """
+    forward_config_template = """
 action(type="omfwd" target="{syslog_target}" port="{syslog_port}" protocol="{syslog_protocol}"
     Template="RSYSLOG_SyslogProtocol23Format" TCP_Framing="octet-counted"
     action.resumeRetryCount="100"
     queue.type="linkedList" queue.size="10000")
 """
-    config = config_template.format(syslog_target=syslog_target, syslog_port=syslog_port,
-                                    syslog_protocol=syslog_protocol)
-    open("/etc/rsyslog.d/forward.conf", "w+").write(config)
+
+    if variables["SYSLOG_TARGET"]:
+        config = forward_config_template.format(syslog_target=variables["SYSLOG_TARGET"], syslog_port=variables["SYSLOG_PORT"],
+                                    syslog_protocol=variables["SYSLOG_PROTOCOL"])
+        write("/etc/rsyslog.d/forward.conf", config)
+
+    file_config_template = """
+# Output all logs to file
+action(type="omfile" dirCreateMode="0700" FileCreateMode="0644"
+       File="/var/log/messages" template="{file_template}")
+    """
+
+    file_format = variables["SYSLOG_FILE_FORMAT"]
+
+    if file_format == "text-traditional":
+        file_format = "RSYSLOG_TraditionalFileFormat"
+    elif file_format == "text":
+        file_format = "RSYSLOG_FileFormat"
+
+    config = file_config_template.format(file_template=file_format)
+    write("/etc/rsyslog.d/file.conf", config)
 
 
 def generate_error_messages(email: str):
@@ -288,12 +318,12 @@ def generate_php_config(variables: dict):
         upload_max_filesize=variables["PHP_UPLOAD_MAX_FILESIZE"],
         session_cookie_samesite=variables["PHP_SESSIONS_COOKIE_SAMESITE"],
     )
-    open("/etc/php.d/99-misp.ini", "w").write(template)
+    write("/etc/php.d/99-misp.ini", template)
 
 
 def generate_crypto_policies(crypto_policy: Optional[str]):
     if crypto_policy:
-        open("/etc/crypto-policies/config", "w").write(crypto_policy)
+        write("/etc/crypto-policies/config", crypto_policy)
 
 
 def main():
@@ -355,7 +385,7 @@ def main():
     generate_snuffleupagus_config(variables['PHP_SNUFFLEUPAGUS'])
     generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_PASSWORD"])
     generate_apache_config(variables)
-    generate_rsyslog_config(variables["SYSLOG_TARGET"], variables["SYSLOG_PORT"], variables["SYSLOG_PROTOCOL"])
+    generate_rsyslog_config(variables)
     generate_error_messages(variables["SUPPORT_EMAIL"])
     generate_php_config(variables)
     generate_crypto_policies(variables["SECURITY_CRYPTO_POLICY"])
