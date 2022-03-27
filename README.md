@@ -169,11 +169,10 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 
 ### Syslog
 
-If enabled, all logs from the container are forwarded to a defined syslog server.
-
-* `SYSLOG_TARGET` (optional, string) - hostname or IP address of the system that shall receive messages
+* `SYSLOG_TARGET` (optional, string) - if defined, all logs from the container are forwarded to a defined syslog server. Should be hostname or IP address of the system that shall receive messages.
 * `SYSLOG_PORT` (optional, integer, default `601`)
 * `SYSLOG_PROTOCOL` (optional, string, default `tcp`)
+* `SYSLOG_FILE_FORMAT` (optional, string, default `text-traditional`) - sets `/var/log/messages` log file format, can be `json`, `text` or `text-traditional`
 
 ### Jobber
 
