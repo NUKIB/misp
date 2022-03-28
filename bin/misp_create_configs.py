@@ -109,7 +109,7 @@ VARIABLES = {
     "SYSLOG_TARGET": Option(),
     "SYSLOG_PORT": Option(typ=int, default=601),
     "SYSLOG_PROTOCOL": Option(default="tcp"),
-    "SYSLOG_FILE_FORMAT": Option(default="text-tradition", options=("text-traditional", "text", "json")),
+    "SYSLOG_FILE_FORMAT": Option(default="text-traditional", options=("text-traditional", "text", "json")),
     "SENTRY_DSN": Option(validation=check_is_url),
     "SENTRY_ENVIRONMENT": Option(),
     # ZeroMQ
