@@ -71,6 +71,11 @@ def check_is_url(variable_name: str, value: str):
         raise ValueError("Environment variable '{}' must be valid URL".format(variable_name))
 
 
+def check_is_email(variable_name: str, value: str):
+    if '@' not in value:
+        raise ValueError("Environment variable '{}' must be email address".format(variable_name))
+
+
 VARIABLES = {
     # MySQL
     "MYSQL_HOST": Option(required=True),
@@ -120,15 +125,15 @@ VARIABLES = {
     "SMTP_HOST": Option(),
     "SMTP_USERNAME": Option(),
     "SMTP_PASSWORD": Option(),
-    "SUPPORT_EMAIL": Option(),
+    "SUPPORT_EMAIL": Option(validation=check_is_email),
     # MISP
     "MISP_BASEURL": Option(required=True),
     "MISP_ORG": Option(required=True),
-    "MISP_EMAIL": Option(required=True),
+    "MISP_EMAIL": Option(required=True, validation=check_is_email),
     "MISP_UUID": Option(required=True),
     "MISP_MODULE_URL": Option(validation=check_is_url),
     "MISP_ATTACHMENT_SCAN_MODULE": Option(),
-    "MISP_EMAIL_REPLY_TO": Option(),
+    "MISP_EMAIL_REPLY_TO": Option(validation=check_is_email),
     "MISP_EVENT_ALERT_DEFAULT_ENABLED": Option(typ=bool, default=False),
     "MISP_HOST_ORG_ID": Option(typ=int, default=1),
     "MISP_DEBUG": Option(typ=bool, default=False),
