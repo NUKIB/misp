@@ -303,7 +303,7 @@ action(type="omfile" dirCreateMode="0700" FileCreateMode="0644"
 
 
 def generate_error_messages(email: str):
-    for path in glob.glob('/var/www/html/*.html'):
+    for path in glob.glob('/var/www/html/*.*html'):
         render_jinja_template(path, {"SUPPORT_EMAIL": email})
 
 
