@@ -169,10 +169,13 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 
 ### Syslog
 
+Syslog is collecting all logs from container (see [rsyslog.conf](rsyslog.conf)) and save them to `SYSLOG_FILE` or optionally sends them to remote syslog server.
+
 * `SYSLOG_TARGET` (optional, string) - if defined, all logs from the container are forwarded to a defined syslog server. Should be hostname or IP address of the system that shall receive messages.
-* `SYSLOG_PORT` (optional, integer, default `601`)
+* `SYSLOG_PORT` (optional, int, default `601`)
 * `SYSLOG_PROTOCOL` (optional, string, default `tcp`)
-* `SYSLOG_FILE_FORMAT` (optional, string, default `text-traditional`) - sets `/var/log/messages` log file format, can be `json`, `text` or `text-traditional`
+* `SYSLOG_FILE` (optional, string, default `/var/log/messages`) - path to file that will contain all logs collected by syslog
+* `SYSLOG_FILE_FORMAT` (optional, string, default `text-traditional`) - sets `SYSLOG_FILE` log file format, can be `json`, `text` or `text-traditional`
 
 ### Jobber
 
@@ -180,7 +183,7 @@ Automation tasks are run by [jobber](https://github.com/dshearer/jobber) applica
 
 You can change default configuration by modifying these environment variables:
 
-* `JOBBER_USER_ID` (optional, integer, default `1`) - MISP user ID which is used in scheduled tasks by Jobber (1 is the user ID of the initial created admin@admin.test user)
+* `JOBBER_USER_ID` (optional, int, default `1`) - MISP user ID which is used in scheduled tasks by Jobber (1 is the user ID of the initial created admin@admin.test user)
 * `JOBBER_CACHE_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for cache feeds task scheduling
 * `JOBBER_FETCH_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for fetch feeds task scheduling
 * `JOBBER_PULL_SERVERS_TIME` (optional, string, default `0 R0-10 6,10,15`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for pull servers task scheduling
