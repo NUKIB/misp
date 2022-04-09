@@ -19,7 +19,7 @@ cd /tmp/igbinary
 download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.7.tar.gz 21863908348f90a8a895c8e92e0ec83c9cf9faffcfd70118b06fe2dca30eaa96
 phpize
 ./configure --silent CFLAGS="-O2 -g" --enable-igbinary
-make -j2
+make -j$(nproc)
 make install # `make install` is necessary, so redis extension can be compiled with `--enable-redis-igbinary`
 mv modules/*.so /build/php-modules/
 
@@ -32,7 +32,7 @@ download_and_check https://github.com/facebook/zstd/archive/refs/tags/v1.5.2.tar
 cd ..
 phpize
 ./configure --silent
-make --silent -j2
+make --silent -j$(nproc)
 mv modules/*.so /build/php-modules/
 
 # Compile redis
@@ -41,7 +41,7 @@ cd /tmp/redis
 download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz 6f5cda93aac8c1c4bafa45255460292571fb2f029b0ac4a5a4dc66987a9529e6
 phpize
 ./configure --silent --enable-redis-igbinary --enable-redis-zstd
-make -j2
+make -j$(nproc)
 mv modules/*.so /build/php-modules/
 
 # Compile ssdeep
@@ -50,7 +50,7 @@ cd /tmp/ssdeep
 download_and_check https://github.com/php/pecl-text-ssdeep/archive/refs/tags/1.1.0.tar.gz 256c5c1d6b965f1c6e0f262b6548b1868f4857c5145ca255031a92d602e8b88d
 phpize
 ./configure --silent --with-ssdeep=/usr --with-libdir=lib64
-make -j2
+make -j$(nproc)
 mv modules/*.so /build/php-modules/
 
 # Compile brotli
@@ -59,7 +59,7 @@ cd /tmp/brotli
 download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.13.1.tar.gz 1eca1af3208e2f6551064e3f26e771453def588898bfc25858ab1db985363e47
 phpize
 ./configure --silent --with-libbrotli
-make -j2
+make -j$(nproc)
 mv modules/*.so /build/php-modules/
 
 # Compile snuffleupagus
@@ -69,7 +69,7 @@ download_and_check https://github.com/jvoisin/snuffleupagus/archive/refs/tags/v0
 cd src
 phpize
 ./configure --silent --enable-snuffleupagus
-make -j2
+make -j$(nproc)
 mv modules/*.so /build/php-modules/
 
 # Remove debug from binaries
