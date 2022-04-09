@@ -114,6 +114,7 @@ VARIABLES = {
     "SYSLOG_TARGET": Option(),
     "SYSLOG_PORT": Option(typ=int, default=601),
     "SYSLOG_PROTOCOL": Option(default="tcp"),
+    "SYSLOG_FILE": Option(default="/var/log/messages"),
     "SYSLOG_FILE_FORMAT": Option(default="text-traditional", options=("text-traditional", "text", "json")),
     "SENTRY_DSN": Option(validation=check_is_url),
     "SENTRY_ENVIRONMENT": Option(),
@@ -188,7 +189,7 @@ def error(message: str):
     sys.exit(1)
 
 
-def write(path: str, content: str):
+def write_file(path: str, content: str):
     try:
         with open(path, "w") as f:
             f.write(content)
@@ -211,7 +212,7 @@ def collect() -> dict:
 def render_jinja_template(path: str, variables: dict):
     template = jinja_env.from_string(open(path, "r").read())
     rendered = template.render(variables)
-    write(path, rendered)
+    write_file(path, rendered)
 
 
 def generate_apache_config(variables: dict):
@@ -236,7 +237,7 @@ xdebug.remote_enable=1
         xdebug_config = xdebug_config_template.format(profiler_enabled=1 if profiler_trigger else 0,
                                                       profiler_trigger=profiler_trigger)
 
-        write(xdebug_config_path, xdebug_config)
+        write_file(xdebug_config_path, xdebug_config)
 
 
 def generate_snuffleupagus_config(enabled: bool):
@@ -250,7 +251,7 @@ extension = snuffleupagus.so
 ; Path to rules configuration files, glob or comma separated list
 sp.configuration_file = '/etc/php.d/snuffleupagus-*.rules'
     """
-    write("/etc/php.d/40-snuffleupagus.ini", config)
+    write_file("/etc/php.d/40-snuffleupagus.ini", config)
 
 
 def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_password: Optional[str] = None):
@@ -268,7 +269,7 @@ php_value[session.save_handler] = redis
 php_value[session.save_path]    = "{redis_path}"
 """
     config = config_template.format(redis_path=redis_path)
-    write(config_path, config)
+    write_file(config_path, config)
 
 
 def generate_rsyslog_config(variables: dict):
@@ -283,23 +284,23 @@ action(type="omfwd" target="{syslog_target}" port="{syslog_port}" protocol="{sys
     if variables["SYSLOG_TARGET"]:
         config = forward_config_template.format(syslog_target=variables["SYSLOG_TARGET"], syslog_port=variables["SYSLOG_PORT"],
                                     syslog_protocol=variables["SYSLOG_PROTOCOL"])
-        write("/etc/rsyslog.d/forward.conf", config)
+        write_file("/etc/rsyslog.d/forward.conf", config)
 
-    file_config_template = """
-# Output all logs to file
-action(type="omfile" dirCreateMode="0700" FileCreateMode="0644"
-       File="/var/log/messages" template="{file_template}")
-    """
+    if variables["SYSLOG_FILE"]:
+        file_config_template = """
+    # Output all logs to file
+    action(type="omfile" dirCreateMode="0700" FileCreateMode="0644"
+           File="{file}" template="{file_template}")
+        """
 
-    file_format = variables["SYSLOG_FILE_FORMAT"]
+        file_format = variables["SYSLOG_FILE_FORMAT"]
+        if file_format == "text-traditional":
+            file_format = "RSYSLOG_TraditionalFileFormat"
+        elif file_format == "text":
+            file_format = "RSYSLOG_FileFormat"
 
-    if file_format == "text-traditional":
-        file_format = "RSYSLOG_TraditionalFileFormat"
-    elif file_format == "text":
-        file_format = "RSYSLOG_FileFormat"
-
-    config = file_config_template.format(file_template=file_format)
-    write("/etc/rsyslog.d/file.conf", config)
+        config = file_config_template.format(file_template=file_format, file=variables["SYSLOG_FILE"])
+        write_file("/etc/rsyslog.d/file.conf", config)
 
 
 def generate_error_messages(email: str):
@@ -323,12 +324,12 @@ def generate_php_config(variables: dict):
         upload_max_filesize=variables["PHP_UPLOAD_MAX_FILESIZE"],
         session_cookie_samesite=variables["PHP_SESSIONS_COOKIE_SAMESITE"],
     )
-    write("/etc/php.d/99-misp.ini", template)
+    write_file("/etc/php.d/99-misp.ini", template)
 
 
 def generate_crypto_policies(crypto_policy: Optional[str]):
     if crypto_policy:
-        write("/etc/crypto-policies/config", crypto_policy)
+        write_file("/etc/crypto-policies/config", crypto_policy)
 
 
 def main():
