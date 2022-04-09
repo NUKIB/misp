@@ -22,6 +22,13 @@ services:
     image: ghcr.io/nukib/misp-modules:latest
     restart: always
     container_name: misp-modules
+    cap_drop:
+      - NET_RAW
+      - SYS_CHROOT
+      - MKNOD
+      - NET_BIND_SERVICE
+      - AUDIT_WRITE
+      - SETFCAP
 
   misp:
     image: ${MISP_IMAGE-ghcr.io/nukib/misp:latest}
@@ -32,6 +39,12 @@ services:
       - redis
     tmpfs:
       - /tmp
+    cap_drop:
+      - NET_RAW
+      - SYS_CHROOT
+      - MKNOD
+      - AUDIT_WRITE
+      - SETFCAP
     environment:
       MYSQL_HOST: mysql
       MYSQL_LOGIN: misp
