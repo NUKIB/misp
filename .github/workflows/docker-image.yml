@@ -61,7 +61,7 @@ jobs:
         sleep 10 # Wait until container is ready
         docker logs misp
         AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake userInit -q)
-        VERSION=$(curl --fail -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion)
+        VERSION=$(curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion)
         echo $VERSION | jq
         docker compose down
     -
