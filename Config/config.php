@@ -48,6 +48,9 @@ $oidcAuth = NULL;
 {% endif %}
 
 $config = [
+  {% if not MISP_DEBUG %}
+  'Asset' => ['timestamp' => 'cached'],
+  {% endif %}
   'debug' => {{ 1 if MISP_DEBUG else 0 }},
   'MISP' => [
     'baseurl' => '{{ MISP_BASEURL }}',
