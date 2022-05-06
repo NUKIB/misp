@@ -25,4 +25,5 @@ chmod u+x /usr/local/bin/yum-builddep
 make -C packaging/rpm pkg-local "DESTDIR=/build/"
 
 # Cleanup
-dnf history rollback -y last-2
+# 2022-05-06: Temporary disabled since stream8 has broken packages
+#dnf history rollback -y last-2
