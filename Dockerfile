@@ -17,9 +17,7 @@ COPY bin/misp_compile_php_extensions.sh bin/misp_enable_epel.sh /build/
 RUN --mount=type=tmpfs,target=/tmp \
     dnf module enable -y php:7.4 && \
     bash /build/misp_enable_epel.sh && \
-    dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file libzstd-devel ssdeep-devel && \
-    bash /build/misp_compile_php_extensions.sh && \
-    dnf history undo -y 0
+    bash /build/misp_compile_php_extensions.sh
 
 # Build jobber, that is not released for arm64 arch
 FROM builder as jobber-build

@@ -11,6 +11,9 @@ download_and_check () {
   rm -f package.tar.gz
 }
 
+# Install required packages for build
+dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file libzstd-devel ssdeep-devel
+
 mkdir /build/php-modules/
 
 # Compile igbinary
@@ -72,5 +75,9 @@ phpize
 make -j$(nproc)
 mv modules/*.so /build/php-modules/
 
-# Remove debug from binaries
+# Remove debug symbols from binaries
 strip /build/php-modules/*.so
+
+# Cleanup
+# 2022-05-06: Temporary disabled since stream8 has broken packages
+# dnf history undo -y 0
