@@ -107,7 +107,7 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `SMTP_PASSWORD` (optional, string)
 * `MISP_EMAIL` (required, string) - the email address that MISP should use for all notifications
 * `MISP_EMAIL_REPLY_TO` (optional, string) - the email address that will be used in `Reply-To` header
-* `MISP_EVENT_ALERT_DEFAULT_ENABLED` (optional, bool, default `False`) - if sending event alert emails should be enabled by default to newly created users
+* `MISP_DEFAULT_PUBLISH_ALERT` (optional, bool, default `false`) - if sending event alert emails should be enabled by default to newly created users
 * `SUPPORT_EMAIL` (optional, string) - the email address that will be included in Apache error pages
 
 ### PGP for email encryption and signing
