@@ -5,7 +5,7 @@
 #sp.readonly_exec.simulation().enable();
 
 # Disabling the loading of external entities in the XML parser.
-sp.disable_xxe.enable();
+sp.xxe_protection.enable();
 
 # Prevent various `mail`-related vulnerabilities
 sp.disable_function.function("mail").drop();
