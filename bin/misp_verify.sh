@@ -18,6 +18,3 @@ check_jinja_template /var/www/MISP/app/Config/config.php
 check_jinja_template /var/www/MISP/app/Config/database.php
 check_jinja_template /var/www/MISP/app/Config/email.php
 check_jinja_template /etc/httpd/conf.d/misp.conf
-
-# Check installed Python packages for vulnerabilities
-safety check --full-report || true # ignore output for now
