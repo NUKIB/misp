@@ -315,7 +315,8 @@ def generate_php_config(variables: dict):
                "max_execution_time = {max_execution_time}\n" \
                "upload_max_filesize = {upload_max_filesize}\n" \
                "post_max_size = {upload_max_filesize}\n" \
-               "session.cookie_samesite = '{session_cookie_samesite}'\n"
+               "session.cookie_samesite = '{session_cookie_samesite}'\n" \
+               "opcache.validate_timestamps= {opcache_validate_timestamps}"
 
     template = template.format(
         timezone=variables["PHP_TIMEZONE"],
@@ -323,6 +324,7 @@ def generate_php_config(variables: dict):
         max_execution_time=variables["PHP_MAX_EXECUTION_TIME"],
         upload_max_filesize=variables["PHP_UPLOAD_MAX_FILESIZE"],
         session_cookie_samesite=variables["PHP_SESSIONS_COOKIE_SAMESITE"],
+        opcache_validate_timestamps=1 if variables["MISP_DEBUG"] else 0,
     )
     write_file("/etc/php.d/99-misp.ini", template)
 
