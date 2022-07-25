@@ -19,12 +19,12 @@ for file in FILES_THAT_SHOULD_NOT_BE_WRITABLE:
 
     if os.stat(file).st_uid == os.getuid():
         fail = True
-        print("File `{}` should not be owned by {} user.".format(file, getpass.getuser()), file=sys.stderr)
+        print(f"File `{file}` should not be owned by {getpass.getuser()} user.", file=sys.stderr)
         continue
 
     if os.access(file, os.W_OK):
         fail = True
-        print("File `{}` should not be writable for {} user.".format(file, getpass.getuser()), file=sys.stderr)
+        print(f"File `{file}` should not be writable for {getpass.getuser()} user.", file=sys.stderr)
 
 if fail:
     print("ERROR: Some files are writable that should not, stopping.", file=sys.stderr)

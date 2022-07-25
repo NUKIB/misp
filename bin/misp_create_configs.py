@@ -22,7 +22,7 @@ class Option:
     def get_value(self, env_name: str) -> Any:
         if env_name not in os.environ:
             if self.required:
-                raise ValueError("Environment variable '{}' is required, but not set".format(env_name))
+                raise ValueError(f"Environment variable '{env_name}' is required, but not set")
             elif self.default is not None:
                 value = self.default
             else:
@@ -38,8 +38,8 @@ class Option:
                 self.validation(env_name, value)
 
             if self.options and value not in self.options:
-                options = ", ".join(["`{}`".format(option) for option in self.options])
-                raise ValueError("Environment variable '{}' value `{}` is invalid, must be one of: {}".format(env_name, value, options))
+                options = ", ".join([f"`{option}`" for option in self.options])
+                raise ValueError(f"Environment variable '{env_name}' value `{value}` is invalid, must be one of: {options}")
 
         return value
 
@@ -48,8 +48,7 @@ class Option:
         try:
             return int(value)
         except ValueError:
-            raise ValueError("Environment variable '{}' must be integer, `{}` given".format(variable_name, value))
-
+            raise ValueError(f"Environment variable '{variable_name}' must be integer, `{value}` given")
 
     @staticmethod
     def convert_bool(variable_name: str, value: str) -> bool:
@@ -59,21 +58,21 @@ class Option:
         if value in ("false", "0", "no", "off", ""):
             return False
 
-        raise ValueError("Environment variable '{}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{}` given".format(variable_name, value))
+        raise ValueError(f"Environment variable '{variable_name}' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{value}` given")
 
 
 def check_is_url(variable_name: str, value: str):
     baseurl = urlparse(value)
     if baseurl.scheme not in ("http", "https"):
-        raise ValueError("Environment variable '{}' must start with 'http://' or 'https://'".format(variable_name))
+        raise ValueError(f"Environment variable '{variable_name}' must start with 'http://' or 'https://'")
 
     if not baseurl.netloc:
-        raise ValueError("Environment variable '{}' must be valid URL".format(variable_name))
+        raise ValueError(f"Environment variable '{variable_name}' must be valid URL")
 
 
 def check_is_email(variable_name: str, value: str):
     if '@' not in value:
-        raise ValueError("Environment variable '{}' must be email address".format(variable_name))
+        raise ValueError(f"Environment variable '{variable_name}' must be email address")
 
 
 VARIABLES = {
@@ -185,7 +184,7 @@ jinja_env.filters["bool"] = lambda x: 'true' if x else 'false'
 
 
 def error(message: str):
-    print("ERROR: " + message, file=sys.stderr)
+    print(f"ERROR: {message}", file=sys.stderr)
     sys.exit(1)
 
 
@@ -227,15 +226,13 @@ def generate_xdebug_config(enabled: bool, profiler_trigger: str):
     xdebug_config_path = "/etc/php.d/15-xdebug.ini"
 
     if enabled:
-        xdebug_config_template = """
-zend_extension=xdebug.so
+        profiler_enabled = 1 if profiler_trigger else 0
 
-xdebug.profiler_enable_trigger={profiler_enabled}
-xdebug.profiler_enable_trigger_value="{profiler_trigger}"
-xdebug.remote_enable=1
-"""
-        xdebug_config = xdebug_config_template.format(profiler_enabled=1 if profiler_trigger else 0,
-                                                      profiler_trigger=profiler_trigger)
+        xdebug_config = f"zend_extension=xdebug.so\n" \
+                        f"\n" \
+                        f"xdebug.profiler_enable_trigger={profiler_enabled}\n" \
+                        f"xdebug.profiler_enable_trigger_value=\"{profiler_trigger}\"\n" \
+                        f"xdebug.remote_enable=1\n"
 
         write_file(xdebug_config_path, xdebug_config)
 
@@ -244,13 +241,12 @@ def generate_snuffleupagus_config(enabled: bool):
     if not enabled:
         return
 
-    config = """
-; Enable 'snuffleupagus' extension module
-extension = snuffleupagus.so
+    config = f"; Enable 'snuffleupagus' extension module\n" \
+             f"extension = snuffleupagus.so\n" \
+             f"\n" \
+             f"; Path to rules configuration files, glob or comma separated list\n" \
+             f"sp.configuration_file = '/etc/php.d/snuffleupagus-*.rules'\n"
 
-; Path to rules configuration files, glob or comma separated list
-sp.configuration_file = '/etc/php.d/snuffleupagus-*.rules'
-    """
     write_file("/etc/php.d/40-snuffleupagus.ini", config)
 
 
@@ -258,48 +254,51 @@ def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_pass
     if not enabled:
         return
 
-    redis_path = "tcp://{redis_host}:6379?database=12".format(redis_host=redis_host)
+    redis_path = f"tcp://{redis_host}:6379?database=12"
     if redis_password:
-        redis_path += "&auth={redis_password}".format(redis_password=redis_password)
+        redis_path = f"{redis_path}&auth={redis_password}"
 
     config_path = "/etc/php-fpm.d/sessions.conf"
-    config_template = """
-[www]
-php_value[session.save_handler] = redis
-php_value[session.save_path]    = "{redis_path}"
-"""
-    config = config_template.format(redis_path=redis_path)
+    config = f"[www]\n" \
+             f"php_value[session.save_handler] = redis\n" \
+             f"php_value[session.save_path]    = \"{redis_path}\"\n"
+
     write_file(config_path, config)
 
 
 def generate_rsyslog_config(variables: dict):
     # Recommended setting from https://github.com/grafana/loki/blob/master/docs/clients/promtail/scraping.md#rsyslog-output-configuration
-    forward_config_template = """
-action(type="omfwd" target="{syslog_target}" port="{syslog_port}" protocol="{syslog_protocol}"
-    Template="RSYSLOG_SyslogProtocol23Format" TCP_Framing="octet-counted"
-    action.resumeRetryCount="100"
-    queue.type="linkedList" queue.size="10000")
-"""
-
     if variables["SYSLOG_TARGET"]:
-        config = forward_config_template.format(syslog_target=variables["SYSLOG_TARGET"], syslog_port=variables["SYSLOG_PORT"],
-                                    syslog_protocol=variables["SYSLOG_PROTOCOL"])
+        config = f'action(\n' \
+                 f'    type="omfwd"\n' \
+                 f'    target="{variables["SYSLOG_TARGET"]}"\n' \
+                 f'    port="{variables["SYSLOG_PORT"]}"\n' \
+                 f'    protocol="{variables["SYSLOG_PROTOCOL"]}"\n' \
+                 f'    Template="RSYSLOG_SyslogProtocol23Format"\n' \
+                 f'    TCP_Framing="octet-counted"\n' \
+                 f'    action.resumeRetryCount="100"\n' \
+                 f'    queue.type="linkedList"\n' \
+                 f'    queue.size="10000"\n' \
+                 f')\n'
+
         write_file("/etc/rsyslog.d/forward.conf", config)
 
     if variables["SYSLOG_FILE"]:
-        file_config_template = """
-    # Output all logs to file
-    action(type="omfile" dirCreateMode="0700" FileCreateMode="0644"
-           File="{file}" template="{file_template}")
-        """
-
         file_format = variables["SYSLOG_FILE_FORMAT"]
         if file_format == "text-traditional":
             file_format = "RSYSLOG_TraditionalFileFormat"
         elif file_format == "text":
             file_format = "RSYSLOG_FileFormat"
 
-        config = file_config_template.format(file_template=file_format, file=variables["SYSLOG_FILE"])
+        config = f'# Output all logs to file\n' \
+                 f'action(\n' \
+                 f'    type="omfile"\n' \
+                 f'    dirCreateMode="0700"\n' \
+                 f'    FileCreateMode="0644"\n' \
+                 f'    File="{variables["SYSLOG_FILE"]}"\n' \
+                 f'    template="{file_format}"\n' \
+                 f')\n'
+
         write_file("/etc/rsyslog.d/file.conf", config)
 
 
@@ -309,21 +308,14 @@ def generate_error_messages(email: str):
 
 
 def generate_php_config(variables: dict):
-    template = "; Do not edit this file directly! It is automatically generated after every container start.\n" \
-               "date.timezone = '{timezone}'\n" \
-               "memory_limit = {memory_limit}\n" \
-               "max_execution_time = {max_execution_time}\n" \
-               "upload_max_filesize = {upload_max_filesize}\n" \
-               "post_max_size = {upload_max_filesize}\n" \
-               "session.cookie_samesite = '{session_cookie_samesite}'\n"
+    template = f"; Do not edit this file directly! It is automatically generated after every container start.\n" \
+               f"date.timezone = '{variables['PHP_TIMEZONE']}'\n" \
+               f"memory_limit = {variables['PHP_MEMORY_LIMIT']}\n" \
+               f"max_execution_time = {variables['PHP_MAX_EXECUTION_TIME']}\n" \
+               f"upload_max_filesize = {variables['PHP_UPLOAD_MAX_FILESIZE']}\n" \
+               f"post_max_size = {variables['PHP_UPLOAD_MAX_FILESIZE']}\n" \
+               f"session.cookie_samesite = '{variables['PHP_SESSIONS_COOKIE_SAMESITE']}'\n"
 
-    template = template.format(
-        timezone=variables["PHP_TIMEZONE"],
-        memory_limit=variables["PHP_MEMORY_LIMIT"],
-        max_execution_time=variables["PHP_MAX_EXECUTION_TIME"],
-        upload_max_filesize=variables["PHP_UPLOAD_MAX_FILESIZE"],
-        session_cookie_samesite=variables["PHP_SESSIONS_COOKIE_SAMESITE"],
-    )
     write_file("/etc/php.d/99-misp.ini", template)
 
 
@@ -349,8 +341,8 @@ def main():
 
     # if security cookie name is not set, generate it by using SECURITY_SALT and MISP_UUID, so it will survive container restart
     if not variables["SECURITY_COOKIE_NAME"]:
-        uniq = hashlib.sha256("{}|{}".format(variables["SECURITY_SALT"], variables["MISP_UUID"]).encode()).hexdigest()
-        variables["SECURITY_COOKIE_NAME"] = "MISP-session-{}".format(uniq[0:5])
+        uniq = hashlib.sha256(f"{variables['SECURITY_SALT']}|{variables['MISP_UUID']}".encode()).hexdigest()
+        variables["SECURITY_COOKIE_NAME"] = f"MISP-session-{uniq[0:5]}"
 
     try:
         uuid.UUID(variables["MISP_UUID"])
@@ -361,7 +353,7 @@ def main():
         error("Environment variable 'PHP_SESSIONS_COOKIE_SAMESITE' must be 'Strict', 'Lax' or not set")
 
     if variables["PHP_SESSIONS_COOKIE_SAMESITE"] is None:
-        is_localhost = variables["MISP_BASEURL"].startswith("http://localhost")
+        is_localhost = variables["MISP_BASEURL"].startswith(("http://localhost", "https://localhost"))
         variables["PHP_SESSIONS_COOKIE_SAMESITE"] = "Lax" if is_localhost else "Strict"
 
     variables["MISP_UUID"] = variables["MISP_UUID"].lower()
@@ -373,18 +365,18 @@ def main():
     if variables["OIDC_LOGIN"]:
         for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):
             if not variables[var]:
-                error("OIDC login is enabled, but '{}' environment variable is not set".format(var))
+                error(f"OIDC login is enabled, but '{var}' environment variable is not set")
 
         for var in ("OIDC_CODE_CHALLENGE_METHOD", "OIDC_CODE_CHALLENGE_METHOD_INNER"):
             if variables[var] not in ("S256", "plain", "", None):
-                error("Environment variable '{}' value is not valid".format(var))
+                error(f"Environment variable '{var}' value is not valid")
 
         # mod_auth_openidc require full URL to metadata
         if "/.well-known/openid-configuration" not in variables["OIDC_PROVIDER"]:
-            variables["OIDC_PROVIDER"] = variables["OIDC_PROVIDER"].rstrip("/") + "/.well-known/openid-configuration"
+            variables["OIDC_PROVIDER"] = f"{variables['OIDC_PROVIDER'].rstrip('/')}/.well-known/openid-configuration"
 
     for template_name in ("database.php", "config.php", "email.php"):
-        path = "/var/www/MISP/app/Config/{}".format(template_name)
+        path = f"/var/www/MISP/app/Config/{template_name}"
         render_jinja_template(path, variables)
 
     generate_xdebug_config(variables["PHP_XDEBUG_ENABLED"], variables["PHP_XDEBUG_PROFILER_TRIGGER"])
