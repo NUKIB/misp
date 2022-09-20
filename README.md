@@ -127,6 +127,7 @@ If you want to generate new PGP keys for email signing, you can do it by running
 * `SECURITY_HIDE_ORGS` (optional, boolean, default `false`) - hide org names for normal users
 * `SECURITY_ENCRYPTION_KEY` (optional, string) - encryption key with at least 32 chars that will be used to encrypt sensitive information stored in database *WARNING:* Never changed this value after deployment!
 * `SECURITY_CRYPTO_POLICY` (optional, string, default `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8). Use empty string to keep container default value.
+* `SECURITY_REST_CLIENT_ENABLE_ARBITRARY_URLS` (optional, boolean, default `false`) - enable to query any arbitrary URL via rest client (required for Workflows Webhook).
 
 ### Outgoing proxy
 

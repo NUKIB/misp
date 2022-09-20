@@ -151,6 +151,7 @@ VARIABLES = {
     "SECURITY_CRYPTO_POLICY": Option(default="DEFAULT:NO-SHA1"),
     "SECURITY_ENCRYPTION_KEY": Option(),
     "SECURITY_COOKIE_NAME": Option(),
+    "SECURITY_REST_CLIENT_ENABLE_ARBITRARY_URLS": Option(typ=bool, default=False),
     # PHP
     "PHP_XDEBUG_ENABLED": Option(typ=bool, default=False),
     "PHP_XDEBUG_PROFILER_TRIGGER": Option(),
