@@ -158,6 +158,7 @@ $config = [
     'hide_organisation_index_from_users' => {{ SECURITY_HIDE_ORGS | bool }},
     'hide_organisations_in_sharing_groups' => {{ SECURITY_HIDE_ORGS | bool }},
     'advanced_authkeys' => {{ SECURITY_ADVANCED_AUTHKEYS | bool }},
+    'rest_client_enable_arbitrary_urls' => {{ SECURITY_REST_CLIENT_ENABLE_ARBITRARY_URLS | bool }},
     {% if OIDC_LOGIN %}
     'auth' => ['OidcAuth.Oidc'],
     'auth_enforced' => true,
