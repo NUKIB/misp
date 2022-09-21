@@ -170,7 +170,7 @@ VARIABLES = {
     "JOBBER_SCAN_ATTACHMENT_TIME": Option(default="0 R0-10 6"),
     "JOBBER_LOG_ROTATE_TIME": Option(default="0 0 5"),
     "JOBBER_USER_CHECK_VALIDITY_TIME": Option(default="0 0 5"),
-    "JOBBER_SEND_PERIODIC_SUMMARY": Option(default="0 0 6"),
+    "JOBBER_SEND_PERIODIC_SUMMARY": Option(default="0 0 6 * * 1-5"),
 }
 
 
