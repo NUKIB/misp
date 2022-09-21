@@ -44,6 +44,13 @@ jobs:
     onError: Backoff
   {% endif %}
 
+  {% if JOBBER_SEND_PERIODIC_SUMMARY %}
+  LogRotate:
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server sendPeriodicSummaryToUsers
+    time: {{ JOBBER_SEND_PERIODIC_SUMMARY }}
+    onError: Continue
+  {% endif %}
+
   {% if JOBBER_USER_CHECK_VALIDITY_TIME and OIDC_LOGIN and OIDC_OFFLINE_ACCESS %}
   UserCheckValidity:
     {% if OIDC_CHECK_USER_VALIDITY %}

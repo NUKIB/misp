@@ -191,6 +191,7 @@ You can change default configuration by modifying these environment variables:
 * `JOBBER_SCAN_ATTACHMENT_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for scan attachment task scheduling
 * `JOBBER_LOG_ROTATE_TIME` (optional, string, default `0 0 5`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for log rotate task scheduling
 * `JOBBER_USER_CHECK_VALIDITY_TIME` (optional, string, default `0 0 5`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for updating user role and org or blocking invalid users (makes sense only if `OIDC_OFFLINE_ACCESS` and `OIDC_CHECK_USER_VALIDITY` is set)
+* `JOBBER_SEND_PERIODIC_SUMMARY` (optional, string, default `0 0 6`) - [Jobber time string](https://dshearer.github.io/jobber/doc/v1.4/#time-strings) for sending periodic summary for users (must be just once per day)
 
 If provided time string is empty, job will be disabled.
 
