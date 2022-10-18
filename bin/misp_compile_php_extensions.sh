@@ -12,7 +12,7 @@ download_and_check () {
 }
 
 # Install required packages for build
-dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file libzstd-devel ssdeep-devel
+dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel php-mbstring php-json php-xml brotli-devel diffutils file ssdeep-devel
 
 mkdir /build/php-modules/
 
@@ -52,7 +52,7 @@ mkdir /tmp/redis
 cd /tmp/redis
 download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz 6f5cda93aac8c1c4bafa45255460292571fb2f029b0ac4a5a4dc66987a9529e6
 phpize
-./configure --silent --enable-redis-igbinary --enable-redis-zstd
+./configure --silent --enable-redis-igbinary
 make -j$(nproc)
 mv modules/*.so /build/php-modules/
 
