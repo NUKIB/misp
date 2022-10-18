@@ -16,6 +16,15 @@ dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-deve
 
 mkdir /build/php-modules/
 
+# Compile simdjson
+mkdir /tmp/simdjson
+cd /tmp/simdjson
+download_and_check https://github.com/crazyxman/simdjson_php/releases/download/3.0.0/simdjson-3.0.0.tgz 23cdf65ee50d7f1d5c2aa623a885349c3208d10dbfe289a71f26bfe105ea8db9
+phpize
+./configure
+make -j$(nproc)
+mv modules/*.so /build/php-modules/
+
 # Compile igbinary
 mkdir /tmp/igbinary
 cd /tmp/igbinary
