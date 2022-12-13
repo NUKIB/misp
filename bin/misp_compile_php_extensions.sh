@@ -38,7 +38,7 @@ mv modules/*.so /build/php-modules/
 # Compile zstd library and zstd extension
 mkdir /tmp/zstd
 cd /tmp/zstd
-download_and_check https://github.com/kjdev/php-ext-zstd/archive/f8721f0c4fd3e453d6d1b0a3ba00c9326a274e06.tar.gz f33d07468db9bbbf66cbdcbde54a7f2b281499f7274b05b9e8df80f8c599af2f
+download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.12.0.tar.gz 11619e80c7c6ef1673d3de91c246524a778a356f72bb55aeb7e5cf85d52833a6
 cd zstd
 download_and_check https://github.com/facebook/zstd/archive/refs/tags/v1.5.2.tar.gz f7de13462f7a82c29ab865820149e778cbfe01087b3a55b5332707abf9db4a6e
 cd ..
