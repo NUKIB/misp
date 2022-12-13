@@ -67,12 +67,19 @@ def check_is_url(variable_name: str, value: str):
         raise ValueError(f"Environment variable '{variable_name}' must start with 'http://' or 'https://'")
 
     if not baseurl.netloc:
-        raise ValueError(f"Environment variable '{variable_name}' must be valid URL")
+        raise ValueError(f"Environment variable '{variable_name}' must be valid URL, `{value}` given")
 
 
 def check_is_email(variable_name: str, value: str):
     if '@' not in value:
-        raise ValueError(f"Environment variable '{variable_name}' must be email address")
+        raise ValueError(f"Environment variable '{variable_name}' must be email address, `{value}` given")
+
+
+def check_is_uuid(variable_name: str, value: str):
+    try:
+        uuid.UUID(value)
+    except ValueError:
+        raise ValueError(f"Environment variable '{variable_name}' must valid UUID, `{value}` given")
 
 
 VARIABLES = {
@@ -127,10 +134,10 @@ VARIABLES = {
     "SMTP_PASSWORD": Option(),
     "SUPPORT_EMAIL": Option(validation=check_is_email),
     # MISP
-    "MISP_BASEURL": Option(required=True),
+    "MISP_BASEURL": Option(required=True, validation=check_is_url),
     "MISP_ORG": Option(required=True),
     "MISP_EMAIL": Option(required=True, validation=check_is_email),
-    "MISP_UUID": Option(required=True),
+    "MISP_UUID": Option(required=True, validation=check_is_uuid),
     "MISP_MODULE_URL": Option(validation=check_is_url),
     "MISP_ATTACHMENT_SCAN_MODULE": Option(),
     "MISP_EMAIL_REPLY_TO": Option(validation=check_is_email),
@@ -330,15 +337,7 @@ def generate_crypto_policies(crypto_policy: Optional[str]):
 
 def main():
     variables = collect()
-
-    baseurl = urlparse(variables["MISP_BASEURL"])
-    if baseurl.scheme not in ("http", "https"):
-        error("Environment variable 'MISP_BASEURL' must start with 'http://' or 'https://'")
-
-    if not baseurl.netloc:
-        error("Environment variable 'MISP_BASEURL' must be valid URL")
-
-    variables["SERVER_NAME"] = baseurl.netloc
+    variables["SERVER_NAME"] = urlparse(variables["MISP_BASEURL"]).netloc
 
     if len(variables["SECURITY_SALT"]) < 32:
         print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long", file=sys.stderr)
@@ -347,11 +346,6 @@ def main():
     if not variables["SECURITY_COOKIE_NAME"]:
         uniq = hashlib.sha256(f"{variables['SECURITY_SALT']}|{variables['MISP_UUID']}".encode()).hexdigest()
         variables["SECURITY_COOKIE_NAME"] = f"MISP-session-{uniq[0:5]}"
-
-    try:
-        uuid.UUID(variables["MISP_UUID"])
-    except TypeError:
-        error("Environment variable 'MISP_UUID' is not valid UUID.")
 
     if variables["PHP_SESSIONS_COOKIE_SAMESITE"] not in ("Strict", "Lax", None):
         error("Environment variable 'PHP_SESSIONS_COOKIE_SAMESITE' must be 'Strict', 'Lax' or not set")
