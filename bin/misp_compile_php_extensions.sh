@@ -77,7 +77,7 @@ mv modules/*.so /build/php-modules/
 # Compile snuffleupagus
 mkdir /tmp/snuffleupagus
 cd /tmp/snuffleupagus
-download_and_check https://github.com/jvoisin/snuffleupagus/archive/refs/tags/v0.8.3.tar.gz 0d4c7fd99ddb9f028d9ca684058a254f52a9ed540455d6056ed1f0af1228e118
+download_and_check https://github.com/jvoisin/snuffleupagus/archive/refs/tags/v0.9.0.tar.gz 36c99dd9540444ab6c931c687255522dac6705275cdc291b4e25a1d416b7a42e
 cd src
 phpize
 ./configure --silent --enable-snuffleupagus
