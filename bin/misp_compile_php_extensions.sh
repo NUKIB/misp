@@ -28,7 +28,7 @@ mv modules/*.so /build/php-modules/
 # Compile igbinary
 mkdir /tmp/igbinary
 cd /tmp/igbinary
-download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.12.tar.gz de41f25b7d3cf707332c0069ad2a7541f0265b6689de5e99da3c2cab4bf5465e
+download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.13.tar.gz 4400ecefafe0901c2ead0e1770b0d4041151e0c51bcb27c4a6c30becb1acb7da
 phpize
 ./configure --silent CFLAGS="-O2 -g" --enable-igbinary
 make -j$(nproc)
