@@ -40,7 +40,7 @@ mkdir /tmp/zstd
 cd /tmp/zstd
 download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.12.1.tar.gz f07d2bbf788565a7a161643b0de218d7d4de0efb07bf5cf600e20fdcd673763e
 cd zstd
-download_and_check https://github.com/facebook/zstd/archive/refs/tags/v1.5.2.tar.gz f7de13462f7a82c29ab865820149e778cbfe01087b3a55b5332707abf9db4a6e
+download_and_check https://github.com/facebook/zstd/releases/download/v1.5.4/zstd-1.5.4.tar.gz 0f470992aedad543126d06efab344dc5f3e171893810455787d38347343a4424
 cd ..
 phpize
 ./configure --silent
