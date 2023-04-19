@@ -7,6 +7,8 @@ services:
     container_name: misp-mysql
     tmpfs:
       - /tmp
+    volumes:
+      - mysql_data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: misp
       MYSQL_USER: misp
@@ -17,6 +19,8 @@ services:
     image: redis:7.0
     restart: always
     container_name: misp-redis
+    volumes:
+      - redis_data:/data
 
   misp-modules:
     image: ghcr.io/nukib/misp-modules:latest
@@ -61,3 +65,7 @@ services:
     ports:
       - 127.0.0.1:8080:80
       - 127.0.0.1:50000:50000
+
+volumes:
+  mysql_data:
+  redis_data:

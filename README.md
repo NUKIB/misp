@@ -31,6 +31,10 @@ Docker Compose file defines MISP itself, [MISP Modules](https://github.com/NUKIB
 
 Then you can access MISP in your browser by accessing `http://localhost:8080`. Default user after installation is `admin@admin.test` with password `admin`.
 
+To delete all volumes after testing, run:
+
+    docker-compose down -v
+
 ### Updating
 
 When a new MISP is released, also new container image is created. For updating MISP and MISP Modules, just run these commands in the folder that contains `docker-compose.yml` file.
@@ -44,7 +48,6 @@ These commands will download the latest images and recreate containers:
 For production usage, please:
 * change passwords for MariaDB and Redis,
 * modify environment variables to requested values,
-* set volumes location, so stored files will survive,
 * deploy reverse proxy (for example `nginx`) before MISP to handle HTTPS connections.
 
 ### Usage in air-gapped environment
