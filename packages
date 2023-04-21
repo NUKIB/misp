@@ -5,6 +5,7 @@ zip
 supervisor
 ssdeep-libs
 rsyslog
+crypto-policies-scripts
 
 # Python
 python39
