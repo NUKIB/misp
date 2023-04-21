@@ -28,7 +28,7 @@ mv modules/*.so /build/php-modules/
 # Compile igbinary
 mkdir /tmp/igbinary
 cd /tmp/igbinary
-download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.13.tar.gz 4400ecefafe0901c2ead0e1770b0d4041151e0c51bcb27c4a6c30becb1acb7da
+download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.14.tar.gz 3dd62637667bee9328b3861c7dddc754a08ba95775d7b57573eadc5e39f95ac6
 phpize
 ./configure --silent CFLAGS="-O2 -g" --enable-igbinary
 make -j$(nproc)
@@ -40,7 +40,7 @@ mkdir /tmp/zstd
 cd /tmp/zstd
 download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.12.1.tar.gz f07d2bbf788565a7a161643b0de218d7d4de0efb07bf5cf600e20fdcd673763e
 cd zstd
-download_and_check https://github.com/facebook/zstd/releases/download/v1.5.4/zstd-1.5.4.tar.gz 0f470992aedad543126d06efab344dc5f3e171893810455787d38347343a4424
+download_and_check https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz 9c4396cc829cfae319a6e2615202e82aad41372073482fce286fac78646d3ee4
 cd ..
 phpize
 ./configure --silent
