@@ -113,6 +113,8 @@ VARIABLES = {
     "OIDC_CLIENT_CRYPTO_PASS": Option(),
     "OIDC_DEFAULT_ORG": Option(),
     "OIDC_PASSWORD_RESET": Option(validation=check_is_url),
+    "OIDC_ROLES_PROPERTY": Option(default="roles"),
+    "OIDC_ROLES_PROPERTY_INNER": Option(),
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
     "OIDC_OFFLINE_ACCESS": Option(typ=bool, default=False),
     "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0),
@@ -357,7 +359,7 @@ def main():
 
     variables["MISP_UUID"] = variables["MISP_UUID"].lower()
 
-    for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER", "OIDC_AUTHENTICATION_METHOD_INNER", "OIDC_CODE_CHALLENGE_METHOD_INNER"):
+    for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER", "OIDC_AUTHENTICATION_METHOD_INNER", "OIDC_CODE_CHALLENGE_METHOD_INNER", "OIDC_ROLES_PROPERTY_INNER"):
         if not variables[var]:
             variables[var] = variables[var.replace("_INNER", "")]
 

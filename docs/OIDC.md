@@ -17,6 +17,7 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 * `OIDC_PASSWORD_RESET` (optional, string) - URL to password reset page
 * `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
 * `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for a user that doesn't have organisation name in claim defined by `OIDC_ORGANISATION_PROPERTY` variable. If not provided `MISP_ORG` will be used.
+* `OIDC_ROLES_PROPERTY` (optional, string, default `roles`) - name of claim used for user roles in MISP
 * `OIDC_ORGANISATION_PROPERTY` (optional, string, default `organization`) - ID token or user info claim that will be used as an organisation in MISP
 * `OIDC_OFFLINE_ACCESS` (optional, boolean, default `false`) - if true, offline access token will be requested for user
 * `OIDC_CHECK_USER_VALIDITY` (optional, int, default `0`)
@@ -30,10 +31,11 @@ You can use a different provider for authentication in MISP. If you don't provid
 * `OIDC_CLIENT_SECRET_INNER` (optional, string, default value from `OIDC_CLIENT_SECRET`)
 * `OIDC_AUTHENTICATION_METHOD_INNER` (optional, string, default value from `OIDC_AUTHENTICATION_METHOD`)
 * `OIDC_CODE_CHALLENGE_METHOD_INNER` (optional, string, default value from `OIDC_CODE_CHALLENGE_METHOD_INNER`)
+* `OIDC_ROLES_PROPERTY_INNER` (optional, string, default value from `OIDC_ROLES_PROPERTY`)
 
 ## User Roles
 
-You can set the user role in MISP by modifying `role` claim in OIDC provider. By default, every user that wants to access 
+You can set the user role in MISP by modifying `roles` claim in OIDC provider. By default, every user that wants to access
 MISP must be assigned to `misp-access` role.
 
 ```php
