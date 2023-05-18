@@ -35,6 +35,7 @@ RUN bash /usr/local/bin/misp_enable_epel.sh && \
     dnf module -y enable mod_auth_openidc php:7.4 python39 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.9 && \
+    alternatives --set python /usr/bin/python3.9 && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
     rm -rf /var/cache/dnf /tmp/packages
 
