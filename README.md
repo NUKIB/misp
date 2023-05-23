@@ -117,10 +117,13 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 ### PGP for email encryption and signing
 
 * `GNUPG_SIGN` (optional, boolean, default `false`) - sign outgoing emails by PGP
-* `GNUPG_PRIVATE_KEY_PASSWORD` (optional, string) - password for PGP key that is used to sign emails send by MISP
+* `GNUPG_PRIVATE_KEY` (optional, string) - private key used to sign emails sent by MISP
+* `GNUPG_PRIVATE_KEY_PASSWORD` (optional, string) - password for PGP private key used to sign emails sent by MISP
 * `GNUPG_BODY_ONLY_ENCRYPTED` (optional, boolean, default `false`)
 
-If you want to generate new PGP keys for email signing, you can do it by running this command inside the container:
+Alternatively, if you want to generate new PGP keys for email signing instead of
+providing a key using `GNUPG_PRIVATE_KEY`, you can do it by running this command
+inside the container:
 
     gpg --homedir /var/www/MISP/.gnupg --full-generate-key --pinentry-mode=loopback --passphrase "password"
 
