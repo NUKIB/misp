@@ -52,7 +52,7 @@ COPY supervisor.ini /etc/supervisord.d/misp.ini
 COPY logrotate/* /etc/logrotate.d/
 
 ARG CACHEBUST=1
-ARG MISP_VERSION=develop
+ARG MISP_VERSION=2.4
 ENV MISP_VERSION $MISP_VERSION
 
 RUN rpm -i /tmp/jobber*.rpm && \
