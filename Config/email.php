@@ -5,7 +5,7 @@ class EmailConfig
     public $default = [
         'transport' => 'Smtp',
         'host' => {{ SMTP_HOST | str }},
-        'port' => 25,
+        'port' => {{ SMTP_PORT | int }},
         'timeout' => 30,
         'username' => {{ SMTP_USERNAME | str }},
         'password' => {{ SMTP_PASSWORD | str }},

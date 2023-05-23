@@ -130,6 +130,7 @@ VARIABLES = {
     "ZEROMQ_PASSWORD": Option(),
     # SMTP
     "SMTP_HOST": Option(),
+    "SMTP_PORT": Option(typ=int, default=25),
     "SMTP_USERNAME": Option(),
     "SMTP_PASSWORD": Option(),
     "SUPPORT_EMAIL": Option(validation=check_is_email),
