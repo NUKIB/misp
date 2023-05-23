@@ -154,6 +154,7 @@ VARIABLES = {
     # Security
     "GNUPG_SIGN": Option(typ=bool, default=False),
     "GNUPG_PRIVATE_KEY_PASSWORD": Option(),
+    "GNUPG_PRIVATE_KEY": Option(),
     "GNUPG_BODY_ONLY_ENCRYPTED": Option(typ=bool, default=False),
     "SECURITY_ADVANCED_AUTHKEYS": Option(typ=bool, default=False),
     "SECURITY_HIDE_ORGS": Option(typ=bool, default=False),
