@@ -1,3 +1,4 @@
+cryptography
 pymisp
 lief
 python-magic
