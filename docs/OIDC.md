@@ -1,6 +1,6 @@
 # OpenID Connect (OIDC) login
 
-This Docker image is prepared to use OIDC for login into MISP. To enhance security, OIDC is implemented right into Apache by [mod_auth_openidc](https://github.com/zmartzone/mod_auth_openidc)
+This Docker image is prepared to use OIDC for login into MISP. To enhance security, OIDC is implemented right into Apache by [mod_auth_openidc](https://github.com/OpenIDC/mod_auth_openidc)
 and also in MISP itself. That means that unauthenticated users will stop right on Apache.
 
 If a request to MISP is made with `Authorization` header, that contains an authentication key in MISP format,
@@ -21,6 +21,7 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 * `OIDC_ORGANISATION_PROPERTY` (optional, string, default `organization`) - ID token or user info claim that will be used as an organisation in MISP
 * `OIDC_OFFLINE_ACCESS` (optional, boolean, default `false`) - if true, offline access token will be requested for user
 * `OIDC_CHECK_USER_VALIDITY` (optional, int, default `0`)
+* `OIDC_TOKEN_SIGNED_ALGORITHM` (optional, string) - can be any of `RS256|RS384|RS512|PS256|PS384|PS512|HS256|HS384|HS512|ES256|ES384|ES512`, the algorithms supported by `mod_auth_openidc` (the Apache OIDC-module), leaving empty will make `mod_auth_openidc` default to `RS256` 
 
 ### Inner
 

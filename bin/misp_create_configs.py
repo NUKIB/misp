@@ -118,6 +118,7 @@ VARIABLES = {
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
     "OIDC_OFFLINE_ACCESS": Option(typ=bool, default=False),
     "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0),
+    "OIDC_TOKEN_SIGNED_ALGORITHM": Option(),
     # Logging
     "SYSLOG_TARGET": Option(),
     "SYSLOG_PORT": Option(typ=int, default=601),
