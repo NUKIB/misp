@@ -202,6 +202,18 @@ You can change default configuration by modifying these environment variables:
 
 If provided time string is empty, job will be disabled.
 
+### Supervisor
+
+Supervisor is used to run all processes within the container, you can adjust the amount of workers which should be started by modifying these variables:
+
+* `DEFAULT_WORKERS` (optional, int, default `1`) - number of default workers to start
+* `EMAIL_WORKERS` (optional, int, default `3`) - number of email workers to start
+* `CACHE_WORKERS` (optional, int, default `1`) - number of cache workers to start
+* `PRIO_WORKERS` (optional, int, default `3`) - number of prio workers to start
+* `UPDATE_WORKERS` (optional, int, default `1`) - number of upadte workers to start
+
+If one of the variables is set to `0`, no workers will be started. 
+
 ## Log locations
 
 * `/var/log/messages` - all logs captured by rsyslog (see [rsyslog.conf](rsyslog.conf) for definition)

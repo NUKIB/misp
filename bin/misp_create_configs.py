@@ -182,6 +182,12 @@ VARIABLES = {
     "JOBBER_LOG_ROTATE_TIME": Option(default="0 0 5"),
     "JOBBER_USER_CHECK_VALIDITY_TIME": Option(default="0 0 5"),
     "JOBBER_SEND_PERIODIC_SUMMARY": Option(default="0 0 6 * * 1-5"),
+    # Supervisor
+    "DEFAULT_WORKERS": Option(typ=int, default=1),
+    "EMAIL_WORKERS": Option(typ=int, default=3),
+    "CACHE_WORKERS": Option(typ=int, default=1),
+    "PRIO_WORKERS": Option(typ=int, default=3),
+    "UPDATE_WORKERS": Option(typ=int, default=1),
 }
 
 
@@ -233,6 +239,9 @@ def generate_apache_config(variables: dict):
 
 def generate_jobber_config(variables: dict):
     render_jinja_template("/root/.jobber", variables)
+     
+def generate_supervisor_config(variables: dict):
+    render_jinja_template("/etc/supervisord.d/misp.ini", variables)
 
 
 def generate_xdebug_config(enabled: bool, profiler_trigger: str):
@@ -390,6 +399,7 @@ def main():
     generate_php_config(variables)
     generate_crypto_policies(variables["SECURITY_CRYPTO_POLICY"])
     generate_jobber_config(variables)
+    generate_supervisor_config(variables)
 
 
 if __name__ == "__main__":
