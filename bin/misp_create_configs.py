@@ -84,7 +84,7 @@ def check_is_uuid(variable_name: str, value: str):
 
 VARIABLES = {
     # MySQL
-    "MYSQL_HOST": Option(required=True),
+    "MYSQL_HOST": Option(required=False),
     "MYSQL_PORT": Option(typ=int, default=3306),
     "MYSQL_LOGIN": Option(required=True),
     "MYSQL_PASSWORD": Option(),
