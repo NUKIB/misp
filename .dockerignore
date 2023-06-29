@@ -1,6 +1,5 @@
 .github
 docs
-docker-compose.yml
 LICENSE
 README.md
 SECURITY.md
