@@ -117,6 +117,9 @@ CakePlugin::load('OidcAuth');
  */
 // CakePlugin::load('CertAuth');
 // CakePlugin::load('ShibbAuth');
+{% if AZURE_LOGIN %}
+CakePlugin::load('AadAuth');
+{% endif %}
 
 /**
  * Configures default file logging options
@@ -142,4 +145,3 @@ CakeLog::config('syslog', array(
 if (in_array('phar', stream_get_wrappers(), true)) {
     stream_wrapper_unregister('phar');
 }
-
