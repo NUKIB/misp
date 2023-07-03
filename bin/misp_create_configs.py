@@ -182,6 +182,16 @@ VARIABLES = {
     "JOBBER_LOG_ROTATE_TIME": Option(default="0 0 5"),
     "JOBBER_USER_CHECK_VALIDITY_TIME": Option(default="0 0 5"),
     "JOBBER_SEND_PERIODIC_SUMMARY": Option(default="0 0 6 * * 1-5"),
+    # Azure AD
+    "AZURE_LOGIN": Option(typ=bool),
+    "AZURE_CLIENT_ID": Option(),
+    "AZURE_AD_TENANT": Option(),
+    "AZURE_CLIENT_SECRET": Option(),
+    "AZURE_REDIRECT_URI": Option(validation=check_is_url),
+    "AZURE_MISP_USER_GROUP": Option(),
+    "AZURE_MISP_ORGADMIN_GROUP": Option(),
+    "AZURE_MISP_SITEADMIN_GROUP": Option(),
+    "AZURE_CHECK_AD_GROUPS": Option(typ=bool),
 }
 
 
@@ -377,7 +387,13 @@ def main():
         if "/.well-known/openid-configuration" not in variables["OIDC_PROVIDER"]:
             variables["OIDC_PROVIDER"] = f"{variables['OIDC_PROVIDER'].rstrip('/')}/.well-known/openid-configuration"
 
-    for template_name in ("database.php", "config.php", "email.php"):
+    if variables["AZURE_LOGIN"]:
+        variables["AZURE_CHECK_AD_GROUPS"] = str(variables["AZURE_CHECK_AD_GROUPS"]).lower()
+        for var in ("AZURE_CLIENT_ID", "AZURE_AD_TENANT", "AZURE_CLIENT_SECRET", "AZURE_REDIRECT_URI", "AZURE_MISP_USER_GROUP", "AZURE_MISP_ORGADMIN_GROUP", "AZURE_MISP_SITEADMIN_GROUP", "AZURE_CHECK_AD_GROUPS"):
+            if not variables[var]:
+                error(f"Azure login is enabled, but '{var}' environment variable is not set")
+
+    for template_name in ("database.php", "config.php", "email.php", "bootstrap.php"):
         path = f"/var/www/MISP/app/Config/{template_name}"
         render_jinja_template(path, variables)
 
