@@ -105,6 +105,20 @@ $config = [
     'custom_css' => {{ MISP_CUSTOM_CSS | str }},
     'tmpdir' => '/tmp',
   ],
+  {% if AZURE_LOGIN %}
+  'AadAuth' => [
+    'client_id' => '{{ AZURE_CLIENT_ID }}', // Client ID (see Azure AD)
+    'ad_tenant' => '{{ AZURE_AD_TENANT }}', // Directory ID (see Azure AD)
+    'client_secret' => '{{ AZURE_CLIENT_SECRET }}', // Client secret (see Azure AD)
+    'redirect_uri' => '{{ AZURE_REDIRECT_URI }}', // Your MISP URI, must be the same as in Azure AD
+    'auth_provider' => 'https://login.microsoftonline.com/', // No change required
+    'auth_provider_user' => 'https://graph.microsoft.com/', // No change required
+    'misp_user' => '{{ AZURE_MISP_USER_GROUP }}', // The AD group for MISP users
+    'misp_orgadmin' => '{{ AZURE_MISP_ORGADMIN_GROUP }}', // The AD group for MISP administrators
+    'misp_siteadmin' => '{{ AZURE_MISP_SITEADMIN_GROUP }}', // The AD group for MISP site administrators
+    'check_ad_groups' => {{ AZURE_CHECK_AD_GROUPS }}, // Should we check if the user belongs to one of the above AD groups?
+  ],
+  {% endif %}
   'SimpleBackgroundJobs' => [
     'enabled' => true,
     'redis_host' => '{{ REDIS_HOST }}',
@@ -142,6 +156,11 @@ $config = [
     'expire' => 300,
   ],
   'Security' => [
+    {% if AZURE_LOGIN %}
+    'auth' => [
+      0 => 'AadAuth.AadAuthenticate',
+    ],
+    {% endif %}
     'force_https' => {{ 'true' if MISP_BASEURL.startswith('https://') else 'false' }},
     'csp_enforce' => true,
     'min_tls_version' => 'tlsv1_2',
