@@ -61,6 +61,9 @@ su-exec apache git config core.filemode false
 cd /var/www/MISP/app/files/
 su-exec apache git submodule update --depth 1 --init --recursive .
 
+# Install Python dependencies
+pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt
+
 # Install MISP composer dependencies
 cd /var/www/MISP/app
 # require exact version of `symfony/polyfill-php80` to keep compatibility, because later version replaces Attribute class :/

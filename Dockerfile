@@ -36,7 +36,6 @@ RUN bash /usr/local/bin/misp_enable_epel.sh && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.11 && \
     alternatives --set python /usr/bin/python3.11 && \
-    pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
     rm -rf /var/cache/dnf /tmp/packages
 
 COPY --from=builder /usr/local/bin/su-exec /usr/local/bin/
