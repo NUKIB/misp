@@ -50,7 +50,7 @@ services:
       - AUDIT_WRITE
       - SETFCAP
     environment:
-      MYSQL_HOST: mysql
+      MYSQL_HOST: localhost
       MYSQL_LOGIN: misp
       MYSQL_PASSWORD: password # Please change for production
       MYSQL_DATABASE: misp
