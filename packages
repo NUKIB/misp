@@ -16,6 +16,7 @@ python3.11-idna
 python3.11-lxml
 python3.11-ply
 python3.11-PyMySQL
+python3.11-cryptography
 
 # PHP
 php-cli
