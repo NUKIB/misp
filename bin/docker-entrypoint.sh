@@ -66,8 +66,8 @@ unset GNUPG_PRIVATE_KEY
 unset GNUPG_PRIVATE_KEY_PASSWORD
 
 # Copy over any custom taxonomy files
-if [ -d /var/www/MISP/app/files.dist/taxonomies ]; then
-    cp -r /var/www/MISP/app/files.dist/taxonomies/* /var/www/MISP/app/files/taxonomies/
+if [ -d /var/www/MISP/app/files.dist/taxonomies/ ]; then
+    cp -r /var/www/MISP/app/files.dist/taxonomies/* /var/www/MISP/app/files/taxonomies/ || :
     chmod 750 /var/www/MISP/app/files/taxonomies/*
 fi
 

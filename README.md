@@ -229,6 +229,7 @@ If one of the variables is set to `0`, no workers will be started.
 * `/var/www/MISP/app/files/certs/` - uploaded certificates used for accessing remote feeds and servers
 * `/var/www/MISP/app/attachments/` - uploaded attachments and malware samples
 * `/var/www/MISP/.gnupg/` - GPG homedir
+* `/var/www/MISP/app/files.dist/taxonomies/` - custom taxonomies to be loaded at startup
 
 ## License
 

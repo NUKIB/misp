@@ -84,6 +84,7 @@ VOLUME /var/www/MISP/app/tmp/logs/
 VOLUME /var/www/MISP/app/files/certs/
 VOLUME /var/www/MISP/app/attachments/
 VOLUME /var/www/MISP/.gnupg/
+VOLUME /var/www/MISP/app/files.dist/taxonomies/
 
 WORKDIR /var/www/MISP/
 # Web server
