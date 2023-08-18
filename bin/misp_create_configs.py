@@ -152,6 +152,8 @@ VARIABLES = {
     "MISP_HOME_LOGO": Option(),
     "MISP_FOOTER_LOGO": Option(),
     "MISP_CUSTOM_CSS": Option(),
+    "MISP_PORT": Option(typ=int, default=80),
+    "MISP_USE_SSL": Option(typ=bool, default=False),
     # Security
     "GNUPG_SIGN": Option(typ=bool, default=False),
     "GNUPG_PRIVATE_KEY_PASSWORD": Option(),
@@ -235,6 +237,7 @@ def render_jinja_template(path: str, variables: dict):
 
 
 def generate_apache_config(variables: dict):
+    os.remove("/etc/httpd/conf.d/ssl.conf")
     render_jinja_template("/etc/httpd/conf.d/misp.conf", variables)
 
 

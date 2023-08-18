@@ -1,6 +1,7 @@
 git-core
 httpd
 mod_auth_openidc
+mod_ssl
 zip
 supervisor
 ssdeep-libs
