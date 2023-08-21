@@ -30,6 +30,13 @@ jobs:
     onError: Backoff
   {% endif %}
 
+  {% if JOBBER_CACHE_SERVERS_TIME %}
+  PullServers:
+    cmd: su-exec apache /var/www/MISP/app/Console/cake Server cacheServerAll {{ JOBBER_USER_ID }}
+    time: {{ JOBBER_CACHE_SERVERS_TIME }}
+    onError: Backoff
+  {% endif %}
+
   {% if JOBBER_SCAN_ATTACHMENT_TIME %}
   ScanAttachment:
     cmd: su-exec apache /var/www/MISP/app/Console/cake admin scanAttachment all
