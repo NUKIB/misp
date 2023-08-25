@@ -92,6 +92,7 @@ VARIABLES = {
     # Redis
     "REDIS_HOST": Option(required=True),
     "REDIS_PASSWORD": Option(),
+    "REDIS_USE_TLS": Option(typ=bool, default=False),
     # Proxy
     "PROXY_HOST": Option(),
     "PROXY_PORT": Option(typ=int, default=3128),
@@ -273,11 +274,12 @@ def generate_snuffleupagus_config(enabled: bool):
     write_file("/etc/php.d/40-snuffleupagus.ini", config)
 
 
-def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_password: Optional[str] = None):
+def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_use_tls: Optional[bool] = False, redis_password: Optional[str] = None):
     if not enabled:
         return
 
-    redis_path = f"tcp://{redis_host}:6379?database=12"
+    scheme = "tls" if redis_use_tls else "tcp"
+    redis_path = f"{scheme}://{redis_host}:6379?database=12"
     if redis_password:
         redis_path = f"{redis_path}&auth={redis_password}"
 
@@ -393,7 +395,7 @@ def main():
 
     generate_xdebug_config(variables["PHP_XDEBUG_ENABLED"], variables["PHP_XDEBUG_PROFILER_TRIGGER"])
     generate_snuffleupagus_config(variables['PHP_SNUFFLEUPAGUS'])
-    generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_PASSWORD"])
+    generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_USE_TLS"], variables["REDIS_PASSWORD"])
     generate_apache_config(variables)
     generate_rsyslog_config(variables)
     generate_error_messages(variables["SUPPORT_EMAIL"])

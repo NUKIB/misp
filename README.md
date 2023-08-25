@@ -84,6 +84,7 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 
 * `REDIS_HOST` (required, string) - hostname or IP address
 * `REDIS_PASSWORD` (optional, string) - password used to connect password protected Redis instance
+* `REDIS_USE_TLS` (optional, bool) - enable encrypted communication
 
 #### Default Redis databases
 
