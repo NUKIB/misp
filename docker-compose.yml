@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   mysql:
-    image: mariadb:11.0
+    image: mariadb:11.1
     restart: always
     container_name: misp-mysql
     tmpfs:
@@ -16,7 +16,7 @@ services:
       MYSQL_ROOT_PASSWORD: password # Please change for production
 
   redis:
-    image: redis:7.0
+    image: redis:7.2
     restart: always
     container_name: misp-redis
     volumes:
