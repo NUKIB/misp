@@ -50,7 +50,7 @@ mv modules/*.so /build/php-modules/
 # Compile redis
 mkdir /tmp/redis
 cd /tmp/redis
-download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.0.1.tar.gz 22ac500d53a3fea75663253e8f4fbe7fdc070ced23cc45b6ee56dee15f5f2913
+download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.0.2.tar.gz 786944f1c7818cc7fd4289a0d0a42ea630a07ebfa6dfa9f70ba17323799fc430
 phpize
 ./configure --silent --enable-redis-igbinary
 make -j$(nproc)
