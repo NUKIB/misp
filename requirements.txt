@@ -11,3 +11,9 @@ pytz
 pydeep2
 simplejson
 stix2-patterns>=1.2.0
+taxii2-client
+cryptography
+/var/www/MISP/app/files/scripts/cti-python-stix2
+/var/www/MISP/app/files/scripts/misp-stix
+/var/www/MISP/app/files/scripts/mixbox
+/var/www/MISP/app/files/scripts/python-stix
