@@ -90,7 +90,6 @@ WORKDIR /var/www/MISP/
 EXPOSE 80
 # ZeroMQ
 EXPOSE 50000
-# This is a hack how to go trought mod_auth_openidc
-HEALTHCHECK CMD su-exec apache curl -H "Authorization: dummydummydummydummydummydummydummydummy" --fail http://127.0.0.1/fpm-status || exit 1
+HEALTHCHECK CMD su-exec apache misp_status.py
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]
