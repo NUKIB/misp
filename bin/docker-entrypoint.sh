@@ -8,7 +8,13 @@ if [ "$1" = 'supervisord' ]; then
     echo "In case of any problem with this image, please fill issue at https://github.com/NUKIB/misp/issues"
     echo "======================================"
 
-    misp_create_configs.py
+    CONFIGS_CREATED_CANARY_FILE=/.configs-created
+    if [ -f "$CONFIGS_CREATED_CANARY_FILE" ]; then
+        echo "Configs files already created"
+    else
+      misp_create_configs.py
+      touch "$CONFIGS_CREATED_CANARY_FILE"
+    fi
 
     update-crypto-policies
 
