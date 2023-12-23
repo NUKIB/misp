@@ -11,11 +11,4 @@ php -v
 #cd /var/www/MISP/tests/
 #bash build-test.sh
 
-check_jinja_template () {
-  python3 -c 'import sys, jinja2; env = jinja2.Environment(); template = open(sys.argv[1]).read(); env.parse(template); sys.exit(0)' $1
-}
-
-check_jinja_template /var/www/MISP/app/Config/config.php
-check_jinja_template /var/www/MISP/app/Config/database.php
-check_jinja_template /var/www/MISP/app/Config/email.php
-check_jinja_template /etc/httpd/conf.d/misp.conf
+misp_create_configs.py validate
