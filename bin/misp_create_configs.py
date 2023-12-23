@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # Copyright (C) 2022 National Cyber and Information Security Agency of the Czech Republic
-import hashlib
 import os
 import sys
 import glob
 import uuid
+import hashlib
+import argparse
 from urllib.parse import urlparse
 from typing import Optional, Type, Callable, Any, NoReturn, List, Union, Tuple
 from jinja2 import Environment
@@ -236,13 +237,19 @@ def render_jinja_template(path: str, variables: dict):
     write_file(path, rendered)
 
 
+def validate_jinja_template(path: str):
+    jinja_env.from_string(open(path, "r").read())
+    print(f"Template {path} is valid", file=sys.stderr)
+
+
 def generate_apache_config(variables: dict):
     render_jinja_template("/etc/httpd/conf.d/misp.conf", variables)
 
 
 def generate_jobber_config(variables: dict):
     render_jinja_template("/root/.jobber", variables)
-     
+
+
 def generate_supervisor_config(variables: dict):
     render_jinja_template("/etc/supervisord.d/misp.ini", variables)
 
@@ -352,6 +359,16 @@ def generate_crypto_policies(crypto_policy: Optional[str]):
         write_file("/etc/crypto-policies/config", crypto_policy)
 
 
+def validate():
+    for template_name in ("database.php", "config.php", "email.php"):
+        path = f"/var/www/MISP/app/Config/{template_name}"
+        validate_jinja_template(path)
+    for path in glob.glob('/var/www/html/*.*html'):
+        validate_jinja_template(path)
+    validate_jinja_template("/etc/httpd/conf.d/misp.conf")
+    validate_jinja_template("/etc/supervisord.d/misp.ini")
+
+
 def main():
     variables = collect()
     variables["SERVER_NAME"] = urlparse(variables["MISP_BASEURL"]).netloc
@@ -407,4 +424,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        prog="misp_create_configs",
+        description="Create configs from env variables",
+    )
+    parser.add_argument("action", nargs="?", choices=("create", "validate"))
+    parsed = parser.parse_args()
+
+    if parsed.action == "validate":
+        validate()
+    else:
+        main()
