@@ -10,4 +10,5 @@ ordered-set
 pytz
 pydeep2
 simplejson
+orjson
 stix2-patterns>=1.2.0

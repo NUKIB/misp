@@ -4,6 +4,7 @@ import os
 import sys
 import glob
 import uuid
+import json
 import hashlib
 import argparse
 from urllib.parse import urlparse
@@ -122,6 +123,13 @@ VARIABLES = {
     "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0),
     "OIDC_TOKEN_SIGNED_ALGORITHM": Option(),
     # Logging
+    "ECS_LOG_ENABLED": Option(typ=bool, default=False),
+    "ECS_LOG_CONSOLE": Option(typ=bool, default=True),
+    "ECS_LOG_CONSOLE_FORMAT": Option(typ=str, options=("text", "ecs"), default="ecs"),
+    "ECS_LOG_FILE": Option(typ=str),
+    "ECS_LOG_FILE_FORMAT": Option(typ=str, options=("text", "ecs"), default="ecs"),
+    "ECS_LOG_VECTOR_ADDRESS": Option(typ=str),
+    "SYSLOG_ENABLED": Option(typ=bool, default=True),
     "SYSLOG_TARGET": Option(),
     "SYSLOG_PORT": Option(typ=int, default=601),
     "SYSLOG_PROTOCOL": Option(default="tcp"),
@@ -175,7 +183,7 @@ VARIABLES = {
     "PHP_MEMORY_LIMIT": Option(default="2048M"),
     "PHP_MAX_EXECUTION_TIME": Option(typ=int, default=300),
     "PHP_UPLOAD_MAX_FILESIZE": Option(default="50M"),
-    "PHP_SESSIONS_COOKIE_SAMESITE": Option(),
+    "PHP_SESSIONS_COOKIE_SAMESITE": Option(options=("Strict", "Lax")),
     # Jobber
     "JOBBER_USER_ID": Option(typ=int, default=1),
     "JOBBER_CACHE_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
@@ -194,6 +202,8 @@ VARIABLES = {
     "UPDATE_WORKERS": Option(typ=int, default=1),
 }
 
+CONFIG_CREATED_CANARY_FILE = "/.misp-configs-created"
+
 
 def str_filter(value: Optional[str]) -> str:
     if value is None:
@@ -209,6 +219,10 @@ jinja_env.filters["bool"] = lambda x: 'true' if x else 'false'
 def error(message: str):
     print(f"ERROR: {message}", file=sys.stderr)
     sys.exit(1)
+
+
+def warning(message: str):
+    print(f"Warning: {message}", file=sys.stderr)
 
 
 def write_file(path: str, content: str):
@@ -300,6 +314,9 @@ def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_use_
 
 
 def generate_rsyslog_config(variables: dict):
+    if not variables["SYSLOG_ENABLED"]:
+        return
+
     # Recommended setting from https://github.com/grafana/loki/blob/master/docs/clients/promtail/scraping.md#rsyslog-output-configuration
     if variables["SYSLOG_TARGET"]:
         config = f'action(\n' \
@@ -333,6 +350,74 @@ def generate_rsyslog_config(variables: dict):
                  f')\n'
 
         write_file("/etc/rsyslog.d/file.conf", config)
+
+
+def generate_vector_config(variables: dict):
+    if not variables["ECS_LOG_ENABLED"]:
+        return
+
+    sinks = {}
+
+    if variables["ECS_LOG_CONSOLE"]:
+        if variables["ECS_LOG_FILE_FORMAT"] == "ecs":
+            sinks = {
+                "console": {
+                    "inputs": ["ecs_without_original_message"],
+                    "type": "console",
+                    "encoding": {
+                        "codec": "json",
+                    },
+                    "framing": {
+                        "method": "newline_delimited",
+                    }
+                }
+            }
+        else:
+            sinks = {
+                "console": {
+                    "inputs": ["ecs_to_text"],
+                    "type": "console",
+                }
+            }
+
+    if variables["ECS_LOG_FILE"]:
+        if variables["ECS_LOG_FILE_FORMAT"] == "ecs":
+            sinks = {
+                "file": {
+                    "inputs": ["ecs_without_original_message"],
+                    "type": "file",
+                    "path": variables["ECS_LOG_FILE"],
+                    "encoding": {
+                        "codec": "json",
+                    },
+                    "framing": {
+                        "method": "newline_delimited",
+                    }
+                }
+            }
+
+        else:
+            sinks = {
+                "file": {
+                    "inputs": ["ecs_to_text"],
+                    "type": "file",
+                    "path": variables["ECS_LOG_FILE"],
+                }
+            }
+
+    if variables["ECS_LOG_VECTOR_ADDRESS"]:
+        sinks = {
+            "vector": {
+                "type": "vector",
+                "inputs": ["ecs_without_original_message"],
+                "address": variables["ECS_LOG_VECTOR_ADDRESS"],
+            }
+        }
+
+    output = {
+        "sinks": sinks,
+    }
+    write_file("/etc/vector/sinks.json", json.dumps(output, indent=2))
 
 
 def generate_error_messages(email: str):
@@ -369,20 +454,25 @@ def validate():
     validate_jinja_template("/etc/supervisord.d/misp.ini")
 
 
-def main():
+def create():
     variables = collect()
     variables["SERVER_NAME"] = urlparse(variables["MISP_BASEURL"]).netloc
 
     if len(variables["SECURITY_SALT"]) < 32:
-        print("Warning: 'SECURITY_SALT' environment variable should be at least 32 chars long", file=sys.stderr)
+        warning("'SECURITY_SALT' environment variable should be at least 32 chars long")
+
+    if variables["SECURITY_ENCRYPTION_KEY"] is None:
+        warning("Sensitive data will be stored in database unencrypted. Please set 'SECURITY_ENCRYPTION_KEY' to random string with at least 32 chars")
+    elif len(variables["SECURITY_ENCRYPTION_KEY"]) < 32:
+        warning("'SECURITY_ENCRYPTION_KEY' environment variable should be at least 32 chars long")
+
+    if variables["SYSLOG_ENABLED"]:
+        warning("Syslog is deprecated and will be removed in near future. Please switch to ECS log instead.")
 
     # if security cookie name is not set, generate it by using SECURITY_SALT and MISP_UUID, so it will survive container restart
     if not variables["SECURITY_COOKIE_NAME"]:
         uniq = hashlib.sha256(f"{variables['SECURITY_SALT']}|{variables['MISP_UUID']}".encode()).hexdigest()
         variables["SECURITY_COOKIE_NAME"] = f"MISP-session-{uniq[0:5]}"
-
-    if variables["PHP_SESSIONS_COOKIE_SAMESITE"] not in ("Strict", "Lax", None):
-        error("Environment variable 'PHP_SESSIONS_COOKIE_SAMESITE' must be 'Strict', 'Lax' or not set")
 
     if variables["PHP_SESSIONS_COOKIE_SAMESITE"] is None:
         is_localhost = variables["MISP_BASEURL"].startswith(("http://localhost", "https://localhost"))
@@ -397,7 +487,7 @@ def main():
     if variables["OIDC_LOGIN"]:
         for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):
             if not variables[var]:
-                error(f"OIDC login is enabled, but '{var}' environment variable is not set")
+                error(f"OIDC login is enabled, but required environment variable '{var}' is not set")
 
         for var in ("OIDC_CODE_CHALLENGE_METHOD", "OIDC_CODE_CHALLENGE_METHOD_INNER"):
             if variables[var] not in ("S256", "plain", "", None):
@@ -406,6 +496,9 @@ def main():
         # mod_auth_openidc require full URL to metadata
         if "/.well-known/openid-configuration" not in variables["OIDC_PROVIDER"]:
             variables["OIDC_PROVIDER"] = f"{variables['OIDC_PROVIDER'].rstrip('/')}/.well-known/openid-configuration"
+
+    # Start modifying files
+    open(CONFIG_CREATED_CANARY_FILE, 'a').close()  # touch
 
     for template_name in ("database.php", "config.php", "email.php"):
         path = f"/var/www/MISP/app/Config/{template_name}"
@@ -416,6 +509,7 @@ def main():
     generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_USE_TLS"], variables["REDIS_PASSWORD"])
     generate_apache_config(variables)
     generate_rsyslog_config(variables)
+    generate_vector_config(variables)
     generate_error_messages(variables["SUPPORT_EMAIL"])
     generate_php_config(variables)
     generate_crypto_policies(variables["SECURITY_CRYPTO_POLICY"])
@@ -431,7 +525,16 @@ if __name__ == "__main__":
     parser.add_argument("action", nargs="?", choices=("create", "validate"))
     parsed = parser.parse_args()
 
+    configs_created = os.path.exists(CONFIG_CREATED_CANARY_FILE)
+
     if parsed.action == "validate":
+        if configs_created:
+            error(f"Configs was already created (canary file {CONFIG_CREATED_CANARY_FILE} exists), it is not possible to validate them")
+
         validate()
     else:
-        main()
+        if configs_created:
+            print(f"Warning: Configs was already created (canary file {CONFIG_CREATED_CANARY_FILE} exists)", file=sys.stderr)
+            sys.exit(0)
+
+        create()

@@ -5,6 +5,7 @@ zip
 supervisor
 ssdeep-libs
 rsyslog
+vector
 crypto-policies-scripts
 
 # Python
