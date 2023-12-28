@@ -11,35 +11,35 @@ prefs:
 jobs:
   {% if JOBBER_CACHE_FEEDS_TIME %}
   CacheFeeds:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server cacheFeed {{ JOBBER_USER_ID }} all 2>/dev/null
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake Server cacheFeed {{ JOBBER_USER_ID }} all 2>/dev/null
     time: {{ JOBBER_CACHE_FEEDS_TIME }}
     onError: Backoff
   {% endif %}
 
   {% if JOBBER_FETCH_FEEDS_TIME %}
   FetchFeeds:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server fetchFeed {{ JOBBER_USER_ID }} all 2>/dev/null
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake Server fetchFeed {{ JOBBER_USER_ID }} all 2>/dev/null
     time: {{ JOBBER_FETCH_FEEDS_TIME }}
     onError: Backoff
   {% endif %}
 
   {% if JOBBER_PULL_SERVERS_TIME %}
   PullServers:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server pullAll {{ JOBBER_USER_ID }}
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake Server pullAll {{ JOBBER_USER_ID }}
     time: {{ JOBBER_PULL_SERVERS_TIME }}
     onError: Backoff
   {% endif %}
 
   {% if JOBBER_CACHE_SERVERS_TIME %}
-  PullServers:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server cacheServerAll {{ JOBBER_USER_ID }}
+  CacheServers:
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake Server cacheServerAll {{ JOBBER_USER_ID }}
     time: {{ JOBBER_CACHE_SERVERS_TIME }}
     onError: Backoff
   {% endif %}
 
   {% if JOBBER_SCAN_ATTACHMENT_TIME %}
   ScanAttachment:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake admin scanAttachment all
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake admin scanAttachment all
     time: {{ JOBBER_SCAN_ATTACHMENT_TIME }}
     onError: Backoff
   {% endif %}
@@ -52,8 +52,8 @@ jobs:
   {% endif %}
 
   {% if JOBBER_SEND_PERIODIC_SUMMARY %}
-  LogRotate:
-    cmd: su-exec apache /var/www/MISP/app/Console/cake Server sendPeriodicSummaryToUsers
+  PeriodicSummary:
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake Server sendPeriodicSummaryToUsers
     time: {{ JOBBER_SEND_PERIODIC_SUMMARY }}
     onError: Continue
   {% endif %}
@@ -61,9 +61,9 @@ jobs:
   {% if JOBBER_USER_CHECK_VALIDITY_TIME and OIDC_LOGIN and OIDC_OFFLINE_ACCESS %}
   UserCheckValidity:
     {% if OIDC_CHECK_USER_VALIDITY %}
-    cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --update --block_invalid
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake user check_validity --update --block_invalid
     {% else %}
-    cmd: su-exec apache /var/www/MISP/app/Console/cake user check_validity --update
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake user check_validity --update
     {% endif %}
     time: {{ JOBBER_USER_CHECK_VALIDITY_TIME }}
     onError: Backoff

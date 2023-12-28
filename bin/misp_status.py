@@ -4,9 +4,37 @@
 import os
 import sys
 import json
+import http.client
+import socket
+import xmlrpc.client
 import logging
 import subprocess
 import requests
+
+
+class UnixStreamHTTPConnection(http.client.HTTPConnection):
+    def connect(self):
+        self.sock = socket.socket(
+            socket.AF_UNIX, socket.SOCK_STREAM
+        )
+        self.sock.connect(self.host)
+
+
+class UnixStreamTransport(xmlrpc.client.Transport, object):
+    def __init__(self, socket_path):
+        self.socket_path = socket_path
+        super().__init__()
+
+    def make_connection(self, host):
+        return UnixStreamHTTPConnection(self.socket_path)
+
+
+class UnixStreamXMLRPCClient(xmlrpc.client.ServerProxy):
+    def __init__(self, addr, **kwargs):
+        transport = UnixStreamTransport(addr)
+        super().__init__(
+            "http://", transport=transport, **kwargs
+        )
 
 
 class SubprocessException(Exception):
@@ -17,12 +45,17 @@ class SubprocessException(Exception):
 
 
 s = requests.Session()
-# This is a hack how to go through mod_auth_openidc
-s.headers["Authorization"] = "dummydummydummydummydummydummydummydummy"
+supervisor_api = UnixStreamXMLRPCClient("/run/supervisor/supervisor.sock")
+
+
+def check_supervisor():
+    state = supervisor_api.supervisor.getState()
+    if state["statecode"] != 1:
+        raise Exception(f"Unexpected state code {state['statecode']} received from supervisor, expected 1")
 
 
 def check_fpm_status() -> dict:
-    r = s.get('http://localhost/fpm-status')
+    r = s.get('http://127.0.0.2/fpm-status')
     r.raise_for_status()
 
     output = {}
@@ -33,7 +66,7 @@ def check_fpm_status() -> dict:
 
 
 def check_httpd_status() -> dict:
-    r = s.get('http://localhost/server-status?auto')
+    r = s.get('http://127.0.0.2/server-status?auto')
     r.raise_for_status()
 
     output = {}
@@ -44,6 +77,25 @@ def check_httpd_status() -> dict:
 
     del output["Scoreboard"]
     return output
+
+
+def check_vector():
+    try:
+        vector_process_info = supervisor_api.supervisor.getProcessInfo("vector")
+    except xmlrpc.client.Fault as e:
+        if e.faultString == "BAD_NAME":
+            return False  # vector is not enabled
+        raise
+
+    if vector_process_info["state"] != 20:
+        raise Exception(f"Invalid process state {vector_process_info['statename']}, expected RUNNING")
+
+    r = s.get('http://127.0.0.1:8686/health')
+    r.raise_for_status()
+    if not r.json()["ok"]:
+        raise Exception(f"Invalid status ({r.text}) received from vector API")
+
+    return True
 
 
 def check_redis():
@@ -57,27 +109,49 @@ if __name__ == "__main__":
         print("This script should not be run under root user", file=sys.stderr)
         sys.exit(255)
 
-    output = {}
+    output = {
+        "supervisor": False,
+        "httpd": False,
+        "php-fpm": False,
+        "redis": False,
+    }
 
     try:
-        output["httpd"] = check_httpd_status()
+        check_supervisor()
+        output["supervisor"] = True
+    except Exception:
+        logging.exception("Could not check supervisor status")
+
+    try:
+        check_httpd_status()
+        output["httpd"] = True
     except Exception:
         logging.exception("Could not check httpd status. Probably Apache is broken.")
-        sys.exit(1)
 
     try:
-        output["fpm"] = check_fpm_status()
+        check_fpm_status()
+        output["php-fpm"] = True
     except Exception:
         logging.exception("Could not check PHP-FPM status. Probably Apache or PHP-FPM is broken.")
-        sys.exit(2)
 
     try:
         check_redis()
         output["redis"] = True
     except Exception:
         logging.exception("Could not check Redis status. Probably Redis connection is broken.")
-        sys.exit(3)
 
-    print(json.dumps(output), file=sys.stderr)
+    try:
+        if check_vector():
+            output["vector"] = True
+    except Exception:
+        output["vector"] = False
+        logging.exception("Could not check vector status")
+
+    print(json.dumps(output))
+
+    for value in output.values():
+        if value is False:
+            sys.exit(1)
+
     sys.exit(0)
 

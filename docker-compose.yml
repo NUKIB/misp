@@ -61,7 +61,10 @@ services:
       MISP_MODULE_URL: http://misp-modules
       MISP_EMAIL: ahoj@example.com # Please change for production
       SECURITY_SALT: PleaseChangeForProduction # Please change for production
-      ZEROMQ_ENABLED: "yes"
+      ZEROMQ_ENABLED: yes
+      SYSLOG_ENABLED: no
+      ECS_LOG_ENABLED: yes
+      MISP_DEBUG: yes
     ports:
       - 127.0.0.1:8080:80
       - 127.0.0.1:50000:50000

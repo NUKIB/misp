@@ -1,0 +1,178 @@
+api:
+  enabled: true
+
+sources:
+  json_socket:
+    type: socket
+    mode: unix_stream
+    path: /run/vector
+    socket_file_mode: 0o777 # apache user must be able to write into this socket
+
+  php_fpm:
+    type: file
+    include:
+      - /var/log/php-fpm/error.log
+      - /var/log/php-fpm/www-error.log
+      - /var/log/php-fpm/www.access.log
+
+  supervisor:
+    type: file
+    include:
+      - /var/log/supervisor/supervisord.log
+
+  jobber:
+    type: file
+    data_dir: /var/www/MISP/app/tmp/logs/ # must survive container recreate
+    include:
+      - /var/www/MISP/app/tmp/logs/jobber-runs
+
+transforms:
+  parse_ecs_socket:
+    type: remap
+    inputs:
+      - json_socket
+    source: |-
+      .log = parse_json!(.message)
+      .log.event.created = .timestamp
+      # Convert timestamp from string to timestamp type
+      .log.@timestamp = parse_timestamp!(.log.@timestamp, "%+")
+      . = .log
+
+  parse_ecs_jobber:
+    type: remap
+    inputs:
+      - jobber
+    source: |-
+      .ecs.version = "8.11"
+      
+      .event.kind = "event"
+      .event.provider = "misp"
+      .event.module = "jobber"
+      .event.dataset = "jobber.runs"
+      .event.created = del(.timestamp)
+      
+      .message = strip_whitespace!(.message)
+      parsed = parse_regex!(.message, r'^(?P<job>\w+)\t(?P<timestamp>\d+)\t(?P<result>\w+)\t(?P<new_job_status>\w+)')
+      .@timestamp = from_unix_timestamp!(parse_int!(parsed.timestamp), "nanoseconds")
+      
+      .log.file.path = del(.file)
+      del(.source_type)
+      del(.host)
+
+  parse_ecs_supervisor:
+    type: remap
+    inputs:
+      - supervisor
+    source: |-
+      .ecs.version = "8.11"
+      
+      .event.kind = "event"
+      .event.provider = "misp"
+      .event.module = "supervisor"
+      .event.dataset = "supervisor.log"
+      .event.created = del(.timestamp)
+      .event.original = del(.message)
+      
+      parsed = parse_regex!(.event.original, r'^(?P<timestamp>\d+-\d+-\d+ \d+:\d+:\d+,\d+) (?P<level>\w+) (?P<message>.*)')
+      .@timestamp = parse_timestamp!(parsed.timestamp, "%Y-%m-%d %H:%M:%S,%3f")
+      .log.level = downcase(parsed.level)
+      .message = parsed.message
+      .log.file.path = del(.file)
+      del(.source_type)
+      del(.host)
+
+  # Parse PHP-FPM logs to ECS format
+  parse_ecs_php_fpm:
+    type: remap
+    inputs:
+      - php_fpm
+    source: |-
+      if length(string!(.message)) == 0 {
+        abort # sometimes, PHP-FPM log contains empty line
+      }
+      
+      .ecs.version = "8.11"
+      
+      .event.category = "web"
+      .event.kind = "event"
+      .event.provider = "misp"
+      .event.module = "php-fpm"
+      .event.created = del(.timestamp)
+      
+      if .file == "/var/log/php-fpm/error.log" {
+        parsed = parse_regex!(.message, r'^\[(?P<timestamp>\d+-\w+-\d+ \d+:\d+:\d+)\] (?P<level>\w+): (?P<message>.*)')
+        .event.original = del(.message)
+        .@timestamp = parse_timestamp!(parsed.timestamp, "%d-%b-%Y %H:%M:%S")
+        .message = parsed.message
+        .log.level = downcase(parsed.level)
+        .event.dataset = "php-fpm.error"
+        .event.type = "error"
+      } else if .file == "/var/log/php-fpm/www-error.log" {
+        parsed = parse_regex!(.message, r'^\[(?P<timestamp>\d+-\w+-\d+ \d+:\d+:\d+) \w+\] (?P<message>.*)')
+        .event.original = del(.message)
+        .@timestamp = parse_timestamp!(parsed.timestamp, "%d-%b-%Y %H:%M:%S")
+        .message = parsed.message
+        .log.level = "error"
+        .event.dataset = "php-fpm.www-error"
+        .event.type = "error"
+      } else {
+        parsed = parse_regex!(.message, r'^(?P<ip>[^ ]+) (?P<request_id>[^ ]+) - (?P<user>[^ ]*) (?P<timestamp>\d+\/\w+\/\d+:\d+:\d+:\d+ [-+]\d+) \"(?P<method>\w+) (?P<url>[^\"]+)\" (?P<status>\d+) (?P<duration>[\d.]+) (?P<memory_usage>\d+) (?P<cpu_usage>[\d.%]+)')
+        
+        if (parsed.method == "GET" && parsed.url == "/fpm-status") {
+          abort # ignore healthcheck requests
+        }
+        
+        .@timestamp = parse_timestamp!(parsed.timestamp, "%d/%b/%Y:%H:%M:%S %z")
+        if length(parsed.request_id) != 0 {
+          .http.request.id = parsed.request_id
+        }
+        .http.request.method = parsed.method
+        .http.response.status_code = parse_int!(parsed.status)
+        
+        # Parse URL to path and query parts
+        url_parts = split(parsed.url, "?", limit: 2)
+        .url.path = url_parts[0]
+        if exists(url_parts[1]) {
+          .url.query = url_parts[1]
+        }
+      
+        .event.dataset = "php-fpm.access"
+        .event.type = "access"
+        .event.duration = to_int(parse_float!(parsed.duration) * 1000000)
+      }
+      
+      .log.file.path = del(.file)
+      del(.source_type)
+      del(.host)
+
+  ecs_without_original_message:
+    type: remap
+    inputs:
+      - parse_ecs_*
+    source: |-
+      del(.event.original)
+
+  # Convert ECS format to single text line format
+  ecs_to_text:
+    type: remap
+    inputs:
+      - parse_ecs_*
+    source: |-
+      new_message = format_timestamp!(.@timestamp, "%FT%T%.6fZ") +  " [" + string!(.event.dataset) + "] "
+      if exists(.event.original) {
+        new_message = new_message + string!(.event.original)
+      } else if exists(.message) {
+        new_message = new_message + string!(.message)
+      } else if exists(.error.message) {
+        new_message = new_message + string!(.error.message)
+      } else {
+        new_message = new_message + encode_json(.)
+      }
+      .message = new_message
+
+sinks:
+  # Without sink, vector will not start
+  dummy_sink:
+    type: blackhole
+    inputs:
+      - ecs_without_original_message

@@ -10,11 +10,6 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FOR
     unset($httpHost);
 }
 
-// If X-Forwarded-For HTTP header is set, use it as remote address
-if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    $_SERVER['REMOTE_ADDR'] = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-}
-
 /**
  * This file is loaded automatically by the app/webroot/index.php file after core.php
  *
@@ -79,21 +74,32 @@ function initializeSentry($sentryDsn) {
 $sentryDsn = Configure::read('MISP.sentry_dsn');
 if (!empty($sentryDsn)) {
     initializeSentry($sentryDsn);
+}
 
-    // SimpleBackgroundTask or when SENTRY_ENABLED is set to true
-    if (getenv('BACKGROUND_JOB_ID') || getenv('SENTRY_ENABLED') === 'true') {
-        $errorHandler = new ConsoleErrorHandler();
+// Send exceptions and PHP errors for SimpleBackgroundTask or when MIPS_AUTOMATIC_TASK environment variable is set to 'true'
+// This overwrites default behaviour that just write logs to stderr
+if (getenv('BACKGROUND_JOB_ID') || getenv('MISP_AUTOMATIC_TASK') === 'true') {
+    $errorHandler = new ConsoleErrorHandler();
 
-        Configure::write('Exception.consoleHandler', function (Throwable $exception) use ($errorHandler) {
+    Configure::write('Exception.consoleHandler', function (Throwable $exception) use ($errorHandler) {
+        if (Configure::read('MISP.sentry_dsn')) {
             Sentry\captureException($exception);
-            $errorHandler->handleException($exception);
-        });
-        Configure::write('Error.consoleHandler', function ($code, $description, $file = null, $line = null, $context = null) use ($errorHandler) {
+        }
+        if (Configure::read('Security.ecs_log')) {
+            EcsLog::handleException($exception);
+        }
+        $errorHandler->handleException($exception);
+    });
+    Configure::write('Error.consoleHandler', function ($code, $description, $file = null, $line = null, $context = null) use ($errorHandler) {
+        if (Configure::read('MISP.sentry_dsn')) {
             $exception = new \ErrorException($description, 0, $code, $file, $line);
             Sentry\captureException($exception);
-            $errorHandler->handleError($code, $description, $file, $line, $context);
-        });
-    }
+        }
+        if (Configure::read('Security.ecs_log')) {
+            EcsLog::handleError($code, $description, $file, $line);
+        }
+        $errorHandler->handleError($code, $description, $file, $line);
+    });
 }
 
 /**
@@ -132,11 +138,24 @@ CakeLog::config('error', array(
 	'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
 	'file' => 'error',
 ));
-CakeLog::config('syslog', array(
-    'engine' => 'Syslog',
-    'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
-    'prefix' => 'MISP',
-));
+
+// Send error logs to syslog just when syslog is enabled in config
+if (Configure::read('Security.syslog')) {
+    CakeLog::config('syslog', array(
+        'engine' => 'Syslog',
+        'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
+        'prefix' => 'MISP',
+    ));
+}
+
+// Send error logs to socket in ECS JSON format just when ECS log is enabled in config
+if (Configure::read('Security.ecs_log')) {
+    CakePlugin::load('EcsLog');
+    CakeLog::config('ecs', [
+        'engine' => 'EcsLog.EcsLog',
+        'types' => ['notice', 'info', 'debug', 'warning', 'error', 'critical', 'alert', 'emergency'],
+    ]);
+}
 
 // Disable phar wrapper, because can be dangerous
 if (in_array('phar', stream_get_wrappers(), true)) {

@@ -64,6 +64,10 @@ If you don't like CentOS Stream, you can use as a base image different distribut
 
     docker build --build-arg BASE_IMAGE=almalinux -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
+## Logging
+
+Logging is important to keep your MISP secure and in good conditions. [Check detailed manual how to configure logging](docs/LOGGING.md)
+
 ## Environment variables
 
 By changing or defining these container environment variables, you can change container behavior.
@@ -80,7 +84,7 @@ MISP requires MySQL or MariaDB database.
 
 ### Redis
 
-By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HOST` variable on port `6379`.
+By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HOST` variable on port `6379`. Redis alternative [Dragonfly](https://www.dragonflydb.io) is also supported.
 
 * `REDIS_HOST` (required, string) - hostname or IP address
 * `REDIS_PASSWORD` (optional, string) - password used to connect password protected Redis instance
@@ -133,7 +137,7 @@ inside the container:
 * `SECURITY_SALT` (required, string) - random string (recommended at least 32 chars) used for salting hashed values (you can use `openssl rand -base64 32` output as value)
 * `SECURITY_ADVANCED_AUTHKEYS` (optional, boolean, default `false`) - enable advanced auth keys support
 * `SECURITY_HIDE_ORGS` (optional, boolean, default `false`) - hide org names for normal users
-* `SECURITY_ENCRYPTION_KEY` (optional, string) - encryption key with at least 32 chars that will be used to encrypt sensitive information stored in database *WARNING:* Never changed this value after deployment!
+* `SECURITY_ENCRYPTION_KEY` (optional, string) - encryption key with at least 32 chars that will be used to encrypt sensitive information stored in database *WARNING:* Never change this value after deployment!
 * `SECURITY_CRYPTO_POLICY` (optional, string, default `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8). Use empty string to keep container default value.
 * `SECURITY_REST_CLIENT_ENABLE_ARBITRARY_URLS` (optional, boolean, default `false`) - enable to query any arbitrary URL via rest client (required for Workflows Webhook).
 
@@ -151,13 +155,6 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 
 [Check detailed manual how to configure OIDC login](docs/OIDC.md)
 
-### Sentry
-
-[Sentry](https://sentry.io/) is a tool for error tracking and support for this tool is integrated into this image. If configured, unhandled exceptions will be logged in Sentry.
-
-* `SENTRY_DSN` (optional, string) - Sentry DSN to catch exceptions
-* `SENTRY_ENVIRONMENT` (optional, string) - Sentry environment
-
 ### ZeroMQ
 
 * `ZEROMQ_ENABLED` (optional, boolean, default `false`) - enable ZeroMQ integration, server will listen at `*:50000`
@@ -174,17 +171,7 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 * `PHP_MAX_EXECUTION_TIME` (optional, int, default `300`) - sets [max_execution_time](https://www.php.net/manual/en/info.configuration.php#ini.max-execution-time) (in seconds)
 * `PHP_UPLOAD_MAX_FILESIZE` (optional, string, default `50M`) - sets [upload_max_filesize](https://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize) and [post_max_size](https://www.php.net/manual/en/ini.core.php#ini.post-max-size)
 * `PHP_XDEBUG_ENABLED` (optional, boolean, default `false`) - enable [Xdebug](https://xdebug.org) PHP extension for debugging purposes (do not enable on production environment)
-* `PHP_XDEBUG_PROFILER_TRIGGER` (optional, string) - secret value for `XDEBUG_PROFILE` GET/POST variable that will enable profiling 
-
-### Syslog
-
-Syslog is collecting all logs from container (see [rsyslog.conf](rsyslog.conf)) and save them to `SYSLOG_FILE` or optionally sends them to remote syslog server.
-
-* `SYSLOG_TARGET` (optional, string) - if defined, all logs from the container are forwarded to a defined syslog server. Should be hostname or IP address of the system that shall receive messages.
-* `SYSLOG_PORT` (optional, int, default `601`)
-* `SYSLOG_PROTOCOL` (optional, string, default `tcp`)
-* `SYSLOG_FILE` (optional, string, default `/var/log/messages`) - path to file that will contain all logs collected by syslog
-* `SYSLOG_FILE_FORMAT` (optional, string, default `text-traditional`) - sets `SYSLOG_FILE` log file format, can be `json`, `text` or `text-traditional`
+* `PHP_XDEBUG_PROFILER_TRIGGER` (optional, string) - secret value for `XDEBUG_PROFILE` GET/POST variable that will enable profiling
 
 ### Jobber
 
@@ -212,18 +199,9 @@ Supervisor is used to run all processes within the container, you can adjust the
 * `EMAIL_WORKERS` (optional, int, default `3`) - number of email workers to start
 * `CACHE_WORKERS` (optional, int, default `1`) - number of cache workers to start
 * `PRIO_WORKERS` (optional, int, default `3`) - number of prio workers to start
-* `UPDATE_WORKERS` (optional, int, default `1`) - number of upadte workers to start
+* `UPDATE_WORKERS` (optional, int, default `1`) - number of update workers to start
 
-If one of the variables is set to `0`, no workers will be started. 
-
-## Log locations
-
-* `/var/log/messages` - all logs captured by rsyslog (see [rsyslog.conf](rsyslog.conf) for definition)
-* `/var/log/httpd/` - Apache logs
-* `/var/log/php-fpm/` - PHP-FPM logs
-* `/var/www/MISP/app/tmp/logs/` - application logs (PHP)
-
-`X-Request-ID` HTTP header is logged in Apache, PHP-FPM, audit, and Sentry logs, so you can use this value to correlate requests between logs.
+If one of the variables is set to `0`, no workers will be started.
 
 ## Container volumes
 

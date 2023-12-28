@@ -104,6 +104,7 @@ $config = [
     'footer_logo' => {{ MISP_FOOTER_LOGO | str }},
     'custom_css' => {{ MISP_CUSTOM_CSS | str }},
     'tmpdir' => '/tmp',
+    'log_client_ip_header' => 'HTTP_X_FORWARDED_FOR',
   ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
@@ -146,7 +147,8 @@ $config = [
     'csp_enforce' => true,
     'min_tls_version' => 'tlsv1_2',
     'require_password_confirmation' => {{ 'false' if OIDC_LOGIN else 'true' }},
-    'syslog' => true,
+    'ecs_log' => {{ ECS_LOG_ENABLED | bool }},
+    'syslog' => {{ SYSLOG_ENABLED | bool }},
     'syslog_to_stderr' => false,
     'syslog_ident' => 'misp-audit',
     'level' => 'medium',

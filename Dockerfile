@@ -30,8 +30,9 @@ FROM base as misp
 # Install required system and Python packages
 COPY packages /tmp/packages
 COPY requirements.txt /tmp/
-COPY bin/misp_enable_epel.sh /usr/local/bin/
+COPY bin/misp_enable_epel.sh bin/misp_enable_vector.sh /usr/local/bin/
 RUN bash /usr/local/bin/misp_enable_epel.sh && \
+    bash /usr/local/bin/misp_enable_vector.sh && \
     dnf module -y enable mod_auth_openidc php:7.4 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.11 && \
@@ -45,6 +46,7 @@ COPY --from=jobber-build /build/jobber*.rpm /tmp
 COPY bin/ /usr/local/bin/
 COPY misp.conf /etc/httpd/conf.d/misp.conf
 COPY httpd-errors/* /var/www/html/
+COPY vector.yaml /etc/vector/
 COPY rsyslog.conf /etc/
 COPY snuffleupagus-misp.rules /etc/php.d/
 COPY .jobber /root/
@@ -71,7 +73,8 @@ RUN chmod u=r,g=r,o=r /var/www/MISP/app/Config/* && \
 # Verify image
 FROM misp as verify
 RUN touch /verified && \
-    su-exec apache /usr/local/bin/misp_verify.sh
+    su-exec apache /usr/local/bin/misp_verify.sh && \
+    /usr/bin/vector --config-dir /etc/vector/ validate
 
 # Final image
 FROM misp
