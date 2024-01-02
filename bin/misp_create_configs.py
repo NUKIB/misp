@@ -153,6 +153,7 @@ VARIABLES = {
     "MISP_HOME_LOGO": Option(),
     "MISP_FOOTER_LOGO": Option(),
     "MISP_CUSTOM_CSS": Option(),
+    "MISP_EMAIL_RETURN_PATH": Option(),
     # Security
     "GNUPG_SIGN": Option(typ=bool, default=False),
     "GNUPG_PRIVATE_KEY_PASSWORD": Option(),

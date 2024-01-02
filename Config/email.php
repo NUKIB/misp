@@ -13,5 +13,8 @@ class EmailConfig
         'log' => false,
         'tls' => true,
         'context' => ['ssl' => ['cafile' => '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem']],
+        {% if MISP_EMAIL_RETURN_PATH %}
+        'additionalParameters' => '-f '.{{ MISP_EMAIL_RETURN_PATH | str }},
+        {% endif %}
     ];
 }

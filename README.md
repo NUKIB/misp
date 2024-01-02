@@ -101,6 +101,7 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `MISP_HOST_ORG_ID` (optional, int, default `1`) - MISP default organisation ID
 * `MISP_MODULE_URL` (optional, string) - full URL to MISP modules
 * `MISP_DEBUG` (optional, boolean, default `false`) - enable debug mode (do not enable on production environment)
+* `MISP_EMAIL_RETURN_PATH` (optional, string) - mail address to use for the return path
 
 [Check more variables that allows MISP customization.](docs/CUSTOMIZATION.md)
 
