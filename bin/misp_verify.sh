@@ -7,8 +7,10 @@ set -o xtrace
 php -v
 
 # Build test
-# TODO: Temporary disable, because LIEF is broken in arm
-#cd /var/www/MISP/tests/
-#bash build-test.sh
+# Temporary disable for aarch64, because LIEF is broken in arm
+if [[ "$(uname -m)" != "aarch64" ]]; then
+  cd /var/www/MISP/tests/
+  bash build-test.sh
+fi
 
 misp_create_configs.py validate
