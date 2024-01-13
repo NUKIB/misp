@@ -54,6 +54,20 @@ def check_supervisor():
         raise Exception(f"Unexpected state code {state['statecode']} received from supervisor, expected 1")
 
 
+def check_supervisor_process(process_name: str) -> bool:
+    try:
+        process_info = supervisor_api.supervisor.getProcessInfo(process_name)
+    except xmlrpc.client.Fault as e:
+        if e.faultString == "BAD_NAME":
+            return False  # process is not enabled
+        raise
+
+    if process_info["state"] != 20:
+        raise Exception(f"Invalid process state {process_info['statename']}, expected RUNNING")
+
+    return True
+
+
 def check_fpm_status() -> dict:
     r = s.get('http://127.0.0.2/fpm-status')
     r.raise_for_status()
@@ -80,15 +94,8 @@ def check_httpd_status() -> dict:
 
 
 def check_vector():
-    try:
-        vector_process_info = supervisor_api.supervisor.getProcessInfo("vector")
-    except xmlrpc.client.Fault as e:
-        if e.faultString == "BAD_NAME":
-            return False  # vector is not enabled
-        raise
-
-    if vector_process_info["state"] != 20:
-        raise Exception(f"Invalid process state {vector_process_info['statename']}, expected RUNNING")
+    if not check_supervisor_process("vector"):
+        return False
 
     r = s.get('http://127.0.0.1:8686/health')
     r.raise_for_status()
@@ -96,6 +103,10 @@ def check_vector():
         raise Exception(f"Invalid status ({r.text}) received from vector API")
 
     return True
+
+
+def check_zeromq():
+    return check_supervisor_process("zeromq")
 
 
 def check_redis():
@@ -147,7 +158,14 @@ if __name__ == "__main__":
         output["vector"] = False
         logging.exception("Could not check vector status")
 
-    print(json.dumps(output))
+    try:
+        if check_zeromq():
+            output["zeromq"] = True
+    except Exception:
+        output["zeromq"] = False
+        logging.exception("Could not check zeromq status")
+
+    sys.stdout.write(json.dumps(output))
 
     for value in output.values():
         if value is False:

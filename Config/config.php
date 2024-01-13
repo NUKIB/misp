@@ -4,6 +4,7 @@ $plugin = ['Sightings_policy' => 3];
 
 {% if ZEROMQ_ENABLED %}
 $plugin['ZeroMQ_enable'] = true;
+$plugin['ZeroMQ_supervisor_managed'] = true;
 {% if ZEROMQ_USERNAME %}
 $plugin['ZeroMQ_username'] = '{{ ZEROMQ_USERNAME }}';
 $plugin['ZeroMQ_password'] = {{ ZEROMQ_PASSWORD | str }};
