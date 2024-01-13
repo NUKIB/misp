@@ -58,7 +58,7 @@ def check_supervisor_process(process_name: str) -> bool:
     try:
         process_info = supervisor_api.supervisor.getProcessInfo(process_name)
     except xmlrpc.client.Fault as e:
-        if e.faultString == "BAD_NAME":
+        if e.faultCode == 10:  # BAD_NAME
             return False  # process is not enabled
         raise
 
@@ -115,11 +115,7 @@ def check_redis():
         raise SubprocessException(r)
 
 
-if __name__ == "__main__":
-    if os.geteuid() == 0:
-        print("This script should not be run under root user", file=sys.stderr)
-        sys.exit(255)
-
+def main() -> dict:
     output = {
         "supervisor": False,
         "httpd": False,
@@ -165,7 +161,16 @@ if __name__ == "__main__":
         output["zeromq"] = False
         logging.exception("Could not check zeromq status")
 
-    sys.stdout.write(json.dumps(output))
+    return output
+
+
+if __name__ == "__main__":
+    if os.geteuid() == 0:
+        print("This script should not be run under root user", file=sys.stderr)
+        sys.exit(255)
+
+    output = main()
+    sys.stdout.write(json.dumps(output, separators=(",", ":")))
 
     for value in output.values():
         if value is False:
