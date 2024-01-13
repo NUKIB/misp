@@ -12,7 +12,7 @@ to update MISP from the user interface and instead, an admin should download a n
 * 👩‍💻 Integrated support for [OpenID Connect (OIDC) authentication](docs/OIDC.md)
 * 🔒️ PHP is by default protected by Snuffleupagus extensions with [rules](snuffleupagus-misp.rules) tailored to MISP
 * 🚀 Optional extensions and configurations that will make MISP faster are enabled
-* 📓 Integrated support for logging exceptions to Sentry and forwarding logs to syslog server
+* 📓 Integrated support for logging into [ECS format](docs/LOGGING.md), exceptions to Sentry and forwarding logs to syslog server
 * 🧪 Final image is automatically tested, so every release should work as expected
 * 🏛 Build for amd64 (x86_64) and arm64 (aarch64)
 
@@ -38,7 +38,7 @@ To delete all volumes after testing, run:
 ### Updating
 
 When a new MISP is released, also new container image is created. For updating MISP and MISP Modules, just run these commands in the folder that contains `docker-compose.yml` file.
-These commands will download the latest images and recreate containers:
+These commands will download the latest images and recreate containers. All data will be preserved.
 
     docker compose pull
     docker compose up -d
@@ -49,6 +49,7 @@ For production usage, please:
 * change passwords for MariaDB and Redis,
 * modify environment variables to requested values,
 * deploy reverse proxy (for example `nginx`) before MISP to handle HTTPS connections.
+  * do not forget to send proper `X-Forwared-For` header
 
 ### Usage in air-gapped environment
 
@@ -202,6 +203,11 @@ Supervisor is used to run all processes within the container, you can adjust the
 * `UPDATE_WORKERS` (optional, int, default `1`) - number of update workers to start
 
 If one of the variables is set to `0`, no workers will be started.
+
+### Extra variables
+
+* `ECS_`, `SYSLOG_` and `SENTRY_` are documented in [LOGGING.md](docs/LOGGING.md) 
+* `OIDC_` are documented in [OIDC.md](docs/OIDC.md) 
 
 ## Container volumes
 
