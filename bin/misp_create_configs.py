@@ -14,12 +14,14 @@ from jinja2 import Environment
 
 class Option:
     def __init__(self, required: bool = False, typ: Type = str, default: Any = None,
-                 validation: Callable[[str, Any], NoReturn] = None, options: Optional[Union[List, Tuple]] = None):
+                 validation: Callable[[str, Any], NoReturn] = None, options: Optional[Union[List, Tuple]] = None,
+                 sensitive: bool = False):
         self.required = required
         self.typ = typ
         self.default = default
         self.validation = validation
         self.options = options
+        self.sensitive = sensitive
 
     def get_value(self, env_name: str) -> Any:
         if env_name not in os.environ:
@@ -89,31 +91,31 @@ VARIABLES = {
     "MYSQL_HOST": Option(required=True),
     "MYSQL_PORT": Option(typ=int, default=3306),
     "MYSQL_LOGIN": Option(required=True),
-    "MYSQL_PASSWORD": Option(),
+    "MYSQL_PASSWORD": Option(sensitive=True),
     "MYSQL_DATABASE": Option(required=True),
     # Redis
     "REDIS_HOST": Option(required=True),
-    "REDIS_PASSWORD": Option(),
+    "REDIS_PASSWORD": Option(sensitive=True),
     "REDIS_USE_TLS": Option(typ=bool, default=False),
     # Proxy
     "PROXY_HOST": Option(),
     "PROXY_PORT": Option(typ=int, default=3128),
     "PROXY_METHOD": Option(),
     "PROXY_USER": Option(),
-    "PROXY_PASSWORD": Option(),
+    "PROXY_PASSWORD": Option(sensitive=True),
     # OIDC
     "OIDC_LOGIN": Option(typ=bool),
     "OIDC_PROVIDER": Option(validation=check_is_url),
     "OIDC_PROVIDER_INNER": Option(validation=check_is_url),
     "OIDC_CLIENT_ID": Option(),
     "OIDC_CLIENT_ID_INNER": Option(),
-    "OIDC_CLIENT_SECRET": Option(),
-    "OIDC_CLIENT_SECRET_INNER": Option(),
+    "OIDC_CLIENT_SECRET": Option(sensitive=True),
+    "OIDC_CLIENT_SECRET_INNER": Option(sensitive=True),
     "OIDC_CODE_CHALLENGE_METHOD": Option(),
     "OIDC_CODE_CHALLENGE_METHOD_INNER": Option(),
     "OIDC_AUTHENTICATION_METHOD": Option(default="client_secret_basic"),
     "OIDC_AUTHENTICATION_METHOD_INNER": Option(),
-    "OIDC_CLIENT_CRYPTO_PASS": Option(),
+    "OIDC_CLIENT_CRYPTO_PASS": Option(sensitive=True),
     "OIDC_DEFAULT_ORG": Option(),
     "OIDC_PASSWORD_RESET": Option(validation=check_is_url),
     "OIDC_ROLES_PROPERTY": Option(default="roles"),
@@ -140,12 +142,12 @@ VARIABLES = {
     # ZeroMQ
     "ZEROMQ_ENABLED": Option(typ=bool, default=False),
     "ZEROMQ_USERNAME": Option(),
-    "ZEROMQ_PASSWORD": Option(),
+    "ZEROMQ_PASSWORD": Option(sensitive=True),
     # SMTP
     "SMTP_HOST": Option(),
     "SMTP_PORT": Option(typ=int, default=25),
     "SMTP_USERNAME": Option(),
-    "SMTP_PASSWORD": Option(),
+    "SMTP_PASSWORD": Option(sensitive=True),
     "SUPPORT_EMAIL": Option(validation=check_is_email),
     # MISP
     "MISP_BASEURL": Option(required=True, validation=check_is_url),
@@ -164,14 +166,14 @@ VARIABLES = {
     "MISP_CUSTOM_CSS": Option(),
     # Security
     "GNUPG_SIGN": Option(typ=bool, default=False),
-    "GNUPG_PRIVATE_KEY_PASSWORD": Option(),
-    "GNUPG_PRIVATE_KEY": Option(),
+    "GNUPG_PRIVATE_KEY_PASSWORD": Option(sensitive=True),
+    "GNUPG_PRIVATE_KEY": Option(sensitive=True),
     "GNUPG_BODY_ONLY_ENCRYPTED": Option(typ=bool, default=False),
     "SECURITY_ADVANCED_AUTHKEYS": Option(typ=bool, default=False),
     "SECURITY_HIDE_ORGS": Option(typ=bool, default=False),
-    "SECURITY_SALT": Option(required=True),
+    "SECURITY_SALT": Option(required=True, sensitive=True),
     "SECURITY_CRYPTO_POLICY": Option(default="DEFAULT:NO-SHA1"),
-    "SECURITY_ENCRYPTION_KEY": Option(),
+    "SECURITY_ENCRYPTION_KEY": Option(sensitive=True),
     "SECURITY_COOKIE_NAME": Option(),
     "SECURITY_REST_CLIENT_ENABLE_ARBITRARY_URLS": Option(typ=bool, default=False),
     # PHP
@@ -522,8 +524,14 @@ if __name__ == "__main__":
         prog="misp_create_configs",
         description="Create configs from env variables",
     )
-    parser.add_argument("action", nargs="?", choices=("create", "validate"))
+    parser.add_argument("action", nargs="?", choices=("create", "validate", "sensitive-variables"))
     parsed = parser.parse_args()
+
+    if parsed.action == "sensitive-variables":
+        for variable_name, variable_option in VARIABLES.items():
+            if variable_option.sensitive:
+                print(variable_name)
+        sys.exit(0)
 
     configs_created = os.path.exists(CONFIG_CREATED_CANARY_FILE)
 

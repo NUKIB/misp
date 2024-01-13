@@ -46,15 +46,6 @@ if [ "$1" = 'supervisord' ]; then
     nice su-exec apache /var/www/MISP/app/Console/cake Admin updateJSON &
 fi
 
-# unset sensitive env variables
-unset MYSQL_PASSWORD
-unset REDIS_PASSWORD
-unset SECURITY_SALT
-unset SECURITY_ENCRYPTION_KEY
-unset OIDC_CLIENT_SECRET_INNER
-unset OIDC_CLIENT_SECRET
-unset OIDC_CLIENT_CRYPTO_PASS
-
 # Create GPG homedir under apache user
 chown -R apache:apache /var/www/MISP/.gnupg
 chmod 700 /var/www/MISP/.gnupg
@@ -65,8 +56,12 @@ if [ -n "${GNUPG_PRIVATE_KEY}" -a -n "${GNUPG_PRIVATE_KEY_PASSWORD}" ]; then
     su-exec apache gpg --homedir /var/www/MISP/.gnupg --import --batch \
         --passphrase "${GNUPG_PRIVATE_KEY_PASSWORD}" <<< "${GNUPG_PRIVATE_KEY}"
 fi
-unset GNUPG_PRIVATE_KEY
-unset GNUPG_PRIVATE_KEY_PASSWORD
+
+# unset sensitive env variables
+for variable_name in $(misp_create_configs.py sensitive-variables)
+do
+  unset "$variable_name"
+done
 
 # Remove possible exists PID files
 rm -f /var/run/httpd/httpd.pid
