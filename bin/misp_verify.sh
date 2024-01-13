@@ -14,3 +14,6 @@ if [[ "$(uname -m)" != "aarch64" ]]; then
 fi
 
 misp_create_configs.py validate
+
+cd /var/www/MISP/
+git status
