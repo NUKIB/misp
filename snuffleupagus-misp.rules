@@ -29,7 +29,6 @@ sp.disable_function.function("move_uploaded_file").param("new_path").value_r("\\
 sp.disable_function.function("move_uploaded_file").param("new_path").value_r("\\.ht").drop();
 
 # Command executions
-sp.disable_function.function("shell_exec").filename("/var/www/MISP/app/Lib/Tools/PubSubTool.php").allow();
 sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Lib/Tools/ProcessTool.php").allow();
 sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Lib/Tools/BackgroundJobs/BackgroundJob.php").allow();
 sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Vendor/pear/crypt_gpg/Crypt/GPG/Engine.php").allow();
