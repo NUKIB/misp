@@ -11,7 +11,7 @@ You can create your MISP image based on NUKIB image, which will include your cus
 
 ## Add custom certificates
 
-This image uses by default TLS system certificates. If you use custom certificate authority that is not trusted in
+This image uses by default system certificates for TLS. If you use custom certificate authority that is not trusted in
 base image, just copy that certificate in PEM format to `/etc/pki/ca-trust/source/anchors/` directory and run
 `update-ca-trust` command.
 
