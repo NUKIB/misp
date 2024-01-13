@@ -460,6 +460,9 @@ def create():
     variables = collect()
     variables["SERVER_NAME"] = urlparse(variables["MISP_BASEURL"]).netloc
 
+    if variables["MISP_DEBUG"]:
+        warning("Debug mode is enabled. Please disable for production usage")
+
     if len(variables["SECURITY_SALT"]) < 32:
         warning("'SECURITY_SALT' environment variable should be at least 32 chars long")
 
