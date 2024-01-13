@@ -52,7 +52,7 @@ LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so" > /etc/httpd/conf.module
 mkdir /var/www/MISP
 chown apache:apache /var/www/MISP
 git config --system http.sslVersion tlsv1.3 # Always use TLSv1.3 or better for git operations
-git config --system --add safe.directory /var/www/MISP # Fix fatal error `detected dubious ownership` in new git
+git config --system --add safe.directory '*' # Fix fatal error `detected dubious ownership` in new git
 su-exec apache git clone --branch "$MISP_VERSION" --depth 1 https://github.com/MISP/MISP.git /var/www/MISP
 
 cd /var/www/MISP
