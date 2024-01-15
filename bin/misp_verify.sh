@@ -15,5 +15,7 @@ fi
 
 misp_create_configs.py validate
 
+httpd_ecs_log.py test
+
 cd /var/www/MISP/
 git status
