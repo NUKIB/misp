@@ -6,6 +6,7 @@ import socket
 import argparse
 import logging
 import datetime
+import typing
 
 try:
     import orjson as json
@@ -232,10 +233,32 @@ def access_log(logger: EcsLogger):
         logger.send(output)
 
 
-def error_message_extract_code(message: str):
+def error_message_extract_code(message: str) -> typing.Optional[str]:
     if len(message) > 6 and message[0] == 'A' and message[7] == ':':
         return message[0:7]
     return None
+
+
+def parse_user_from_error_log(log: dict) -> dict:
+    if "error" in log and "code" in log["error"] and log["error"]["code"] == "AH01631":
+        log["event"]["category"] = "authentication"
+        log["event"]["outcome"] = "failure"
+
+        column_pos = log["message"].find(':', 14)
+        if column_pos == -1:
+            return log  # invalid log line
+        username = log["message"][14:column_pos]
+
+        if "@" in username:
+            user_id, domain = username.split("@", 1)
+            log["user"] = {
+                "id": user_id,
+                "domain": domain
+            }
+        else:
+            log["event"] = {"id": username}
+
+    return log
 
 
 def parse_error_log(line: str) -> dict:
@@ -287,6 +310,8 @@ def parse_error_log(line: str) -> dict:
                 "ip": ip,
                 "port": int(port),
             }
+
+    output = parse_user_from_error_log(output)
     return output
 
 
@@ -300,6 +325,17 @@ def error_log(logger: EcsLogger):
         logger.send(output)
 
 
+def test():
+    line = 'AH01631: user 8cdf6212-6511-459b-8439-f913230a9ee3@sso.example.cz/realms/staging: authorization failure for "/": '
+    output = parse_error_log(line)
+    assert output["error"]["code"] == "AH01631"
+    assert output["user"]["id"] == "8cdf6212-6511-459b-8439-f913230a9ee3"
+    assert output["user"]["domain"] == "sso.example.cz/realms/staging"
+
+    jsonl = jsonl_serialize(output)
+    assert jsonl[-1] == 10  # new line char in binary format
+
+
 def main():
     logging.basicConfig(format='%(asctime)s [PID %(process)d] %(message)s', level=logging.INFO)
 
@@ -307,9 +343,13 @@ def main():
         prog="httpd_ecs_log",
         description="Converts httpd logs to ECS JSON and send them to socket",
     )
-    parser.add_argument("type", choices=("error_log", "access_log"))
+    parser.add_argument("type", choices=("error_log", "access_log", "test"))
     parser.add_argument("socket", nargs="?", default="/run/vector")
     parsed = parser.parse_args()
+
+    if parsed.type == "test":
+        test()
+        return
 
     logger = EcsLogger(parsed.socket)
 
