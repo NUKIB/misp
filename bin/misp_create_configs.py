@@ -456,12 +456,16 @@ def validate():
     validate_jinja_template("/etc/supervisord.d/misp.ini")
 
 
-def create():
-    variables = collect()
-    variables["SERVER_NAME"] = urlparse(variables["MISP_BASEURL"]).netloc
-
+def check_warnings(variables: dict):
     if variables["MISP_DEBUG"]:
-        warning("Debug mode is enabled. Please disable for production usage")
+        warning("Debug mode is enabled. Please do not forget to disable for production usage - debug mode is insecure and slow.")
+    else:
+        if variables["MYSQL_PASSWORD"] is None:
+            warning("Password for MySQL database is not set. This is considered insecure.")
+        if variables["REDIS_PASSWORD"] is None:
+            warning("Password for Redis database is not set. This is considered insecure.")
+        if not variables['PHP_SNUFFLEUPAGUS']:
+            warning('PHP Snuffleupagus extension is disabled. This extension can protected this server from hackers.')
 
     if len(variables["SECURITY_SALT"]) < 32:
         warning("'SECURITY_SALT' environment variable should be at least 32 chars long")
@@ -473,6 +477,13 @@ def create():
 
     if variables["SYSLOG_ENABLED"]:
         warning("Syslog is deprecated and will be removed in near future. Please switch to ECS log instead.")
+
+
+def create():
+    variables = collect()
+    check_warnings(variables)
+
+    variables["SERVER_NAME"] = urlparse(variables["MISP_BASEURL"]).netloc
 
     # if security cookie name is not set, generate it by using SECURITY_SALT and MISP_UUID, so it will survive container restart
     if not variables["SECURITY_COOKIE_NAME"]:
