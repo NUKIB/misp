@@ -112,7 +112,7 @@ def access_log(logger: EcsLogger):
             continue
 
         # Normalize log by removing dash that indicates empty value from log messages
-        for field in ("log_id", "request_id", "http_x_forwarded_for", "user", "http_referer", "upstream_status", "user_email"):
+        for field in ("log_id", "request_id", "http_x_forwarded_for", "user", "http_referer", "http_location", "user_email"):
             if field in log and log[field] == "-":
                 log[field] = None
 
@@ -198,6 +198,9 @@ def access_log(logger: EcsLogger):
                 "path": log["file"],
             }
         }
+
+        if log["http_location"]:
+            output["http"]["response"]["location"] = log["http_location"]
 
         if log["host"]:
             if ":" in log["host"]:
