@@ -1,6 +1,6 @@
 # MISP Docker image
 
-[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on CentOS Stream 8.
+[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on CentOS Stream 8, ready for production.
 
 This image contains the latest version of MISP and the required dependencies. Image is intended as immutable, which means that it is not possible
 to update MISP from the user interface and instead, an admin should download a newer image.
@@ -8,12 +8,12 @@ to update MISP from the user interface and instead, an admin should download a n
 ## Key features
 
 * 🎩 Image is based on CentOS Stream 8, so perfectly fits your infrastructure if you use CentOS or RHEL as a host system
-* ✅ Modern MISP features are enabled by default (like advanced audit log or storing setting in the database)
+* ✅ Modern MISP features are enabled by default (like advanced audit log or storing settings in the database)
 * 👩‍💻 Integrated support for [OpenID Connect (OIDC) authentication](docs/OIDC.md)
 * 🔒️ PHP is by default protected by Snuffleupagus extensions with [rules](snuffleupagus-misp.rules) tailored to MISP
 * 🚀 Optional extensions and configurations that will make MISP faster are enabled
 * 📓 Integrated support for logging into [ECS format](docs/LOGGING.md), exceptions to Sentry and forwarding logs to syslog server
-* 🧪 Final image is automatically tested, so every release should work as expected
+* 🧪 The final image is automatically tested, so every release should work as expected
 * 🏛 Build for amd64 (x86_64) and arm64 (aarch64)
 
 ## Usage
@@ -29,7 +29,7 @@ Docker Compose file defines MISP itself, [MISP Modules](https://github.com/NUKIB
     curl --proto '=https' --tlsv1.2 -O https://raw.githubusercontent.com/NUKIB/misp/main/docker-compose.yml
     docker compose up -d
 
-Then you can access MISP in your browser by accessing `http://localhost:8080`. Default user after installation is `admin@admin.test` with password `admin`.
+Then you can access MISP in your browser by accessing `http://localhost:8080`. The default user after installation is `admin@admin.test` with the password `admin`.
 
 To delete all volumes after testing, run:
 
@@ -67,7 +67,7 @@ If you don't like CentOS Stream, you can use as a base image different distribut
 
 ## Logging
 
-Logging is important to keep your MISP secure and in good conditions. [Check detailed manual how to configure logging](docs/LOGGING.md)
+Logging is important to keep your MISP secure and in good condition. [Check detailed manual how to configure logging](docs/LOGGING.md)
 
 ## Environment variables
 
@@ -88,7 +88,7 @@ MISP requires MySQL or MariaDB database.
 By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HOST` variable on port `6379`. Redis alternative [Dragonfly](https://www.dragonflydb.io) is also supported.
 
 * `REDIS_HOST` (required, string) - hostname or IP address
-* `REDIS_PASSWORD` (optional, string) - password used to connect password protected Redis instance
+* `REDIS_PASSWORD` (optional, string) - password used to connect password-protected Redis instance
 * `REDIS_USE_TLS` (optional, bool) - enable encrypted communication
 
 #### Default Redis databases
@@ -107,7 +107,7 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `MISP_MODULE_URL` (optional, string) - full URL to MISP modules
 * `MISP_DEBUG` (optional, boolean, default `false`) - enable debug mode (do not enable on production environment)
 
-[Check more variables that allows MISP customization.](docs/CUSTOMIZATION.md)
+[Check more variables that allow MISP customization.](docs/CUSTOMIZATION.md)
 
 ### Email setting
 
@@ -139,7 +139,7 @@ inside the container:
 * `SECURITY_ADVANCED_AUTHKEYS` (optional, boolean, default `false`) - enable advanced auth keys support
 * `SECURITY_HIDE_ORGS` (optional, boolean, default `false`) - hide org names for normal users
 * `SECURITY_ENCRYPTION_KEY` (optional, string) - encryption key with at least 32 chars that will be used to encrypt sensitive information stored in database *WARNING:* Never change this value after deployment!
-* `SECURITY_CRYPTO_POLICY` (optional, string, default `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8). Use empty string to keep container default value.
+* `SECURITY_CRYPTO_POLICY` (optional, string, default `DEFAULT:NO-SHA1`) - set container wide crypto policies. [More details](https://www.redhat.com/en/blog/consistent-security-crypto-policies-red-hat-enterprise-linux-8). Use an empty string to keep container default value.
 * `SECURITY_REST_CLIENT_ENABLE_ARBITRARY_URLS` (optional, boolean, default `false`) - enable to query any arbitrary URL via rest client (required for Workflows Webhook).
 
 ### Outgoing proxy
@@ -164,7 +164,7 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 
 ### PHP config
 
-* `PHP_SESSIONS_IN_REDIS` (optional, boolean, default `true`) - when enabled, sessions information are stored in Redis. That provides better performance and sessions survives container restart
+* `PHP_SESSIONS_IN_REDIS` (optional, boolean, default `true`) - when enabled, sessions are stored in Redis. That provides better performance and sessions survive container restart
 * `PHP_SESSIONS_COOKIE_SAMESITE` (optional, string) - sets [session.cookie_samesite](https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite), can be `Strict` or `Lax`. By default, is set to Strict, just for testing on localhost is set to Lax.
 * `PHP_SNUFFLEUPAGUS` (optional, boolean, default `true`) - enable PHP hardening by using [Snuffleupagus](https://snuffleupagus.readthedocs.io) PHP extension with [rules](snuffleupagus-misp.rules) tailored to MISP
 * `PHP_TIMEZONE` (optional, string, default `UTC`) - sets [date.timezone](https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone)
@@ -194,7 +194,7 @@ If provided time string is empty, job will be disabled.
 
 ### Supervisor
 
-Supervisor is used to run all processes within the container, you can adjust the amount of workers which should be started by modifying these variables:
+Supervisor is used to run all processes within the container, you can adjust the amount of workers that should be started by modifying these variables:
 
 * `DEFAULT_WORKERS` (optional, int, default `1`) - number of default workers to start
 * `EMAIL_WORKERS` (optional, int, default `3`) - number of email workers to start
