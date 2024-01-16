@@ -29,7 +29,7 @@ def ecs_is_error(item: dict) -> bool:
     if item["event"]["dataset"] in ("httpd.error", "php-fpm.error"):
         return True
 
-    if "log" in item and "level" in item["log"] and item["log"]["level"] in ("error", "warn"):
+    if "log" in item and "level" in item["log"] and item["log"]["level"] in ("error", "warn", "warning"):
         return True
 
     return False
