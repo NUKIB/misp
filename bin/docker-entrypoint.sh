@@ -42,6 +42,11 @@ if [ "$1" = 'supervisord' ]; then
     # Update database to latest version
     su-exec apache /var/www/MISP/app/Console/cake Admin runUpdates || true
 
+    # Checks if encryption key is valid if set, but continue even if not valid
+    if [[ -n $SECURITY_ENCRYPTION_KEY ]]; then
+      su-exec apache /var/www/MISP/app/Console/cake Admin isEncryptionKeyValid || true
+    fi
+
     # Update all data stored in JSONs like objects, warninglists etc.
     nice su-exec apache /var/www/MISP/app/Console/cake Admin updateJSON &
 fi
