@@ -60,7 +60,7 @@ su-exec apache git config core.filemode false
 
 # Clone just submodules under app/files, we don't need the rest
 cd /var/www/MISP/app/files/
-su-exec apache git submodule update --depth 1 --init --recursive .
+su-exec apache git submodule update --depth 1 --jobs 4 --init --recursive .
 
 # Install MISP composer dependencies
 cd /var/www/MISP/app
