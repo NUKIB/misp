@@ -15,13 +15,14 @@ from jinja2 import Environment
 class Option:
     def __init__(self, required: bool = False, typ: Type = str, default: Any = None,
                  validation: Callable[[str, Any], NoReturn] = None, options: Optional[Union[List, Tuple]] = None,
-                 sensitive: bool = False):
+                 sensitive: bool = False, parser: Callable[[str, Any], Any] = None):
         self.required = required
         self.typ = typ
         self.default = default
         self.validation = validation
         self.options = options
         self.sensitive = sensitive
+        self.parser = parser
 
     def get_value(self, env_name: str) -> Any:
         if env_name not in os.environ:
@@ -44,6 +45,9 @@ class Option:
             if self.options and value not in self.options:
                 options = ", ".join([f"`{option}`" for option in self.options])
                 raise ValueError(f"Environment variable '{env_name}' value `{value}` is invalid, must be one of: {options}")
+
+        if value and self.parser:
+            return self.parser(env_name, value)
 
         return value
 
@@ -86,6 +90,21 @@ def check_is_uuid(variable_name: str, value: str):
         raise ValueError(f"Environment variable '{variable_name}' must valid UUID, `{value}` given")
 
 
+def parse_oidc_roles(variable_name: str, value: str) -> dict:
+    output = {}
+    for item in value.split(','):
+        item = item.strip()
+        if "=" not in item:
+            raise ValueError(f"OIDC roles mapping variable {variable_name} contains invalid mapping '{item}', should contain '='")
+        parts = item.split("=")
+        if len(parts) != 2:
+            raise ValueError(f"OIDC roles mapping variable {variable_name} contains invalid mapping '{item}', should contain just one '='")
+        if len(parts[0]) == 0 or len(parts[1]) == 0:
+            raise ValueError(f"OIDC roles mapping variable {variable_name} contains invalid mapping '{item}'")
+        output[parts[0]] = parts[1]
+    return output
+
+
 VARIABLES = {
     # MySQL
     "MYSQL_HOST": Option(required=True),
@@ -119,6 +138,10 @@ VARIABLES = {
     "OIDC_DEFAULT_ORG": Option(),
     "OIDC_PASSWORD_RESET": Option(validation=check_is_url),
     "OIDC_ROLES_PROPERTY": Option(default="roles"),
+    "OIDC_ROLES_MAPPING": Option(
+        default="misp-admin-access=1,misp-org-admin-access=2,misp-sync-access=5,misp-publisher-access=4,misp-api-access=User with API access,misp-access=3",
+        parser=parse_oidc_roles,
+    ),
     "OIDC_ROLES_PROPERTY_INNER": Option(),
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
     "OIDC_OFFLINE_ACCESS": Option(typ=bool, default=False),
@@ -213,9 +236,17 @@ def str_filter(value: Optional[str]) -> str:
     return "'" + value.replace("'", "\\'") + "'"
 
 
+def str_or_int_filter(value: Optional[str]) -> str:
+    try:
+        return str(int(value))
+    except ValueError:
+        return str_filter(value)
+
+
 jinja_env = Environment(trim_blocks=True, lstrip_blocks=True)
 jinja_env.filters["str"] = str_filter
 jinja_env.filters["bool"] = lambda x: 'true' if x else 'false'
+jinja_env.filters["str_or_int"] = str_or_int_filter
 
 
 def error(message: str):
@@ -533,13 +564,13 @@ def create():
     generate_supervisor_config(variables)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
+def main():
+    arg_parser = argparse.ArgumentParser(
         prog="misp_create_configs",
         description="Create configs from env variables",
     )
-    parser.add_argument("action", nargs="?", choices=("create", "validate", "sensitive-variables"))
-    parsed = parser.parse_args()
+    arg_parser.add_argument("action", nargs="?", choices=("create", "validate", "sensitive-variables"))
+    parsed = arg_parser.parse_args()
 
     if parsed.action == "sensitive-variables":
         for variable_name, variable_option in VARIABLES.items():
@@ -560,3 +591,7 @@ if __name__ == "__main__":
             sys.exit(0)
 
         create()
+
+
+if __name__ == "__main__":
+    main()

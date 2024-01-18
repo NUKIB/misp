@@ -29,12 +29,9 @@ $oidcAuth = [
     'authentication_method' => {{ OIDC_AUTHENTICATION_METHOD_INNER | str }},
     'code_challenge_method' => {{ OIDC_CODE_CHALLENGE_METHOD_INNER | str }},
     'role_mapper' => [
-        'misp-admin-access' => 1, // Admin
-        'misp-org-admin-access' => 2, // Org Admin
-        'misp-sync-access' => 5, // Sync user
-        'misp-publisher-access' => 4, // Publisher
-        'misp-api-access' => 'User with API access',
-        'misp-access' => 3, // User
+        {% for oidc_name, misp_name in OIDC_ROLES_MAPPING.items() %}
+        {{ oidc_name | str }} => {{ misp_name | str_or_int }},
+        {% endfor %}
     ],
     'roles_property' => {{ OIDC_ROLES_PROPERTY_INNER | str }},
     'organisation_property' => {{ OIDC_ORGANISATION_PROPERTY | str }},
