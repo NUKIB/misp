@@ -31,14 +31,15 @@ FROM base as misp
 COPY packages /tmp/packages
 COPY requirements.txt /tmp/
 COPY bin/misp_enable_epel.sh bin/misp_enable_vector.sh /usr/local/bin/
-RUN bash /usr/local/bin/misp_enable_epel.sh && \
+RUN --mount=type=tmpfs,target=/var/cache/dnf \
+    bash /usr/local/bin/misp_enable_epel.sh && \
     bash /usr/local/bin/misp_enable_vector.sh && \
     dnf module -y enable mod_auth_openidc php:7.4 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.11 && \
     alternatives --set python /usr/bin/python3.11 && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
-    rm -rf /var/cache/dnf /tmp/packages
+    rm -rf /tmp/packages
 
 COPY --from=builder /usr/local/bin/su-exec /usr/local/bin/
 COPY --from=php-build /build/php-modules/* /usr/lib64/php/modules/
