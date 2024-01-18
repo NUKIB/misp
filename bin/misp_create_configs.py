@@ -7,7 +7,7 @@ import uuid
 import json
 import hashlib
 import argparse
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote_plus
 from typing import Optional, Type, Callable, Any, NoReturn, List, Union, Tuple
 from jinja2 import Environment
 
@@ -336,6 +336,7 @@ def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_use_
     scheme = "tls" if redis_use_tls else "tcp"
     redis_path = f"{scheme}://{redis_host}:6379?database=12"
     if redis_password:
+        redis_password = quote_plus(redis_password)
         redis_path = f"{redis_path}&auth={redis_password}"
 
     config_path = "/etc/php-fpm.d/sessions.conf"
