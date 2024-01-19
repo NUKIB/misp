@@ -90,6 +90,12 @@ def check_is_uuid(variable_name: str, value: str):
         raise ValueError(f"Environment variable '{variable_name}' must valid UUID, `{value}` given")
 
 
+def check_oidc_code_challenge(variable_name: str, value: str):
+    valid_methods = ("S256", "plain", "", None)
+    if value not in valid_methods:
+        raise ValueError(f"Environment variable '{variable_name}' value is not valid, must be one of {valid_methods}")
+
+
 def parse_oidc_roles(variable_name: str, value: str) -> dict:
     output = {}
     for item in value.split(','):
@@ -130,8 +136,8 @@ VARIABLES = {
     "OIDC_CLIENT_ID_INNER": Option(),
     "OIDC_CLIENT_SECRET": Option(sensitive=True),
     "OIDC_CLIENT_SECRET_INNER": Option(sensitive=True),
-    "OIDC_CODE_CHALLENGE_METHOD": Option(),
-    "OIDC_CODE_CHALLENGE_METHOD_INNER": Option(),
+    "OIDC_CODE_CHALLENGE_METHOD": Option(validation=check_oidc_code_challenge),
+    "OIDC_CODE_CHALLENGE_METHOD_INNER": Option(validation=check_oidc_code_challenge),
     "OIDC_AUTHENTICATION_METHOD": Option(default="client_secret_basic"),
     "OIDC_AUTHENTICATION_METHOD_INNER": Option(),
     "OIDC_CLIENT_CRYPTO_PASS": Option(sensitive=True),
@@ -537,9 +543,8 @@ def create():
             if not variables[var]:
                 error(f"OIDC login is enabled, but required environment variable '{var}' is not set")
 
-        for var in ("OIDC_CODE_CHALLENGE_METHOD", "OIDC_CODE_CHALLENGE_METHOD_INNER"):
-            if variables[var] not in ("S256", "plain", "", None):
-                error(f"Environment variable '{var}' value is not valid")
+        if len(variables["OIDC_ROLES_MAPPING"]) == 0:
+            warning(f"Environment variable 'OIDC_ROLES_MAPPING' is empty, OIDC login will not work")
 
         # mod_auth_openidc require full URL to metadata
         if "/.well-known/openid-configuration" not in variables["OIDC_PROVIDER"]:
@@ -588,7 +593,7 @@ def main():
         validate()
     else:
         if configs_created:
-            print(f"Warning: Configs was already created (canary file {CONFIG_CREATED_CANARY_FILE} exists)", file=sys.stderr)
+            warning(f"Configs was already created (canary file {CONFIG_CREATED_CANARY_FILE} exists)")
             sys.exit(0)
 
         create()
