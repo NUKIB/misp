@@ -91,22 +91,32 @@ def check_is_uuid(variable_name: str, value: str):
 
 
 def check_oidc_code_challenge(variable_name: str, value: str):
-    valid_methods = ("S256", "plain", "", None)
+    valid_methods = ("S256", "plain", "")
     if value not in valid_methods:
         raise ValueError(f"Environment variable '{variable_name}' value is not valid, must be one of {valid_methods}")
 
 
 def parse_oidc_roles(variable_name: str, value: str) -> dict:
+    value = value.strip()
+    if len(value) == 0:
+        return {}
+
+    if value[0] == '{':
+        try:
+            return json.loads(value)
+        except Exception as e:
+            warning(f"OIDC roles mapping variable '{variable_name}' looks like JSON, but is not valid: {e}")
+
     output = {}
     for item in value.split(','):
         item = item.strip()
         if "=" not in item:
-            raise ValueError(f"OIDC roles mapping variable {variable_name} contains invalid mapping '{item}', should contain '='")
+            raise ValueError(f"OIDC roles mapping variable '{variable_name}' contains invalid mapping '{item}', should contain '='")
         parts = item.split("=")
         if len(parts) != 2:
-            raise ValueError(f"OIDC roles mapping variable {variable_name} contains invalid mapping '{item}', should contain just one '='")
+            raise ValueError(f"OIDC roles mapping variable '{variable_name}' contains invalid mapping '{item}', should contain just one '='")
         if len(parts[0]) == 0 or len(parts[1]) == 0:
-            raise ValueError(f"OIDC roles mapping variable {variable_name} contains invalid mapping '{item}'")
+            raise ValueError(f"OIDC roles mapping variable '{variable_name}' contains invalid mapping '{item}'")
         output[parts[0]] = parts[1]
     return output
 

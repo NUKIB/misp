@@ -57,7 +57,7 @@ If you want to modify this setting, you have to modify `OIDC_ROLES_MAPPING` valu
 misp-admin-access=1,misp-org-admin-access=2,misp-sync-access=5,misp-publisher-access=4,misp-api-access=User with API access,misp-access=3
 ```
 
-The format is `<IdP ROLE NAME>=<MISP ROLE ID OR NAME>`.
+The format is `<IdP ROLE NAME>=<MISP ROLE ID OR NAME>` or also JSON string can be provided where key is IdP Role name and value MISP Role ID or Name.
 
 ## User Organisation
 
