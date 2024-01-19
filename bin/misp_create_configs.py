@@ -90,6 +90,11 @@ def check_is_uuid(variable_name: str, value: str):
         raise ValueError(f"Environment variable '{variable_name}' must valid UUID, `{value}` given")
 
 
+def check_uint(variable_name: str, value: int):
+    if value < 0:
+        raise ValueError(f"Environment variable '{variable_name}' value is not valid, must be positive integer or zero")
+
+
 def check_oidc_code_challenge(variable_name: str, value: str):
     valid_methods = ("S256", "plain", "")
     if value not in valid_methods:
@@ -124,7 +129,7 @@ def parse_oidc_roles(variable_name: str, value: str) -> dict:
 VARIABLES = {
     # MySQL
     "MYSQL_HOST": Option(required=True),
-    "MYSQL_PORT": Option(typ=int, default=3306),
+    "MYSQL_PORT": Option(typ=int, default=3306, validation=check_uint),
     "MYSQL_LOGIN": Option(required=True),
     "MYSQL_PASSWORD": Option(sensitive=True),
     "MYSQL_DATABASE": Option(required=True),
@@ -134,7 +139,7 @@ VARIABLES = {
     "REDIS_USE_TLS": Option(typ=bool, default=False),
     # Proxy
     "PROXY_HOST": Option(),
-    "PROXY_PORT": Option(typ=int, default=3128),
+    "PROXY_PORT": Option(typ=int, default=3128, validation=check_uint),
     "PROXY_METHOD": Option(),
     "PROXY_USER": Option(),
     "PROXY_PASSWORD": Option(sensitive=True),
@@ -161,7 +166,7 @@ VARIABLES = {
     "OIDC_ROLES_PROPERTY_INNER": Option(),
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
     "OIDC_OFFLINE_ACCESS": Option(typ=bool, default=False),
-    "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0),
+    "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0, validation=check_uint),
     "OIDC_TOKEN_SIGNED_ALGORITHM": Option(),
     # Logging
     "ECS_LOG_ENABLED": Option(typ=bool, default=False),
@@ -172,7 +177,7 @@ VARIABLES = {
     "ECS_LOG_VECTOR_ADDRESS": Option(typ=str),
     "SYSLOG_ENABLED": Option(typ=bool, default=True),
     "SYSLOG_TARGET": Option(),
-    "SYSLOG_PORT": Option(typ=int, default=601),
+    "SYSLOG_PORT": Option(typ=int, default=601, validation=check_uint),
     "SYSLOG_PROTOCOL": Option(default="tcp"),
     "SYSLOG_FILE": Option(default="/var/log/messages"),
     "SYSLOG_FILE_FORMAT": Option(default="text-traditional", options=("text-traditional", "text", "json")),
@@ -184,7 +189,7 @@ VARIABLES = {
     "ZEROMQ_PASSWORD": Option(sensitive=True),
     # SMTP
     "SMTP_HOST": Option(),
-    "SMTP_PORT": Option(typ=int, default=25),
+    "SMTP_PORT": Option(typ=int, default=25, validation=check_uint),
     "SMTP_USERNAME": Option(),
     "SMTP_PASSWORD": Option(sensitive=True),
     "SUPPORT_EMAIL": Option(validation=check_is_email),
@@ -197,7 +202,7 @@ VARIABLES = {
     "MISP_ATTACHMENT_SCAN_MODULE": Option(),
     "MISP_EMAIL_REPLY_TO": Option(validation=check_is_email),
     "MISP_DEFAULT_PUBLISH_ALERT": Option(typ=bool, default=False),
-    "MISP_HOST_ORG_ID": Option(typ=int, default=1),
+    "MISP_HOST_ORG_ID": Option(typ=int, default=1, validation=check_uint),
     "MISP_DEBUG": Option(typ=bool, default=False),
     "MISP_TERMS_FILE": Option(),
     "MISP_HOME_LOGO": Option(),
@@ -222,11 +227,11 @@ VARIABLES = {
     "PHP_SNUFFLEUPAGUS": Option(typ=bool, default=True),
     "PHP_TIMEZONE": Option(default="UTC"),
     "PHP_MEMORY_LIMIT": Option(default="2048M"),
-    "PHP_MAX_EXECUTION_TIME": Option(typ=int, default=300),
+    "PHP_MAX_EXECUTION_TIME": Option(typ=int, default=300, validation=check_uint),
     "PHP_UPLOAD_MAX_FILESIZE": Option(default="50M"),
     "PHP_SESSIONS_COOKIE_SAMESITE": Option(options=("Strict", "Lax")),
     # Jobber
-    "JOBBER_USER_ID": Option(typ=int, default=1),
+    "JOBBER_USER_ID": Option(typ=int, default=1, validation=check_uint),
     "JOBBER_CACHE_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
     "JOBBER_FETCH_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
     "JOBBER_PULL_SERVERS_TIME": Option(default="0 R0-10 6,10,15"),
@@ -236,11 +241,11 @@ VARIABLES = {
     "JOBBER_USER_CHECK_VALIDITY_TIME": Option(default="0 0 5"),
     "JOBBER_SEND_PERIODIC_SUMMARY": Option(default="0 0 6 * * 1-5"),
     # Supervisor
-    "DEFAULT_WORKERS": Option(typ=int, default=1),
-    "EMAIL_WORKERS": Option(typ=int, default=3),
-    "CACHE_WORKERS": Option(typ=int, default=1),
-    "PRIO_WORKERS": Option(typ=int, default=3),
-    "UPDATE_WORKERS": Option(typ=int, default=1),
+    "DEFAULT_WORKERS": Option(typ=int, default=1, validation=check_uint),
+    "EMAIL_WORKERS": Option(typ=int, default=3, validation=check_uint),
+    "CACHE_WORKERS": Option(typ=int, default=1, validation=check_uint),
+    "PRIO_WORKERS": Option(typ=int, default=3, validation=check_uint),
+    "UPDATE_WORKERS": Option(typ=int, default=1, validation=check_uint),
 }
 
 CONFIG_CREATED_CANARY_FILE = "/.misp-configs-created"
