@@ -220,4 +220,4 @@ If one of the variables is set to `0`, no workers will be started.
 
 This software is licensed under GNU General Public License version 3. MISP is licensed under GNU Affero General Public License version 3.
 
-* Copyright (C) 2022 [National Cyber and Information Security Agency of the Czech Republic (NÚKIB)](https://www.nukib.cz/en/) 🇨🇿
+* Copyright (C) 2022-2024 [National Cyber and Information Security Agency of the Czech Republic (NÚKIB)](https://nukib.gov.cz/en/) 🇨🇿
