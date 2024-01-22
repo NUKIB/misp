@@ -103,6 +103,7 @@ $config = [
     'custom_css' => {{ MISP_CUSTOM_CSS | str }},
     'tmpdir' => '/tmp',
     'log_client_ip_header' => 'HTTP_X_FORWARDED_FOR',
+    'thumbnail_in_redis' => true,
   ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
