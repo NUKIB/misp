@@ -104,6 +104,7 @@ $config = [
     'tmpdir' => '/tmp',
     'log_client_ip_header' => 'HTTP_X_FORWARDED_FOR',
     'thumbnail_in_redis' => true,
+    'self_update' => false,
   ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
