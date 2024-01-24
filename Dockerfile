@@ -4,11 +4,9 @@ FROM $BASE_IMAGE as base
 
 # Some packages requires building, so use different stage for that
 FROM base as builder
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc make && \
-    useradd --create-home --system --user-group build
-# Build su-exec
 COPY su-exec.c /tmp/
-RUN gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c && \
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc make && \
+    gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c && \
     chmod u+x /usr/local/bin/su-exec
 
 # Build PHP extensions that are not included in packages
