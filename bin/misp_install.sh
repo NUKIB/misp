@@ -64,10 +64,10 @@ su-exec apache git submodule update --depth 1 --jobs 4 --init --recursive .
 
 # Install MISP composer dependencies
 cd /var/www/MISP/app
-# require exact version of `symfony/polyfill-php80` to keep compatibility, because later version replaces Attribute class :/
-su-exec apache php composer.phar --no-cache require --update-no-dev symfony/polyfill-php80:v1.18.1 sentry/sdk jakub-onderka/openid-connect-php:1.1.0 cakephp/cakephp:2.10.24 supervisorphp/supervisor guzzlehttp/guzzle php-http/message php-http/message-factory
 # Remove unused packages
 su-exec apache php composer.phar --no-cache remove --update-no-dev kamisama/cake-resque
+# require exact version of `symfony/polyfill-php80` to keep compatibility, because later version replaces Attribute class :/
+su-exec apache php composer.phar --no-cache require --update-no-dev symfony/polyfill-php80:v1.18.1 sentry/sdk jakub-onderka/openid-connect-php:1.1.0 cakephp/cakephp:2.10.24 supervisorphp/supervisor guzzlehttp/guzzle php-http/message php-http/message-factory
 
 # Create attachments folder and set correct owner
 mkdir /var/www/MISP/app/attachments
