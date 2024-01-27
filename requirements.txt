@@ -5,7 +5,6 @@ plyara
 pyzmq
 redis
 hiredis
-jinja2
 ordered-set
 pytz
 pydeep2
