@@ -32,7 +32,7 @@ RUN --mount=type=tmpfs,target=/tmp mkdir /tmp/zlib-ng && \
     make -j$(nproc) && \
     strip libz.so.1.3.0.zlib-ng && \
     mkdir /build && \
-    cp libz.so.1.3.0.zlib-ng /build/
+    mv libz.so.1.3.0.zlib-ng /build/
 
 # MISP image
 FROM base as misp
@@ -49,21 +49,22 @@ RUN --mount=type=tmpfs,target=/var/cache/dnf \
     alternatives --set python3 /usr/bin/python3.11 && \
     alternatives --set python /usr/bin/python3.11 && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
+    mkdir /run/php-fpm && \
     rm -rf /tmp/packages
 
-COPY --from=builder /usr/local/bin/su-exec /usr/local/bin/
+COPY --from=builder --chmod=755 /usr/local/bin/su-exec /usr/local/bin/
 COPY --from=php-build /build/php-modules/* /usr/lib64/php/modules/
 COPY --from=jobber-build /build/jobber*.rpm /tmp
 COPY --from=zlib-ng-build /build/libz.so.1.3.0.zlib-ng /lib64/
-COPY bin/ /usr/local/bin/
-COPY misp.conf /etc/httpd/conf.d/misp.conf
-COPY httpd-errors/* /var/www/html/
-COPY vector.yaml /etc/vector/
-COPY rsyslog.conf /etc/
-COPY snuffleupagus-misp.rules /etc/php.d/
-COPY .jobber /root/
-COPY supervisor.ini /etc/supervisord.d/misp.ini
-COPY logrotate/* /etc/logrotate.d/
+COPY --chmod=755 bin/ /usr/local/bin/
+COPY --chmod=644 misp.conf /etc/httpd/conf.d/misp.conf
+COPY --chmod=644 httpd-errors/* /var/www/html/
+COPY --chmod=644 vector.yaml /etc/vector/
+COPY --chmod=644 rsyslog.conf /etc/
+COPY --chmod=644 snuffleupagus-misp.rules /etc/php.d/
+COPY --chmod=644 .jobber /root/
+COPY --chmod=644 supervisor.ini /etc/supervisord.d/misp.ini
+COPY --chmod=644 logrotate/* /etc/logrotate.d/
 
 ARG CACHEBUST=1
 ARG MISP_VERSION=2.4
@@ -72,17 +73,8 @@ ENV MISP_VERSION $MISP_VERSION
 RUN rm /lib64/libz.so.1 && \
     ln -s /lib64/libz.so.1.3.0.zlib-ng /lib64/libz.so.1 && \
     rpm -i /tmp/jobber*.rpm && \
-    chmod u=rwx,g=rx,o=rx /usr/local/bin/* &&  \
     /usr/local/bin/misp_install.sh
-COPY Config/* /var/www/MISP/app/Config/
-RUN chmod u=r,g=r,o=r /var/www/MISP/app/Config/* && \
-    chmod 644 /etc/supervisord.d/misp.ini && \
-    chmod 644 /etc/rsyslog.conf && \
-    chmod 644 /etc/httpd/conf.d/misp.conf && \
-    chmod 644 /etc/php.d/snuffleupagus-misp.rules && \
-    chmod 644 /etc/logrotate.d/* && \
-    chmod 644 /root/.jobber && \
-    mkdir /run/php-fpm
+COPY --chmod=444 Config/* /var/www/MISP/app/Config/
 
 # Verify image
 FROM misp as verify
