@@ -38,8 +38,7 @@ RUN --mount=type=tmpfs,target=/tmp mkdir /tmp/zlib-ng && \
 FROM base as misp
 
 # Install required system and Python packages
-COPY packages /tmp/packages
-COPY requirements.txt /tmp/
+COPY requirements.txt packages /tmp/
 COPY bin/misp_enable_epel.sh bin/misp_enable_vector.sh /usr/local/bin/
 RUN --mount=type=tmpfs,target=/var/cache/dnf \
     bash /usr/local/bin/misp_enable_epel.sh && \
@@ -70,8 +69,7 @@ ARG CACHEBUST=1
 ARG MISP_VERSION=2.4
 ENV MISP_VERSION $MISP_VERSION
 
-RUN rm /lib64/libz.so.1 && \
-    ln -s /lib64/libz.so.1.3.0.zlib-ng /lib64/libz.so.1 && \
+RUN ln -f -s /lib64/libz.so.1.3.0.zlib-ng /lib64/libz.so.1 && \
     rpm -i /tmp/jobber*.rpm && \
     /usr/local/bin/misp_install.sh
 COPY --chmod=444 Config/* /var/www/MISP/app/Config/
