@@ -3,7 +3,7 @@
 set -e
 
 # Change volumes permission to apache user
-chown apache:apache /var/www/MISP/app/attachments /var/www/MISP/app/tmp/logs /var/www/MISP/app/files/certs
+chown apache:apache /var/www/MISP/app/{attachments,tmp/logs,files/certs,webroot/img/orgs,webroot/img/custom}
 
 if [ "$1" = 'supervisord' ]; then
     echo "======================================"
@@ -27,6 +27,9 @@ if [ "$1" = 'supervisord' ]; then
     su-exec apache php -n -l /var/www/MISP/app/Config/config.php
     su-exec apache php -n -l /var/www/MISP/app/Config/database.php
     su-exec apache php -n -l /var/www/MISP/app/Config/email.php
+
+    # Create symlinks to images from customisation
+    su-exec apache misp_image_symlinks.py
 
     # Check if all permissions are OK
     su-exec apache misp_check_permissions.py

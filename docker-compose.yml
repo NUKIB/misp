@@ -65,10 +65,23 @@ services:
       SYSLOG_ENABLED: no
       ECS_LOG_ENABLED: yes
       MISP_DEBUG: yes
+    volumes:
+      - misp_logs:/var/www/MISP/app/tmp/logs/
+      - misp_certs:/var/www/MISP/app/files/certs/
+      - misp_attachments:/var/www/MISP/app/attachments/
+      - misp_img_orgs:/var/www/MISP/app/webroot/img/orgs/
+      - misp_img_custom:/var/www/MISP/app/webroot/img/custom/
+      - misp_gnupg:/var/www/MISP/.gnupg/
     ports:
-      - 127.0.0.1:8080:80
-      - 127.0.0.1:50000:50000
+      - "127.0.0.1:8080:80"
+      - "127.0.0.1:50000:50000"
 
 volumes:
   mysql_data:
   redis_data:
+  misp_logs:
+  misp_certs:
+  misp_attachments:
+  misp_img_orgs:
+  misp_img_custom:
+  misp_gnupg:

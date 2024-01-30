@@ -1,6 +1,6 @@
 # How to customize MISP image
 
-You can create your MISP image based on NUKIB image, which will include your customizations.
+You can create your custom MISP image based on NUKIB image, which can include your customizations.
 
 ## Additional environment variables for visual changes
 
@@ -15,12 +15,16 @@ This image uses by default system certificates for TLS. If you use custom certif
 base image, just copy that certificate in PEM format to `/etc/pki/ca-trust/source/anchors/` directory and run
 `update-ca-trust` command.
 
+## Add images
+
+You can add additional custom org or custom images by copying them to `/customize/img_orgs/` or to `/customize/img_custom/` directories during container build.
+
 ## Example
 
 Create a new file `Dockerfile` in a new directory and copy your customization files:
 
 ```dockerfile
-# Based on original NUKIB image
+# Base on original NUKIB image
 FROM ghcr.io/nukib/misp
 
 # Include custom CA to system certificates
@@ -28,10 +32,10 @@ COPY cert.pem /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
 
 # Copy additional organization logos
-COPY org-images/* /var/www/MISP/app/webroot/img/orgs/
-# Copy custom images, thatcan be used as home or footer logo
-COPY img/* /var/www/MISP/app/webroot/img/custom/
-# Copy custom CSS,  
+COPY org-images/* /customize/img_orgs/
+# Copy custom images, that can be used as home or footer logo
+COPY img/* /customize/img_custom/
+# Copy custom CSS
 COPY custom.css /var/www/MISP/app/webroot/css/
 # Copy custom terms
 COPY terms.html /var/www/MISP/app/files/terms/
