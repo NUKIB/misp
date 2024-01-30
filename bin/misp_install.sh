@@ -34,8 +34,8 @@ sed -e 's/opcache.enable_cli=1/opcache.enable_cli=0/' -i /etc/php.d/10-opcache.i
 # use igbinary serializer for apcu and sessions
 sed -e 's/session.serialize_handler = php/session.serialize_handler = igbinary/' -i ${PHP_INI}
 sed -e "s/;apc.serializer='php'/apc.serializer='igbinary'/" -i /etc/php.d/40-apcu.ini
-# Disable modules that are not required by MISP
-rm /etc/php.d/{20-ftp.ini,20-shmop.ini,20-sysvmsg.ini,20-sysvsem.ini,20-sysvshm.ini,20-exif.ini}
+# Disable modules that are not required by MISP to reduce attack potential
+rm /etc/php.d/{20-ftp.ini,20-shmop.ini,20-sysvmsg.ini,20-sysvsem.ini,20-sysvshm.ini,20-exif.ini,20-xsl.ini,30-mysqli.ini,20-calendar.ini}
 rm /etc/php.d/15-xdebug.ini # disable xdebug by default
 
 # Apache config
