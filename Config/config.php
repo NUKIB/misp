@@ -93,6 +93,7 @@ $config = [
     'enable_advanced_correlations' => true,
     'log_user_ips' => true,
     'log_user_ips_authkeys' => true,
+    'log_skip_access_logs_in_application_logs' => true,
     'disable_cached_exports' => true,
     'allow_disabling_correlation' => true,
     'system_setting_db' => true,
