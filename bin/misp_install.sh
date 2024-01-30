@@ -16,7 +16,7 @@ echo "extension = redis.so
 redis.session.locking_enabled = 1
 redis.session.lock_expire = 30
 redis.session.lock_wait_time = 50000
-redis.session.lock_retries = 30" > /etc/php.d/50-redis.ini
+redis.session.lock_retries = 100" > /etc/php.d/50-redis.ini
 
 # PHP-FPM config
 echo 'pm.status_path = /fpm-status' >> /etc/php-fpm.d/www.conf # enable PHP-FPM status page
