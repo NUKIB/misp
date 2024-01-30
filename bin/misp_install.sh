@@ -82,5 +82,10 @@ chown -R apache:apache /var/www/MISP/app/tmp
 chown -R apache:apache /var/www/MISP/app/webroot/img/orgs
 chown -R apache:apache /var/www/MISP/app/webroot/img/custom
 
+# Create customisations folders and copy default content
+mkdir -p /customize/img_orgs/ /customize/img_custom/
+cp /var/www/MISP/app/webroot/img/orgs/* /customize/img_orgs/
+chmod 644 /customize/img_orgs/*
+
 # Create alias to cake console command
 echo 'alias cake="su-exec apache /var/www/MISP/app/Console/cake"' >> /root/.bashrc
