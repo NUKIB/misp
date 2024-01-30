@@ -286,7 +286,7 @@ if (Configure::read('debug') >= 1) {
 Cache::config('_cake_core_', [
 	'engine'    => $engine,
 	'prefix'    => 'cake_core_',
-	'path'      => CACHE . 'persistent' . DS,
+	'path'      => '/tmp/cake/',
 	'serialize' => true,
 	'duration'  => $duration,
 ]);
@@ -298,7 +298,7 @@ Cache::config('_cake_core_', [
 Cache::config('_cake_model_', [
 	'engine'    => $engine,
 	'prefix'    => 'cake_model_',
-	'path'      => CACHE . 'models' . DS,
+	'path'      => '/tmp/cake/',
 	'serialize' => true,
 	'duration'  => $duration,
 ]);
