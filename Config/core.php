@@ -264,43 +264,43 @@ Configure::write('Security.level', 'medium');
  *       Please check the comments in boostrap.php for more info on the cache engines available
  *       and their setttings.
  */
-$engine = 'File';
-// NUKIB change - use apcu instead, because Apc engine supports also APCu
-if (PHP_SAPI !== 'cli' || ini_get('apc.enable_cli')) {
+
+// NUKIB change - use apcu for web server and binary files for CLI
+if (PHP_SAPI === 'cli') {
+    require_once APP . 'Plugin/BinaryFileCache/Engine/BinaryFileEngine.php'; // it is not possible to use plugin
+    $engine = 'BinaryFile';
+} else {
     require_once APP . 'Plugin/ApcuCache/Engine/ApcuEngine.php'; // it is not possible to use plugin
     $engine = 'Apcu';
 }
 
 $duration = 0; // default duration is unlimited
 if (Configure::read('debug') >= 1) {
-	$duration = '+10 seconds'; // In development mode, caches should expire quickly.
+	$duration = 10; // In development mode, caches should expire quickly.
 }
-
-// Prefix each application on the same server with a different string, to avoid Memcache and APC conflicts.
-$prefix = 'myapp_';
 
 /**
  * Configure the cache used for general framework caching.  Path information,
  * object listings, and translation cache files are stored with this configuration.
  */
-Cache::config('_cake_core_', array(
+Cache::config('_cake_core_', [
 	'engine'    => $engine,
-	'prefix'    => $prefix . 'cake_core_',
+	'prefix'    => 'cake_core_',
 	'path'      => CACHE . 'persistent' . DS,
 	'serialize' => true,
-	'duration'  => $duration
-));
+	'duration'  => $duration,
+]);
 
 /**
  * Configure the cache for model and datasource caches.  This cache configuration
  * is used to store schema descriptions, and table listings in connections.
  */
-Cache::config('_cake_model_', array(
+Cache::config('_cake_model_', [
 	'engine'    => $engine,
-	'prefix'    => $prefix . 'cake_model_',
+	'prefix'    => 'cake_model_',
 	'path'      => CACHE . 'models' . DS,
 	'serialize' => true,
-	'duration'  => $duration
-));
+	'duration'  => $duration,
+]);
 
 require_once dirname(__DIR__) . '/Vendor/autoload.php';
