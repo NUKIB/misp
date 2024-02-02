@@ -106,6 +106,8 @@ By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HO
 * `MISP_HOST_ORG_ID` (optional, int, default `1`) - MISP default organisation ID
 * `MISP_MODULE_URL` (optional, string) - full URL to MISP modules
 * `MISP_DEBUG` (optional, boolean, default `false`) - enable debug mode (do not enable on production environment)
+* `MISP_PORT (optional, int, default `80`) - port to serve MISP web interface on
+* `MISP_USE_SSL` (optional, boolean, default `false`) - enable to serve MISP web interface over HTTPS
 
 [Check more variables that allow MISP customization.](docs/CUSTOMIZATION.md)
 
@@ -215,6 +217,7 @@ If one of the variables is set to `0`, no workers will be started.
 * `/var/www/MISP/app/files/certs/` - uploaded certificates used for accessing remote feeds and servers
 * `/var/www/MISP/app/attachments/` - uploaded attachments and malware samples
 * `/var/www/MISP/.gnupg/` - GPG homedir
+* `/etc/pik/tls` - certificates to serve MISP over HTTPS
 
 ## License
 
