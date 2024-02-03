@@ -204,6 +204,7 @@ VARIABLES = {
     "MISP_DEFAULT_PUBLISH_ALERT": Option(typ=bool, default=False),
     "MISP_HOST_ORG_ID": Option(typ=int, default=1, validation=check_uint),
     "MISP_DEBUG": Option(typ=bool, default=False),
+    "MISP_OUTPUT_COMPRESSION": Option(typ=bool, default=True),
     "MISP_TERMS_FILE": Option(),
     "MISP_HOME_LOGO": Option(),
     "MISP_FOOTER_LOGO": Option(),
