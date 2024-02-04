@@ -5,7 +5,7 @@ set -e
 set -o xtrace
 
 download_and_check () {
-  curl --proto '=https' --tlsv1.3 -sS --location --fail -o package.tar.gz $1
+  curl --proto '=https' --tlsv1.3 -sS --location --fail -o package.tar.gz "$1"
   echo "$2 package.tar.gz" | sha256sum -c
   tar zxf package.tar.gz --strip-components=1
   rm -f package.tar.gz
@@ -38,7 +38,7 @@ mv modules/*.so /build/php-modules/
 # Compile zstd library and zstd extension
 mkdir /tmp/zstd
 cd /tmp/zstd
-download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.13.2.tar.gz b85ddcbd72855b17731f309877048f7f1e492ebd6d15eb44d140f6fb5096313d
+download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.13.3.tar.gz 547f84759c2177f4415ae4a5d5066f09d2979f06aa2b3b4b97b42c0990a1efc5
 cd zstd
 download_and_check https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz 9c4396cc829cfae319a6e2615202e82aad41372073482fce286fac78646d3ee4
 cd ..
@@ -68,7 +68,7 @@ mv modules/*.so /build/php-modules/
 # Compile brotli
 mkdir /tmp/brotli
 cd /tmp/brotli
-download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.14.2.tar.gz 40b00f6ab75a4ce54b8af009e8ad2ac5077a4a35d6bbb50807324565b8472bee
+download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.15.0.tar.gz 2e5f3366d43f91a2a3e5ad7eb824868505f5e4268d2f334d31763b6335d83daf
 phpize
 ./configure --silent --with-libbrotli
 make -j$(nproc)
