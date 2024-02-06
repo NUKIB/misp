@@ -59,7 +59,7 @@ mv modules/*.so /build/php-modules/
 # Compile ssdeep
 mkdir /tmp/ssdeep
 cd /tmp/ssdeep
-download_and_check https://github.com/php/pecl-text-ssdeep/archive/refs/tags/1.1.0.tar.gz 256c5c1d6b965f1c6e0f262b6548b1868f4857c5145ca255031a92d602e8b88d
+download_and_check https://github.com/JakubOnderka/pecl-text-ssdeep/archive/3a2e2d9e5d58fe55003aa8b1f31009c7ad7f54e0.tar.gz 275bb3d6ed93b5897c9b37dac358509c3696239f521453d175ac582c81e23cbb
 phpize
 ./configure --silent --with-ssdeep=/usr --with-libdir=lib64
 make -j$(nproc)
