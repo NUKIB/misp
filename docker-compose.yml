@@ -69,8 +69,8 @@ services:
       - misp_logs:/var/www/MISP/app/tmp/logs/
       - misp_certs:/var/www/MISP/app/files/certs/
       - misp_attachments:/var/www/MISP/app/attachments/
-      - misp_img_orgs:/var/www/MISP/app/webroot/img/orgs/
-      - misp_img_custom:/var/www/MISP/app/webroot/img/custom/
+      - misp_img_orgs:/var/www/MISP/app/files/img/orgs/
+      - misp_img_custom:/var/www/MISP/app/files/img/custom/
       - misp_gnupg:/var/www/MISP/.gnupg/
     ports:
       - "127.0.0.1:8080:80"

@@ -4,8 +4,8 @@ import sys
 from pathlib import Path
 
 DIRS = {
-    "/customize/img_orgs/": "/var/www/MISP/app/webroot/img/orgs/",
-    "/customize/img_custom/": "/var/www/MISP/app/webroot/img/custom/"
+    "/customize/img_orgs/": "/var/www/MISP/app/files/img/orgs/",
+    "/customize/img_custom/": "/var/www/MISP/app/files/img/custom/"
 }
 
 for source, destination in DIRS.items():
