@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   mysql:
-    image: mariadb:11.2
+    image: mariadb:11.3
     restart: always
     container_name: misp-mysql
     tmpfs:
