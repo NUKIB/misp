@@ -39,6 +39,7 @@ $oidcAuth = [
     'unblock' => true,
     'offline_access' => {{ OIDC_OFFLINE_ACCESS | bool }},
     'check_user_validity' => {{ OIDC_CHECK_USER_VALIDITY }},
+    'update_user_role' => {{ OIDC_UPDATE_USER_ROLE | bool}},
 ];
 $plugin['CustomAuth_custom_logout'] = "{{ MISP_BASEURL }}/oauth2callback?logout={{ MISP_BASEURL | urlencode }}";
 $plugin['CustomAuth_custom_password_reset'] = {{ OIDC_PASSWORD_RESET | str }};
