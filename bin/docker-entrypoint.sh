@@ -3,7 +3,7 @@
 set -e
 
 # Change volumes permission to apache user
-chown apache:apache /var/www/MISP/app/{attachments,tmp/logs,files/certs,webroot/img/orgs,webroot/img/custom}
+chown apache:apache /var/www/MISP/app/{attachments,tmp/logs,files/certs,files/img/orgs,files/img/custom}
 
 if [ "$1" = 'supervisord' ]; then
     echo "======================================"
