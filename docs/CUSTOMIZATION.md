@@ -6,8 +6,8 @@ You can create your custom MISP image based on NUKIB image, which can include yo
 
 * `MISP_CUSTOM_CSS` (optional, string) - filename from `/var/www/MISP/app/webroot/css/` directory that will be used as another CSS file
 * `MISP_TERMS_FILE` (optional, string) - filename from `/var/www/MISP/app/files/terms/` directory
-* `MISP_HOME_LOGO` (optional, string) - filename from `/var/www/MISP/app/webroot/img/custom/` directory that will be used as home logo
-* `MISP_FOOTER_LOGO` (optional, string) - filename from `/var/www/MISP/app/webroot/img/custom/` directory that will be used as footer logo
+* `MISP_HOME_LOGO` (optional, string) - filename from `/var/www/MISP/app/files/img/custom/` directory that will be used as home logo
+* `MISP_FOOTER_LOGO` (optional, string) - filename from `/var/www/MISP/app/files/img/custom/` directory that will be used as footer logo
 
 ## Add custom certificates
 
