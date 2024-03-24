@@ -85,6 +85,31 @@ function initializeSentry($sentryDsn) {
             $scope->setTag('request_id', $_SERVER['HTTP_X_REQUEST_ID']);
         }
     });
+
+    App::uses('CakeLogInterface', 'Log');
+    class SentryLog implements CakeLogInterface
+    {
+        const LOG_LEVEL_BREADCRUMB = [
+            'emergency' => Sentry\Breadcrumb::LEVEL_FATAL,
+            'alert' => Sentry\Breadcrumb::LEVEL_FATAL,
+            'critical' => Sentry\Breadcrumb::LEVEL_FATAL,
+            'error' => Sentry\Breadcrumb::LEVEL_ERROR,
+            'warning' => Sentry\Breadcrumb::LEVEL_WARNING,
+            'notice' => Sentry\Breadcrumb::LEVEL_WARNING,
+            'info' => Sentry\Breadcrumb::LEVEL_INFO,
+            'debug' => Sentry\Breadcrumb::LEVEL_DEBUG,
+        ];
+
+        public function write($type, $message)
+        {
+            Sentry\addBreadcrumb('log', $message, [], self::LOG_LEVEL_BREADCRUMB[$type]);
+        }
+    }
+
+    CakeLog::config('sentry', [
+        'engine' => 'SentryLog',
+        'types' => ['notice', 'info', 'debug', 'warning', 'error', 'critical', 'alert', 'emergency'],
+    ]);
 }
 
 $sentryDsn = Configure::read('MISP.sentry_dsn');
