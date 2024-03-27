@@ -9,17 +9,17 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 ## Environment variables
 
 * `OIDC_LOGIN` (optional, boolean, default `false`) - set to `true` to enable OIDC login
-* `OIDC_PROVIDER` (optional, string) - URL for OIDC provider in Apache
-* `OIDC_CLIENT_ID` (optional, string)
-* `OIDC_CLIENT_SECRET` (optional, string)
+* `OIDC_PROVIDER` (required when `OIDC_LOGIN` is `true`, string) - URL for OIDC provider in Apache
+* `OIDC_CLIENT_ID` (required when `OIDC_LOGIN` is `true`, string)
+* `OIDC_CLIENT_SECRET` (required when `OIDC_LOGIN` is `true`, string)
 * `OIDC_AUTHENTICATION_METHOD` (optional, string, default `client_secret_basic`) - should be set to `client_secret_jwt` if identity provider supports that method, because it is more secure
 * `OIDC_CODE_CHALLENGE_METHOD` (optional, string) - can be set to `plain` or `S256`, but this method must be supported by the identity provider
 * `OIDC_PASSWORD_RESET` (optional, string) - URL to password reset page
-* `OIDC_CLIENT_CRYPTO_PASS` (optional, string) - password used for cookie encryption by Apache
-* `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for a user that doesn't have organisation name in claim defined by `OIDC_ORGANISATION_PROPERTY` variable. If not provided `MISP_ORG` will be used.
+* `OIDC_CLIENT_CRYPTO_PASS` (required when `OIDC_LOGIN` is `true`, string) - password used for cookie encryption by Apache, should be at least 32 chars long
+* `OIDC_DEFAULT_ORG` (optional, string) - default organisation name for a user that doesn't have organisation name in claim defined by `OIDC_ORGANISATION_PROPERTY` variable. If not provided `MISP_ORG` will be used. Value should be organisation ID, name or UUID.
 * `OIDC_ROLES_PROPERTY` (optional, string, default `roles`) - name of claim used for user roles in MISP
 * `OIDC_ROLES_MAPPING` (optional, string, default see bellow) - roles mapping from roles provided by IdP to MISP roles
-* `OIDC_ORGANISATION_PROPERTY` (optional, string, default `organization`) - ID token or user info claim that will be used as an organisation in MISP
+* `OIDC_ORGANISATION_PROPERTY` (optional, string, default `organization`) - ID token or user info claim that will be used as an organisation in MISP. This property should contain organisation ID, name or UUID.
 * `OIDC_OFFLINE_ACCESS` (optional, boolean, default `false`) - if true, offline access token will be requested for user
 * `OIDC_CHECK_USER_VALIDITY` (optional, int, default `0`) - number of seconds, after which user will be revalidated if he is still active in IdP. Zero means that this functionality is disabled. Recommended value is `300`.
 * `OIDC_UPDATE_USER_ROLE` (optional, bool, default `true`) - if disabled, manually modified role in MISP admin interface will be not changed from roles defined in OIDC

@@ -36,13 +36,29 @@ function initializeSentry($sentryDsn) {
                 return $event;
             }
 
+            $remoteIp = function() {
+                $clientIpHeader = Configure::read('MISP.log_client_ip_header');
+                if ($clientIpHeader && isset($_SERVER[$clientIpHeader])) {
+                    $headerValue = $_SERVER[$clientIpHeader];
+                    // X-Forwarded-For can contain multiple IPs, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
+                    if (($commaPos = strpos($headerValue, ',')) !== false) {
+                        $headerValue = substr($headerValue, 0, $commaPos);
+                    }
+                    $remoteIp = trim($headerValue);
+                } else {
+                    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
+                }
+
+                return $remoteIp;
+            };
+
             App::uses('AuthComponent', 'Controller/Component');
             $authUser = AuthComponent::user();
             if (!empty($authUser)) {
                 $user = [
                     'id' => $authUser['id'],
                     'email' => $authUser['email'],
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    'ip_address' => $remoteIp(),
                     'logged_by_authkey' => isset($authUser['logged_by_authkey']),
                 ];
                 if (isset($authUser['authkey_id'])) {
@@ -69,6 +85,31 @@ function initializeSentry($sentryDsn) {
             $scope->setTag('request_id', $_SERVER['HTTP_X_REQUEST_ID']);
         }
     });
+
+    App::uses('CakeLogInterface', 'Log');
+    class SentryLog implements CakeLogInterface
+    {
+        const LOG_LEVEL_BREADCRUMB = [
+            'emergency' => Sentry\Breadcrumb::LEVEL_FATAL,
+            'alert' => Sentry\Breadcrumb::LEVEL_FATAL,
+            'critical' => Sentry\Breadcrumb::LEVEL_FATAL,
+            'error' => Sentry\Breadcrumb::LEVEL_ERROR,
+            'warning' => Sentry\Breadcrumb::LEVEL_WARNING,
+            'notice' => Sentry\Breadcrumb::LEVEL_WARNING,
+            'info' => Sentry\Breadcrumb::LEVEL_INFO,
+            'debug' => Sentry\Breadcrumb::LEVEL_DEBUG,
+        ];
+
+        public function write($type, $message)
+        {
+            Sentry\addBreadcrumb('log', $message, [], self::LOG_LEVEL_BREADCRUMB[$type]);
+        }
+    }
+
+    CakeLog::config('sentry', [
+        'engine' => 'SentryLog',
+        'types' => ['notice', 'info', 'debug', 'warning', 'error', 'critical', 'alert', 'emergency'],
+    ]);
 }
 
 $sentryDsn = Configure::read('MISP.sentry_dsn');
