@@ -75,8 +75,9 @@ do
   unset "$variable_name"
 done
 
-# Remove possible exists PID files
-rm -f /var/run/httpd/httpd.pid
-rm -f /var/run/syslogd.pid
+# Remove possible exists PID and socket files
+rm -f /run/httpd/httpd.pid
+rm -f /run/syslogd.pid
+rm -f /run/vector
 
 exec "$@"
