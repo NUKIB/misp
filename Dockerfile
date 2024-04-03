@@ -1,5 +1,5 @@
 # Base image
-ARG BASE_IMAGE=quay.io/centos/centos:stream8
+ARG BASE_IMAGE=almalinux:8
 FROM $BASE_IMAGE as base
 
 # Some packages requires building, so use different stage for that
