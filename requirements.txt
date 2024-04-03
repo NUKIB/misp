@@ -1,4 +1,4 @@
-pymisp
+git+https://github.com/MISP/PyMISP.git
 lief
 python-magic
 plyara
