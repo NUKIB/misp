@@ -1,13 +1,13 @@
 # MISP Docker image
 
-[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on CentOS Stream 8, ready for production.
+[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on [AlmaLinux](https://hub.docker.com/_/almalinux), ready for production.
 
 This image contains the latest version of MISP and the required dependencies. Image is intended as immutable, which means that it is not possible
 to update MISP from the user interface and instead, an admin should download a newer image.
 
 ## Key features
 
-* 🎩 Image is based on CentOS Stream 8, so perfectly fits your infrastructure if you use CentOS or RHEL as a host system
+* 🎩 Image is based on AlmaLinux, so perfectly fits your infrastructure if you use CentOS or RHEL as a host system
 * ✅ Modern MISP features are enabled by default (like advanced audit log or storing settings in the database)
 * 👩‍💻 Integrated support for [OpenID Connect (OIDC) authentication](docs/OIDC.md)
 * 🔒️ PHP is by default protected by Snuffleupagus extensions with [rules](snuffleupagus-misp.rules) tailored to MISP
@@ -61,9 +61,9 @@ If you don't trust image built by GitHub Actions and stored in GitHub Container 
 
     docker build --build-arg MISP_VERSION=v2.4.152 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
-If you don't like CentOS Stream, you can use as a base image different distribution that is compatible with CentOS, like [AlmaLinux](https://hub.docker.com/_/almalinux) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
+If you don't like AlmaLinux, you can use as a base image different distribution that is compatible with AlmaLinux 8, like [CentOS Stream](https://www.centos.org/centos-stream/) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
 
-    docker build --build-arg BASE_IMAGE=almalinux -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
+    docker build --build-arg BASE_IMAGE=quay.io/centos/centos:stream8 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
 ## Logging
 
