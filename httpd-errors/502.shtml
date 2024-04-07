@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <style>
+        html, body { width: 100%; margin: 0; padding: 0; }
+        body { font-family: 'Calibri', sans-serif; font-size: 16px; color: #ebebeb; background-color: #151515; text-align: center; margin-top: 10% }
+        h2 { text-transform: uppercase; font-weight: lighter; font-size: 45px; margin: 5px 0; }
+        p { margin: 0; }
+        br { margin: 5px; }
+        a { color: white }
+        .requestId { font-size: 12px; color: gray }
+    </style>
+    <title>Service Unavailable</title>
+</head>
+<body>
+    <h2>Service Unavailable</h2>
+    <br>
+    <p>The server is temporarily unable to service your request due to maintenance downtime or capacity problems. Please try again later{% if SUPPORT_EMAIL %} or contact us at <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>{% endif %}.</p>
+    <br>
+    <p class="requestId">Request ID: <!--#echo encoding="entity" var="HTTP_X_REQUEST_ID" --></p>
+</body>
+</html>
