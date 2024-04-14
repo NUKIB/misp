@@ -10,6 +10,7 @@ import xmlrpc.client
 import logging
 import subprocess
 import requests
+import misp_redis_ready
 
 
 class UnixStreamHTTPConnection(http.client.HTTPConnection):
@@ -110,9 +111,8 @@ def check_zeromq():
 
 
 def check_redis():
-    r = subprocess.run(["/var/www/MISP/app/Console/cake", "Admin", "redisReady"], capture_output=True)
-    if r.returncode != 0:
-        raise SubprocessException(r)
+    host, password, use_tls = misp_redis_ready.get_connection_info()
+    misp_redis_ready.connect(host, password, use_tls)
 
 
 def main() -> dict:
