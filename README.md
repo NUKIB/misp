@@ -166,7 +166,7 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 ### PHP config
 
 * `PHP_SESSIONS_IN_REDIS` (optional, boolean, default `true`) - when enabled, sessions are stored in Redis. That provides better performance and sessions survive container restart
-* `PHP_SESSIONS_COOKIE_SAMESITE` (optional, string) - sets [session.cookie_samesite](https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite), can be `Strict` or `Lax`. By default, is set to Strict, just for testing on localhost is set to Lax.
+* `PHP_SESSIONS_COOKIE_SAMESITE` (optional, string, default `Lax`) - sets [session.cookie_samesite](https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite), can be `Strict` or `Lax`.
 * `PHP_SNUFFLEUPAGUS` (optional, boolean, default `true`) - enable PHP hardening by using [Snuffleupagus](https://snuffleupagus.readthedocs.io) PHP extension with [rules](snuffleupagus-misp.rules) tailored to MISP
 * `PHP_TIMEZONE` (optional, string, default `UTC`) - sets [date.timezone](https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone)
 * `PHP_MEMORY_LIMIT` (optional, string, default `2048M`) - sets [memory_limit](https://www.php.net/manual/en/ini.core.php#ini.memory-limit)

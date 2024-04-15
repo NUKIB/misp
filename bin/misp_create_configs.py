@@ -231,7 +231,7 @@ VARIABLES = {
     "PHP_MEMORY_LIMIT": Option(default="2048M"),
     "PHP_MAX_EXECUTION_TIME": Option(typ=int, default=300, validation=check_uint),
     "PHP_UPLOAD_MAX_FILESIZE": Option(default="50M"),
-    "PHP_SESSIONS_COOKIE_SAMESITE": Option(options=("Strict", "Lax")),
+    "PHP_SESSIONS_COOKIE_SAMESITE": Option(options=("Strict", "Lax"), default="Lax"),
     # Jobber
     "JOBBER_USER_ID": Option(typ=int, default=1, validation=check_uint),
     "JOBBER_CACHE_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
@@ -544,10 +544,6 @@ def create():
     if not variables["SECURITY_COOKIE_NAME"]:
         uniq = hashlib.sha256(f"{variables['SECURITY_SALT']}|{variables['MISP_UUID']}".encode()).hexdigest()
         variables["SECURITY_COOKIE_NAME"] = f"MISP-session-{uniq[0:5]}"
-
-    if variables["PHP_SESSIONS_COOKIE_SAMESITE"] is None:
-        is_localhost = variables["MISP_BASEURL"].startswith(("http://localhost", "https://localhost"))
-        variables["PHP_SESSIONS_COOKIE_SAMESITE"] = "Lax" if is_localhost else "Strict"
 
     variables["MISP_UUID"] = variables["MISP_UUID"].lower()
 
