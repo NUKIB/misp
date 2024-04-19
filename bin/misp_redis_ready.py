@@ -3,7 +3,7 @@
 import os
 import sys
 import time
-from typing import Optional
+from typing import Optional, Tuple
 import redis
 import logging
 
@@ -44,9 +44,7 @@ def wait_for_connection(host: str, password: Optional[str] = None, use_tls: bool
     sys.exit(1)
 
 
-def main():
-    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
-
+def get_connection_info() -> Tuple[str, Optional[str], bool]:
     host = os.environ.get("REDIS_HOST")
     if host is None:
         error("Environment variable 'REDIS_HOST' not set.")
@@ -56,6 +54,13 @@ def main():
     use_tls = os.environ.get("REDIS_USE_TLS")
     use_tls = convert_bool(use_tls) if use_tls else False
 
+    return host, password, use_tls
+
+
+def main():
+    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
+
+    host, password, use_tls = get_connection_info()
     redis = wait_for_connection(host, password, use_tls)
     info = redis.info("server")
     logging.info(f"Connected to Redis {info['redis_version']}")
