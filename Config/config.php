@@ -170,6 +170,7 @@ $config = [
     {% if OIDC_LOGIN %}
     'auth' => ['OidcAuth.Oidc'],
     'auth_enforced' => true,
+    'otp_disabled' => true,
     {% endif %}
   ],
   'Session' => [
