@@ -30,6 +30,13 @@ jobs:
     onError: Backoff
   {% endif %}
 
+  {% if JOBBER_PUSH_SERVERS_TIME %}
+  PushServers:
+    cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake Server pushAll {{ JOBBER_USER_ID }}
+    time: {{ JOBBER_PUSH_SERVERS_TIME }}
+    onError: Backoff
+  {% endif %}
+
   {% if JOBBER_CACHE_SERVERS_TIME %}
   CacheServers:
     cmd: MISP_AUTOMATIC_TASK=true su-exec apache /var/www/MISP/app/Console/cake Server cacheServerAll {{ JOBBER_USER_ID }}
