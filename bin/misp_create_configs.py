@@ -237,6 +237,7 @@ VARIABLES = {
     "JOBBER_CACHE_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
     "JOBBER_FETCH_FEEDS_TIME": Option(default="0 R0-10 6,8,10,12,14,16,18"),
     "JOBBER_PULL_SERVERS_TIME": Option(default="0 R0-10 6,10,15"),
+    "JOBBER_PUSH_SERVERS_TIME": Option(),
     "JOBBER_CACHE_SERVERS_TIME": Option(default="0 R0-10 6,10,15"),
     "JOBBER_SCAN_ATTACHMENT_TIME": Option(default="0 R0-10 6"),
     "JOBBER_LOG_ROTATE_TIME": Option(default="0 0 5"),
