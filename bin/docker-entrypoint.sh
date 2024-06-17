@@ -2,6 +2,43 @@
 # Copyright (C) 2022 National Cyber and Information Security Agency of the Czech Republic
 set -e
 
+# usage: file_env VAR [DEFAULT]
+#    ie: file_env 'XYZ_DB_PASSWORD' 'example'
+# (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
+#  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
+file_env() {
+	local var="$1"
+	local fileVar="${var}_FILE"
+	local def="${2:-}"
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+		printf >&2 'error: both %s and %s are set (but are exclusive)\n' "$var" "$fileVar"
+		exit 1
+	fi
+	local val="$def"
+	if [ "${!var:-}" ]; then
+		val="${!var}"
+	elif [ "${!fileVar:-}" ]; then
+		val="$(< "${!fileVar}")"
+	fi
+	export "$var"="$val"
+	unset "$fileVar"
+}
+
+# Initialize values that might be stored in a file
+
+file_env 'MYSQL_DATABASE'
+file_env 'MYSQL_LOGIN'
+file_env 'MYSQL_PASSWORD'
+file_env 'REDIS_PASSWORD'
+file_env 'GNUPG_PRIVATE_KEY'
+file_env 'GNUPG_PRIVATE_KEY_PASSWORD'
+file_env 'SECURITY_SALT'
+file_env 'SECURITY_ENCRYPTION_KEY'
+file_env 'PROXY_USER'
+file_env 'PROXY_PASSWORD'
+file_env 'ZEROMQ_USERNAME'
+file_env 'ZEROMQ_PASSWORD'
+
 # Change volumes permission to apache user
 chown apache:apache /var/www/MISP/app/{attachments,tmp/logs,files/certs,files/img/orgs,files/img/custom}
 
