@@ -25,14 +25,14 @@ RUN --mount=type=tmpfs,target=/tmp bash /build/misp_compile_jobber.sh
 FROM builder as zlib-ng-build
 RUN --mount=type=tmpfs,target=/tmp mkdir /tmp/zlib-ng && \
     cd /tmp/zlib-ng && \
-    curl --fail -sS --location -o zlib-ng.tar.gz https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.1.6.tar.gz && \
-    echo "a5d504c0d52e2e2721e7e7d86988dec2e290d723ced2307145dedd06aeb6fef2 zlib-ng.tar.gz" | sha256sum -c && \
+    curl --fail -sS --location -o zlib-ng.tar.gz https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.1.7.tar.gz && \
+    echo "59e68f67cbb16999842daeb517cdd86fc25b177b4affd335cd72b76ddc2a46d8 zlib-ng.tar.gz" | sha256sum -c && \
     tar zxf zlib-ng.tar.gz --strip-components=1 && \
     ./configure --zlib-compat && \
     make -j$(nproc) && \
-    strip libz.so.1.3.0.zlib-ng && \
+    strip libz.so.1.3.1.zlib-ng && \
     mkdir /build && \
-    mv libz.so.1.3.0.zlib-ng /build/
+    mv libz.so.1.3.1.zlib-ng /build/
 
 # MISP image
 FROM base as misp
@@ -54,7 +54,7 @@ RUN --mount=type=tmpfs,target=/var/cache/dnf \
 COPY --from=builder --chmod=755 /usr/local/bin/su-exec /usr/local/bin/
 COPY --from=php-build /build/php-modules/* /usr/lib64/php/modules/
 COPY --from=jobber-build /build/jobber*.rpm /tmp
-COPY --from=zlib-ng-build /build/libz.so.1.3.0.zlib-ng /lib64/
+COPY --from=zlib-ng-build /build/libz.so.1.3.1.zlib-ng /lib64/
 COPY --chmod=755 bin/ /usr/local/bin/
 COPY --chmod=644 misp.conf /etc/httpd/conf.d/misp.conf
 COPY --chmod=644 httpd-errors/* /var/www/html/
@@ -69,7 +69,7 @@ ARG CACHEBUST=1
 ARG MISP_VERSION=2.4
 ENV MISP_VERSION $MISP_VERSION
 
-RUN ln -f -s /lib64/libz.so.1.3.0.zlib-ng /lib64/libz.so.1 && \
+RUN ln -f -s /lib64/libz.so.1.3.1.zlib-ng /lib64/libz.so.1 && \
     rpm -i /tmp/jobber*.rpm && \
     /usr/local/bin/misp_install.sh
 COPY --chmod=444 Config/* /var/www/MISP/app/Config/
