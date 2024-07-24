@@ -1,15 +1,15 @@
 # Base image
 ARG BASE_IMAGE=almalinux:8
-FROM $BASE_IMAGE as base
+FROM $BASE_IMAGE AS base
 
 # Some packages requires building, so use different stage for that
-FROM base as builder
+FROM base AS builder
 COPY su-exec.c /tmp/
 RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc make && \
     gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c
 
 # Build PHP extensions that are not included in packages
-FROM builder as php-build
+FROM builder AS php-build
 COPY bin/misp_compile_php_extensions.sh bin/misp_enable_epel.sh /build/
 RUN --mount=type=tmpfs,target=/tmp \
     dnf module enable -y php:7.4 && \
@@ -17,12 +17,12 @@ RUN --mount=type=tmpfs,target=/tmp \
     bash /build/misp_compile_php_extensions.sh
 
 # Build jobber, that is not released for arm64 arch
-FROM builder as jobber-build
+FROM builder AS jobber-build
 COPY bin/misp_compile_jobber.sh /build/
 RUN --mount=type=tmpfs,target=/tmp bash /build/misp_compile_jobber.sh
 
 # Build zlib-ng, faster alternative of zlib library
-FROM builder as zlib-ng-build
+FROM builder AS zlib-ng-build
 RUN --mount=type=tmpfs,target=/tmp mkdir /tmp/zlib-ng && \
     cd /tmp/zlib-ng && \
     curl --fail -sS --location -o zlib-ng.tar.gz https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.1.tar.gz && \
@@ -35,7 +35,7 @@ RUN --mount=type=tmpfs,target=/tmp mkdir /tmp/zlib-ng && \
     mv libz.so.1.3.1.zlib-ng /build/
 
 # MISP image
-FROM base as misp
+FROM base AS misp
 
 # Install required system and Python packages
 COPY requirements.txt packages /tmp/
@@ -67,7 +67,7 @@ COPY --chmod=644 logrotate/* /etc/logrotate.d/
 
 ARG CACHEBUST=1
 ARG MISP_VERSION=2.4
-ENV MISP_VERSION $MISP_VERSION
+ENV MISP_VERSION=$MISP_VERSION
 
 RUN ln -f -s /lib64/libz.so.1.3.1.zlib-ng /lib64/libz.so.1 && \
     rpm -i /tmp/jobber*.rpm && \
@@ -75,7 +75,7 @@ RUN ln -f -s /lib64/libz.so.1.3.1.zlib-ng /lib64/libz.so.1 && \
 COPY --chmod=444 Config/* /var/www/MISP/app/Config/
 
 # Verify image
-FROM misp as verify
+FROM misp AS verify
 RUN touch /verified && \
     su-exec apache /usr/local/bin/misp_verify.sh && \
     /usr/bin/vector --config-dir /etc/vector/ validate
@@ -85,7 +85,7 @@ FROM misp
 # Hack that will force run verify stage
 COPY --from=verify /verified /
 
-ENV GNUPGHOME /var/www/MISP/.gnupg
+ENV GNUPGHOME=/var/www/MISP/.gnupg
 
 VOLUME /var/www/MISP/app/tmp/logs/
 VOLUME /var/www/MISP/app/files/certs/
