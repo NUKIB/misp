@@ -44,6 +44,30 @@ def wait_for_connection(host: str, password: Optional[str] = None, use_tls: bool
     sys.exit(1)
 
 
+def wait_for_load(connection: redis.Redis):
+    data_loaded = False
+    for i in range(1, 10):
+        try:
+            persistence = connection.info("persistence")
+        except Exception:
+            logging.error(f"Could not get persistence info from Redis server, skipping")
+            sys.exit(0)
+
+        if "loading" not in persistence:
+            logging.warning("Loading not found in persistence info from Redis, skipping loading check")
+
+        if persistence["loading"]:
+            logging.info("Waiting for Redis to load to memory...")
+            time.sleep(1)
+        else:
+            data_loaded = True
+
+    if data_loaded:
+        logging.info("Redis ready")
+    else:
+        logging.warning("Redis is still loading data to memory, waiting skipped")
+
+
 def get_connection_info() -> Tuple[str, Optional[str], bool]:
     host = os.environ.get("REDIS_HOST")
     if host is None:
@@ -62,8 +86,11 @@ def main():
 
     host, password, use_tls = get_connection_info()
     redis = wait_for_connection(host, password, use_tls)
+
     info = redis.info("server")
     logging.info(f"Connected to Redis {info['redis_version']}")
+
+    wait_for_load(redis)
 
 
 if __name__ == "__main__":
