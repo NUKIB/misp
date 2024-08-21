@@ -62,6 +62,9 @@ su-exec apache git config core.filemode false
 cd /var/www/MISP/app/files/
 su-exec apache git submodule update --depth 1 --jobs 4 --init --recursive .
 
+# Install Python dependencies as system package
+pip3 install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/python-stix scripts/python-cybox
+
 # Install MISP composer dependencies
 cd /var/www/MISP/app
 # Remove unused packages
