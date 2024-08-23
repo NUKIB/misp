@@ -5,7 +5,8 @@ FROM $BASE_IMAGE AS base
 # Some packages requires building, so use different stage for that
 FROM base AS builder
 COPY su-exec.c /tmp/
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc make && \
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc-toolset-13 make && \
+    source scl_source enable gcc-toolset-13 && \
     gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c
 
 # Build PHP extensions that are not included in packages
@@ -23,16 +24,8 @@ RUN --mount=type=tmpfs,target=/tmp bash /build/misp_compile_jobber.sh
 
 # Build zlib-ng, faster alternative of zlib library
 FROM builder AS zlib-ng-build
-RUN --mount=type=tmpfs,target=/tmp mkdir /tmp/zlib-ng && \
-    cd /tmp/zlib-ng && \
-    curl --fail -sS --location -o zlib-ng.tar.gz https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.1.tar.gz && \
-    echo "ec6a76169d4214e2e8b737e0850ba4acb806c69eeace6240ed4481b9f5c57cdf zlib-ng.tar.gz" | sha256sum -c && \
-    tar zxf zlib-ng.tar.gz --strip-components=1 && \
-    ./configure --zlib-compat && \
-    make -j$(nproc) && \
-    strip libz.so.1.3.1.zlib-ng && \
-    mkdir /build && \
-    mv libz.so.1.3.1.zlib-ng /build/
+COPY bin/misp_compile_zlib_ng.sh /build/
+RUN --mount=type=tmpfs,target=/tmp bash /build/misp_compile_zlib_ng.sh
 
 # MISP image
 FROM base AS misp
