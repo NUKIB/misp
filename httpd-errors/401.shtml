@@ -17,7 +17,7 @@
 <body>
     <h2>Permission Denied</h2>
     <br>
-    <p>Sorry, you do not have access to this page.{% if SUPPORT_EMAIL %} If you think this you should be able to access this page, please contact us at <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>{% endif %}.</p>
+    <p>Sorry, you do not have access to this page.{% if SUPPORT_EMAIL %} If you think this you should be able to access this page, please contact us at <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>.{% endif %}</p>
     <br>
     <p class="requestId">Request ID: <!--#echo encoding="entity" var="HTTP_X_REQUEST_ID" --></p>
 </body>
