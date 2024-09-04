@@ -78,6 +78,7 @@ FROM misp
 # Hack that will force run verify stage
 COPY --from=verify /verified /
 
+ENV LD_PRELOAD=/usr/lib64/libjemalloc.so.2
 ENV GNUPGHOME=/var/www/MISP/.gnupg
 
 VOLUME /var/www/MISP/app/tmp/logs/
