@@ -60,7 +60,7 @@ jobs:
       run: |
         docker history ${{ env.TEST_TAG }}
         MISP_IMAGE=${{ env.TEST_TAG }} docker compose up --detach --quiet-pull
-        sleep 10 # Wait until container is ready
+        sleep 15 # Wait until container is ready
         docker logs misp
         AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake user init)
         VERSION=$(curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion)
