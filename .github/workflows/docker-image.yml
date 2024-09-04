@@ -65,6 +65,9 @@ jobs:
         AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake user init)
         VERSION=$(curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion)
         echo $VERSION | jq
+        docker restart misp # Also test restart
+        sleep 10 # Wait until container is ready
+        curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion
         docker compose down
     -
       name: Container scan
