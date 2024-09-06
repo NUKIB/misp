@@ -55,6 +55,7 @@ def wait_for_load(connection: redis.Redis):
 
         if "loading" not in persistence:
             logging.warning("Loading not found in persistence info from Redis, skipping loading check")
+            sys.exit(0)
 
         if persistence["loading"]:
             logging.info("Waiting for Redis to load to memory...")
