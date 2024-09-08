@@ -66,6 +66,7 @@ RUN ln -f -s /lib64/libz.so.1.3.1.zlib-ng /lib64/libz.so.1 && \
     rpm -i /tmp/jobber*.rpm && \
     /usr/local/bin/misp_install.sh
 COPY --chmod=444 Config/* /var/www/MISP/app/Config/
+COPY --chmod=444 patches/cake.php /var/www/MISP/app/Console/
 
 # Verify image
 FROM misp AS verify

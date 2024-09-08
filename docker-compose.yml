@@ -47,6 +47,9 @@ services:
       - MKNOD
       - AUDIT_WRITE
       - SETFCAP
+    # Just for debugging purposes
+    #cap_add:
+    #  - SYS_PTRACE
     environment:
       MYSQL_HOST: mysql
       MYSQL_LOGIN: misp
