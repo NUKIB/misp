@@ -5,7 +5,7 @@
 sp.global.show_old_php_warning.disable();
 
 # Prevent the execution of writeable PHP files.
-#sp.readonly_exec.simulation().enable();
+sp.readonly_exec.no_extended_checks().enable();
 
 # Disabling the loading of external entities in the XML parser.
 sp.xxe_protection.enable();
