@@ -31,5 +31,5 @@ else:
 
 print("Latest commit for {} is {}".format(args.ref, last_commit), file=sys.stderr)
 
-print("::set-output name=MISP_VERSION::{}".format(args.ref))
-print("::set-output name=MISP_COMMIT::{}".format(last_commit))
+print("MISP_VERSION={}".format(args.ref))
+print("MISP_COMMIT={}".format(last_commit))
