@@ -70,7 +70,7 @@ cd /var/www/MISP/app
 # Remove unused packages
 su-exec apache php composer.phar --no-cache remove --update-no-dev kamisama/cake-resque
 # require exact version of `symfony/polyfill-php80` to keep compatibility, because later version replaces Attribute class :/
-su-exec apache php composer.phar --no-cache require --update-no-dev symfony/polyfill-php80:v1.18.1 sentry/sdk jakub-onderka/openid-connect-php:1.1.0 cakephp/cakephp:2.10.24 supervisorphp/supervisor guzzlehttp/guzzle php-http/message php-http/message-factory
+su-exec apache php composer.phar --no-cache require --update-no-dev symfony/polyfill-php80:v1.18.1 sentry/sdk jakub-onderka/openid-connect-php:1.1.0 cakephp/cakephp:2.10.24 supervisorphp/supervisor guzzlehttp/guzzle php-http/message php-http/message-factory aws/aws-sdk-php
 
 # Create attachments folder and set correct owner
 mkdir /var/www/MISP/app/attachments

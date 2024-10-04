@@ -33,7 +33,7 @@ services:
       - SETFCAP
 
   misp:
-    image: ${MISP_IMAGE-ghcr.io/nukib/misp:latest}
+    image: local-misp:dev #${MISP_IMAGE-ghcr.io/cparta/misp:latest}
     restart: always
     container_name: misp
     depends_on:
@@ -47,9 +47,9 @@ services:
       - MKNOD
       - AUDIT_WRITE
       - SETFCAP
-    # Just for debugging purposes
-    #cap_add:
-    #  - SYS_PTRACE
+    env_file:
+      - path: .env_s3
+        required: false
     environment:
       MYSQL_HOST: mysql
       MYSQL_LOGIN: misp
@@ -62,10 +62,10 @@ services:
       MISP_MODULE_URL: http://misp-modules
       MISP_EMAIL: ahoj@example.com # Please change for production
       SECURITY_SALT: PleaseChangeForProduction # Please change for production
-      ZEROMQ_ENABLED: yes
-      SYSLOG_ENABLED: no
-      ECS_LOG_ENABLED: yes
-      MISP_DEBUG: yes
+      ZEROMQ_ENABLED: "yes"
+      SYSLOG_ENABLED: "no"
+      ECS_LOG_ENABLED: "yes"
+      MISP_DEBUG: "yes"
     volumes:
       - misp_logs:/var/www/MISP/app/tmp/logs/
       - misp_certs:/var/www/MISP/app/files/certs/

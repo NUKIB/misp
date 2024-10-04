@@ -188,6 +188,16 @@ VARIABLES = {
     "ZEROMQ_ENABLED": Option(typ=bool, default=False),
     "ZEROMQ_USERNAME": Option(),
     "ZEROMQ_PASSWORD": Option(sensitive=True),
+    # S3
+    "S3_ENABLED": Option(typ=bool, default=False),
+    "S3_AWS_ENDPOINT": Option(typ=str),
+    "S3_REGION": Option(typ=str),
+    "S3_AWS_COMPATIBLE": Option(typ=bool, default=False),
+    "S3_BUCKET_NAME": Option(typ=str),
+    "S3_ACCESS_KEY": Option(typ=str),
+    "S3_SECRET_KEY": Option(typ=str),
+    "S3_CA": Option(typ=str),
+    "S3_CA_VALIDATE": Option(typ=bool, default=True),
     # SMTP
     "SMTP_HOST": Option(),
     "SMTP_PORT": Option(typ=int, default=25, validation=check_uint),
