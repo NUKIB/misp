@@ -33,7 +33,7 @@ services:
       - SETFCAP
 
   misp:
-    image: l${MISP_IMAGE-ghcr.io/nukib/misp:latest}
+    image: ${MISP_IMAGE-ghcr.io/nukib/misp:latest}
     restart: always
     container_name: misp
     depends_on:
