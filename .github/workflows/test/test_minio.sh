@@ -21,7 +21,7 @@ fi
 
 echo "Setup MinIO container"
 NETWORK=$(docker inspect misp --format="{{ .HostConfig.NetworkMode }}")
-docker run -d --expose 9000 --network $NETWORK -e MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY -e MINIO_SECRET_KEY=$MINIO_SECRET_KEY --quiet --name minio quay.io/minio/minio
+docker run -d --expose 9000 --network $NETWORK -e MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY -e MINIO_SECRET_KEY=$MINIO_SECRET_KEY --quiet --name minio ghcr.io/cparta/minio-cicd:latest
 
 echo "Ensure MinIO client exists"
 curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
