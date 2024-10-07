@@ -212,6 +212,7 @@ If one of the variables is set to `0`, no workers will be started.
 
 * `ECS_`, `SYSLOG_` and `SENTRY_` are documented in [LOGGING.md](docs/LOGGING.md) 
 * `OIDC_` are documented in [OIDC.md](docs/OIDC.md) 
+* `S3_` for storing attachments in S3 compatible object storage are documented in [S3_SUPPORT.md](docs/S3_SUPPORT.md) 
 
 ## Container volumes
 
