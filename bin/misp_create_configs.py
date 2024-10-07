@@ -363,6 +363,17 @@ def generate_snuffleupagus_config(enabled: bool):
     write_file("/etc/php.d/40-snuffleupagus.ini", config)
 
 
+def generate_jit_config(enabled: bool):
+    if not enabled:
+        return
+
+    config = f"; Enable PHP JIT\n" \
+             f"opcache.jit=On\n" \
+             f"opcache.jit_buffer_size=256M\n"
+
+    write_file("/etc/php.d/10-opcache-jit.ini", config)
+
+
 def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_use_tls: Optional[bool] = False, redis_password: Optional[str] = None):
     if not enabled:
         return
@@ -583,6 +594,7 @@ def create():
 
     generate_xdebug_config(variables["PHP_XDEBUG_ENABLED"], variables["PHP_XDEBUG_PROFILER_TRIGGER"])
     generate_snuffleupagus_config(variables['PHP_SNUFFLEUPAGUS'])
+    generate_jit_config(not variables['PHP_SNUFFLEUPAGUS']) # PHP JIT is not supported when snuffleupagus is enabled
     generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_USE_TLS"], variables["REDIS_PASSWORD"])
     generate_apache_config(variables)
     generate_rsyslog_config(variables)

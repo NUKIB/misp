@@ -13,7 +13,7 @@ RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc-
 FROM builder AS php-build
 COPY bin/misp_compile_php_extensions.sh bin/misp_enable_epel.sh /build/
 RUN --mount=type=tmpfs,target=/tmp \
-    dnf module enable -y php:7.4 && \
+    dnf module enable -y php:8.2 && \
     bash /build/misp_enable_epel.sh && \
     bash /build/misp_compile_php_extensions.sh
 
@@ -36,7 +36,7 @@ COPY bin/misp_enable_epel.sh bin/misp_enable_vector.sh /usr/local/bin/
 RUN --mount=type=tmpfs,target=/var/cache/dnf \
     bash /usr/local/bin/misp_enable_epel.sh && \
     bash /usr/local/bin/misp_enable_vector.sh && \
-    dnf module -y enable mod_auth_openidc php:7.4 && \
+    dnf module -y enable mod_auth_openidc php:8.2 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     alternatives --set python3 /usr/bin/python3.11 && \
     alternatives --set python /usr/bin/python3.11 && \
@@ -59,7 +59,7 @@ COPY --chmod=644 supervisor.ini /etc/supervisord.d/misp.ini
 COPY --chmod=644 logrotate/* /etc/logrotate.d/
 
 ARG CACHEBUST=1
-ARG MISP_VERSION=2.4
+ARG MISP_VERSION=2.5
 ENV MISP_VERSION=$MISP_VERSION
 
 RUN ln -f -s /lib64/libz.so.1.3.1.zlib-ng /lib64/libz.so.1 && \

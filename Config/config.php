@@ -209,4 +209,3 @@ $config['MISP']['sentry_dsn'] = '{{ SENTRY_DSN }}';
 $config['MISP']['sentry_environment'] = '{{ SENTRY_ENVIRONMENT }}';
 {% endif %}
 {% endif %}
-?>

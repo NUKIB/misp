@@ -9,9 +9,9 @@ const DS = DIRECTORY_SEPARATOR;
 const CAKE_SHELL_DISPATCHER = 'Cake' . DS . 'Console' . DS . 'ShellDispatcher.php';
 
 $appDir = dirname(__DIR__);
-$composerInstall = $appDir . DS . 'Vendor' . DS . 'cakephp' . DS . 'cakephp' . DS . 'lib';
+$cakeLib = $appDir . DS . 'Lib' . DS . 'cakephp' . DS . 'lib';
 
-if (!include $composerInstall . DS . CAKE_SHELL_DISPATCHER) {
+if (!include $cakeLib . DS . CAKE_SHELL_DISPATCHER) {
     trigger_error('Could not locate CakePHP core files.', E_USER_ERROR);
 }
 unset($composerInstall);
