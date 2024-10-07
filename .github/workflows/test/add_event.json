@@ -1,0 +1,21 @@
+{
+    "org_id": "12345",
+    "distribution": "0",
+    "info": "logged source ip",
+    "orgc_id": "12345",
+    "uuid": "c99506a6-1255-4b71-afa5-7b8ba48c3b1b",
+    "date": "1991-01-15",
+    "published": false,
+    "analysis": "0",
+    "attribute_count": "321",
+    "timestamp": "1617875568",
+    "sharing_group_id": "1",
+    "proposal_email_lock": true,
+    "locked": true,
+    "threat_level_id": "1",
+    "publish_timestamp": "1617875568",
+    "sighting_timestamp": "1617875568",
+    "disable_correlation": false,
+    "extends_uuid": "c99506a6-1255-4b71-afa5-7b8ba48c3b1b",
+    "event_creator_email": "user@example.com"
+  }
