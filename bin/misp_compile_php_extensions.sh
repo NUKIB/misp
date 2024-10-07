@@ -43,7 +43,7 @@ mv modules/*.so /build/php-modules/
 # Compile igbinary
 mkdir /tmp/igbinary
 cd /tmp/igbinary
-download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.14.tar.gz 3dd62637667bee9328b3861c7dddc754a08ba95775d7b57573eadc5e39f95ac6
+download_and_check https://github.com/igbinary/igbinary/archive/refs/tags/3.2.16.tar.gz 941f1cf2ccbecdc1c221dbfae9213439d334be5d490a2f3da2be31e8a00b0cdb
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --enable-igbinary
 make -j$NPROC
@@ -65,7 +65,7 @@ mv modules/*.so /build/php-modules/
 # Compile redis
 mkdir /tmp/redis
 cd /tmp/redis
-download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.0.2.tar.gz 786944f1c7818cc7fd4289a0d0a42ea630a07ebfa6dfa9f70ba17323799fc430
+download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz 57135db32a0ccb1659f56c75feb26c10ea94fb3d2471edd047d94a9800f959b0
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --enable-redis-igbinary
 #./configure --silent --enable-redis-igbinary

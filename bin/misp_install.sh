@@ -30,6 +30,7 @@ sed -e 's/;assert.active = On/assert.active = Off/' -i ${PHP_INI}
 sed -e 's/expose_php = On/expose_php = Off/' -i ${PHP_INI}
 sed -e 's/session.sid_length = 26/session.sid_length = 32/' -i ${PHP_INI}
 sed -e 's/session.use_strict_mode = 0/session.use_strict_mode = 1/' -i ${PHP_INI}
+sed -e 's/pcre.jit=0/pcre.jit=1/' -i ${PHP_INI}
 sed -e 's/opcache.enable_cli=1/opcache.enable_cli=0/' -i /etc/php.d/10-opcache.ini
 # use igbinary serializer for apcu and sessions
 sed -e 's/session.serialize_handler = php/session.serialize_handler = igbinary/' -i ${PHP_INI}
@@ -55,22 +56,22 @@ git config --system http.sslVersion tlsv1.3 # Always use TLSv1.3 or better for g
 git config --system --add safe.directory '*' # Fix fatal error `detected dubious ownership` in new git
 su-exec apache git clone --branch "$MISP_VERSION" --depth 1 https://github.com/MISP/MISP.git /var/www/MISP
 
-cd /var/www/MISP
+cd /var/www/MISP/
 su-exec apache git config core.filemode false
 
-# Clone just submodules under app/files, we don't need the rest
-cd /var/www/MISP/app/files/
+# Clone just submodules under app, we don't need the rest
+cd /var/www/MISP/app/
 su-exec apache git submodule update --depth 1 --jobs 4 --init --recursive .
 
 # Install Python dependencies as system package
+cd /var/www/MISP/app/files/
 pip3 install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/python-stix scripts/python-cybox
 
 # Install MISP composer dependencies
-cd /var/www/MISP/app
+cd /var/www/MISP/app/
 # Remove unused packages
-su-exec apache php composer.phar --no-cache remove --update-no-dev kamisama/cake-resque
-# require exact version of `symfony/polyfill-php80` to keep compatibility, because later version replaces Attribute class :/
-su-exec apache php composer.phar --no-cache require --update-no-dev symfony/polyfill-php80:v1.18.1 sentry/sdk jakub-onderka/openid-connect-php:1.1.0 cakephp/cakephp:2.10.24 supervisorphp/supervisor guzzlehttp/guzzle php-http/message php-http/message-factory aws/aws-sdk-php
+su-exec apache php composer.phar --no-cache remove --update-no-dev iglocska/cake-resque
+su-exec apache php composer.phar --no-cache require --update-no-dev sentry/sdk jakub-onderka/openid-connect-php:1.1.0 aws/aws-sdk-php
 
 # Create attachments folder and set correct owner
 mkdir /var/www/MISP/app/attachments
