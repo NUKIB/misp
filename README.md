@@ -1,13 +1,16 @@
 # MISP Docker image
 
-[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on [AlmaLinux](https://hub.docker.com/_/almalinux), ready for production.
+[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on [AlmaLinux 8](https://hub.docker.com/_/almalinux), ready for production.
 
 This image contains the latest version of MISP and the required dependencies. Image is intended as immutable, which means that it is not possible
 to update MISP from the user interface and instead, an admin should download a newer image.
 
+> [!IMPORTANT]  
+> This container is intended to be used with MISP v2.5. If you want to use older MISP v2.4, please use [`misp-2.4` branch](https://github.com/NUKIB/misp/tree/misp-2.4). 
+
 ## Key features
 
-* 🎩 Image is based on AlmaLinux, so perfectly fits your infrastructure if you use CentOS or RHEL as a host system
+* 🎩 Image is based on AlmaLinux, so it perfectly fits your infrastructure if you use CentOS or RHEL as a host system
 * ✅ Modern MISP features are enabled by default (like advanced audit log or storing settings in the database)
 * 👩‍💻 Integrated support for [OpenID Connect (OIDC) authentication](docs/OIDC.md)
 * 🔒️ PHP is by default protected by Snuffleupagus extensions with [rules](snuffleupagus-misp.rules) tailored to MISP
@@ -37,7 +40,7 @@ To delete all volumes after testing, run:
 
 ### Updating
 
-When a new MISP is released, also new container image is created. For updating MISP and MISP Modules, just run these commands in the folder that contains `docker-compose.yml` file.
+When a new MISP is released, a new container image is also created. To update MISP and MISP Modules, just run these commands in the folder that contains `docker-compose.yml` file.
 These commands will download the latest images and recreate containers. All data will be preserved.
 
     docker compose pull
@@ -49,7 +52,7 @@ For production usage, please:
 * change passwords for MariaDB and Redis,
 * modify environment variables to requested values,
 * deploy reverse proxy (for example `nginx`) before MISP to handle HTTPS connections.
-  * do not forget to send proper `X-Forwared-For` header
+  * do not forget to send the proper `X-Forwared-For` header
 
 ### Usage in air-gapped environment
 
@@ -59,7 +62,7 @@ MISP by default does not require access to Internet. So it is possible to use MI
 
 If you don't trust image built by GitHub Actions and stored in GitHub Container Registry or you want to build a different MISP version, you can build this image by yourself:
 
-    docker build --build-arg MISP_VERSION=v2.4.152 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
+    docker build --build-arg MISP_VERSION=v2.5.0 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
 If you don't like AlmaLinux, you can use as a base image different distribution that is compatible with AlmaLinux 8, like [CentOS Stream](https://www.centos.org/centos-stream/) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
 
@@ -67,7 +70,7 @@ If you don't like AlmaLinux, you can use as a base image different distribution 
 
 ## Logging
 
-Logging is important to keep your MISP secure and in good condition. [Check detailed manual how to configure logging](docs/LOGGING.md)
+Logging is important to keep your MISP secure and in good condition. [Check detailed manual how to configure logging.](docs/LOGGING.md)
 
 ## Environment variables
 
