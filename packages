@@ -19,7 +19,6 @@ python3.11-lxml
 python3.11-ply
 python3.11-PyMySQL
 python3.11-cryptography
-python3.11-jinja2
 
 # PHP
 php-cli
