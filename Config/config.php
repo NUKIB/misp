@@ -124,6 +124,7 @@ $config = [
     'log_client_ip_header' => 'HTTP_X_FORWARDED_FOR',
     'thumbnail_in_redis' => true,
     'self_update' => false,
+    'python_bin' => '/usr/bin/python3.11',
   ],
   'SimpleBackgroundJobs' => [
     'enabled' => true,
