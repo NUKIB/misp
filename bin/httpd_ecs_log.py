@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.11
 # This script converts Apache logs from custom defined format to JSON
 # Generating JSON directly by setting ErrorLogFormat is problematic because of JSON escaping
 import re

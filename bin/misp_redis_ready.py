@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.11
 # Copyright (C) 2024 National Cyber and Information Security Agency of the Czech Republic
 import os
 import sys

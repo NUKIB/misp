@@ -38,10 +38,7 @@ RUN --mount=type=tmpfs,target=/var/cache/dnf \
     bash /usr/local/bin/misp_enable_vector.sh && \
     dnf module -y enable php:8.2 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
-    alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 50 && \
-    alternatives --install /usr/bin/python python /usr/bin/python3.11 50 && \
-    alternatives --install /usr/bin/pip3 pip /usr/bin/pip3.11 50 && \
-    pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
+    pip3.11 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
     mkdir /run/php-fpm && \
     rm -rf /tmp/packages
 
