@@ -11,11 +11,8 @@ php-fpm --test
 misp_verify.php
 
 # Build test
-# Temporary disable for aarch64, because LIEF is broken in arm
-if [[ "$(uname -m)" != "aarch64" ]]; then
-  cd /var/www/MISP/tests/
-  bash build-test.sh
-fi
+cd /var/www/MISP/tests/
+bash build-test.sh
 
 misp_create_configs.py validate
 
