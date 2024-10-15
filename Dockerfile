@@ -62,6 +62,7 @@ COPY --chmod=644 logrotate/* /etc/logrotate.d/
 ARG CACHEBUST=1
 ARG MISP_VERSION=2.5
 ENV MISP_VERSION=$MISP_VERSION
+ENV LD_PRELOAD=/usr/lib64/libjemalloc.so.2
 
 RUN ln -f -s /lib64/libz.so.1.3.1.zlib-ng /lib64/libz.so.1 && \
     rpm -i /tmp/jobber*.rpm && \
