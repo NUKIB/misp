@@ -3,4 +3,4 @@
 set -e
 
 /var/www/MISP/app/Console/cake admin createZmqConfig
-exec python3 /var/www/MISP/app/files/scripts/mispzmq/mispzmq.py
+exec python3.11 /var/www/MISP/app/files/scripts/mispzmq/mispzmq.py
