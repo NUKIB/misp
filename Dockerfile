@@ -69,7 +69,9 @@ COPY --chmod=444 patches/cake.php /var/www/MISP/app/Console/
 # Verify image
 FROM misp AS verify
 RUN touch /verified && \
+    ln -s /usr/bin/python3.11 /usr/bin/python && \
     su-exec apache /usr/local/bin/misp_verify.sh && \
+    rm /usr/bin/python && \
     /usr/bin/vector --config-dir /etc/vector/ validate
 
 # Final image
