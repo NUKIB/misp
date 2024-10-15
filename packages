@@ -7,7 +7,6 @@ ssdeep-libs
 rsyslog
 vector
 crypto-policies-scripts
-jemalloc
 
 # Python
 python3.11
