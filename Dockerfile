@@ -38,7 +38,7 @@ RUN --mount=type=tmpfs,target=/var/cache/dnf \
     bash /usr/local/bin/misp_enable_vector.sh && \
     dnf module -y enable php:8.2 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
-    pip3.11 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
+    pip3.12 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
     mkdir /run/php-fpm && \
     rm -rf /tmp/packages
 
@@ -69,7 +69,7 @@ COPY --chmod=444 patches/cake.php /var/www/MISP/app/Console/
 # Verify image
 FROM misp AS verify
 RUN touch /verified && \
-    ln -s /usr/bin/python3.11 /usr/bin/python && \
+    ln -s /usr/bin/python3.12 /usr/bin/python && \
     su-exec apache /usr/local/bin/misp_verify.sh && \
     rm /usr/bin/python && \
     /usr/bin/vector --config-dir /etc/vector/ validate

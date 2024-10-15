@@ -10,15 +10,16 @@ vector
 crypto-policies-scripts
 
 # Python
-python3.11
-python3.11-pip
-python3.11-wheel
-python3.11-urllib3
-python3.11-idna
-python3.11-lxml
-python3.11-ply
-python3.11-PyMySQL
-python3.11-cryptography
+python3.12
+python3.12-pip
+python3.12-wheel
+python3.12-urllib3
+python3.12-idna
+python3.12-lxml
+python3.12-ply
+python3.12-PyMySQL
+python3.12-cryptography
+python3.12-setuptools
 
 # PHP
 php-cli
