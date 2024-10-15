@@ -1,5 +1,5 @@
 # Base image
-ARG BASE_IMAGE=almalinux:8
+ARG BASE_IMAGE=almalinux:9
 FROM $BASE_IMAGE AS base
 
 # Some packages requires building, so use different stage for that
@@ -36,10 +36,11 @@ COPY bin/misp_enable_epel.sh bin/misp_enable_vector.sh /usr/local/bin/
 RUN --mount=type=tmpfs,target=/var/cache/dnf \
     bash /usr/local/bin/misp_enable_epel.sh && \
     bash /usr/local/bin/misp_enable_vector.sh && \
-    dnf module -y enable mod_auth_openidc php:8.2 && \
+    dnf module -y enable php:8.2 && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
-    alternatives --set python3 /usr/bin/python3.11 && \
-    alternatives --set python /usr/bin/python3.11 && \
+    alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 50 && \
+    alternatives --install /usr/bin/python python /usr/bin/python3.11 50 && \
+    alternatives --install /usr/bin/pip3 pip /usr/bin/pip3.11 50 && \
     pip3 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
     mkdir /run/php-fpm && \
     rm -rf /tmp/packages
