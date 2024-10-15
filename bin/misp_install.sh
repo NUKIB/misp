@@ -65,7 +65,7 @@ su-exec apache git submodule update --depth 1 --jobs 4 --init --recursive .
 
 # Install Python dependencies as system package
 cd /var/www/MISP/app/files/
-pip3.11 install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/python-stix scripts/python-cybox
+pip3.12 install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/python-stix scripts/python-cybox
 
 # Install MISP composer dependencies
 cd /var/www/MISP/app/
