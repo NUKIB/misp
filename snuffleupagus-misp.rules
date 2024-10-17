@@ -25,8 +25,8 @@ sp.disable_function.function("ini_set").param("option").value("zend.assertions")
 sp.disable_function.function("ini_set").param("option").value("open_basedir").drop();
 
 # File upload
-sp.disable_function.function("move_uploaded_file").param("new_path").value_r("\\.ph").drop();
-sp.disable_function.function("move_uploaded_file").param("new_path").value_r("\\.ht").drop();
+sp.disable_function.function("move_uploaded_file").param("to").value_r("\\.ph").drop();
+sp.disable_function.function("move_uploaded_file").param("to").value_r("\\.ht").drop();
 
 # Ensure that file:// protocol is not allowed in CURL
 sp.disable_function.function("curl_setopt").param("value").value_r("file://").drop().alias("file:// protocol is disabled");
