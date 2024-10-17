@@ -14,9 +14,8 @@ echo 'extension = simdjson.so' > /etc/php.d/40-simdjson.ini
 echo "extension = redis.so
 
 redis.session.locking_enabled = 1
-redis.session.lock_expire = 30
-redis.session.lock_wait_time = 50000
-redis.session.lock_retries = 100" > /etc/php.d/50-redis.ini
+redis.session.lock_wait_time = 10000
+redis.session.lock_retries = -1" > /etc/php.d/50-redis.ini
 
 # PHP-FPM config
 echo 'pm.status_path = /fpm-status' >> /etc/php-fpm.d/www.conf # enable PHP-FPM status page
@@ -65,7 +64,7 @@ su-exec apache git submodule update --depth 1 --jobs 4 --init --recursive .
 
 # Install Python dependencies as system package
 cd /var/www/MISP/app/files/
-pip3 install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/python-stix scripts/python-cybox
+pip3.12 install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/python-stix scripts/python-cybox
 
 # Install MISP composer dependencies
 cd /var/www/MISP/app/
