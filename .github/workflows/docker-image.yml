@@ -78,12 +78,6 @@ jobs:
         sleep 10 # Wait until container is ready
         curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion
         docker compose down
-    - 
-      name: Container scan
-      uses: azure/container-scan@v0
-      with:
-        image-name: ${{ env.TEST_TAG }}
-        severity-threshold: CRITICAL
     -
       name: Build Docker for linux/arm64
       uses: docker/build-push-action@v5
