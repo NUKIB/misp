@@ -34,7 +34,7 @@ mkdir /build/php-modules/
 # Compile simdjson
 mkdir /tmp/simdjson
 cd /tmp/simdjson
-download_and_check https://github.com/JakubOnderka/simdjson_php/archive/0dc0a55215d8056a6a91a4cd126bd7b0c0f5300d.tar.gz 5fb23a60e6374bd4a4499dae2d2e654bbd01c590d7b2ef5db371601786cbaa53
+download_and_check https://github.com/JakubOnderka/simdjson_php/archive/e3b7cf4cb61cc4aeba3ad262525df61c244e1de7.tar.gz b0a1000b69ee5d9ad6d0487dad7c3e74b97d30c7729c9dacd869d4c422cc9a36
 phpize
 CPPFLAGS="$DEFAULT_FLAGS" ./configure --silent
 make -j$NPROC
@@ -84,7 +84,7 @@ mv modules/*.so /build/php-modules/
 # Compile brotli
 mkdir /tmp/brotli
 cd /tmp/brotli
-download_and_check https://github.com/kjdev/php-ext-brotli/archive/48bf4071d266c556d61684e07d40d917f61c9eb7.tar.gz c145696965fac0bacd6b5ffef383eaf7a67539e9a0ed8897ab1632ca119510c6
+download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.15.2.tar.gz b5e41174652993d516f14243873d217f46dd2d241252f12ccf899cbdbbfa693e
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --with-libbrotli
 make -j$NPROC
