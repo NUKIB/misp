@@ -8,6 +8,9 @@ to update MISP from the user interface and instead, an admin should download a n
 > [!IMPORTANT]  
 > This container is intended to be used with MISP v2.5. If you want to use older MISP v2.4, please use [`misp-2.4` branch](https://github.com/NUKIB/misp/tree/misp-2.4). 
 
+> [!IMPORTANT]  
+> This container is intended to be used with RHEL 9 base image. If you want to use older base image, please use [`el8` branch](https://github.com/NUKIB/misp/tree/el8).
+
 ## Key features
 
 * 🎩 Image is based on AlmaLinux, so it perfectly fits your infrastructure if you use CentOS or RHEL as a host system
