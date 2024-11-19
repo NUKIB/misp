@@ -1,6 +1,6 @@
 # MISP Docker image
 
-[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on [AlmaLinux 8](https://hub.docker.com/_/almalinux), ready for production.
+[MISP](https://github.com/misp/misp/) container (Docker) image focused on high performance and security based on [AlmaLinux 9](https://hub.docker.com/_/almalinux), ready for production.
 
 This image contains the latest version of MISP and the required dependencies. Image is intended as immutable, which means that it is not possible
 to update MISP from the user interface and instead, an admin should download a newer image.
@@ -67,9 +67,9 @@ If you don't trust image built by GitHub Actions and stored in GitHub Container 
 
     docker build --build-arg MISP_VERSION=v2.5.0 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
-If you don't like AlmaLinux, you can use as a base image different distribution that is compatible with AlmaLinux 8, like [CentOS Stream](https://www.centos.org/centos-stream/) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
+If you don't like AlmaLinux, you can use as a base image different distribution that is compatible with AlmaLinux 9, like [CentOS Stream](https://www.centos.org/centos-stream/) or [Rocky Linux](https://hub.docker.com/r/rockylinux/rockylinux):
 
-    docker build --build-arg BASE_IMAGE=quay.io/centos/centos:stream8 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
+    docker build --build-arg BASE_IMAGE=quay.io/centos/centos:stream9 -t ghcr.io/nukib/misp https://github.com/NUKIB/misp.git#main
 
 ## Logging
 
