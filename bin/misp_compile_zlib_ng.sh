@@ -2,8 +2,8 @@
 # Copyright (C) 2024 National Cyber and Information Security Agency of the Czech Republic
 set -e
 
-# Enable GCC Toolset version 13
-source scl_source enable gcc-toolset-13
+# Enable GCC Toolset version 14
+source scl_source enable gcc-toolset-14
 
 set -o xtrace
 

@@ -5,8 +5,8 @@ FROM $BASE_IMAGE AS base
 # Some packages requires building, so use different stage for that
 FROM base AS builder
 COPY su-exec.c /tmp/
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc-toolset-13 make && \
-    source scl_source enable gcc-toolset-13 && \
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc-toolset-14 make && \
+    source scl_source enable gcc-toolset-14 && \
     gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c
 
 # Build PHP extensions that are not included in packages
