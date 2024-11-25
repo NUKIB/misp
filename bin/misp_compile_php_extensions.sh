@@ -37,7 +37,7 @@ mkdir /build/php-modules/
 # Compile simdjson
 mkdir /tmp/simdjson
 cd /tmp/simdjson
-download_and_check https://github.com/JakubOnderka/simdjson_php/archive/e3b7cf4cb61cc4aeba3ad262525df61c244e1de7.tar.gz b0a1000b69ee5d9ad6d0487dad7c3e74b97d30c7729c9dacd869d4c422cc9a36
+download_and_check https://github.com/JakubOnderka/simdjson_php/archive/defa31983378d93dab55bc2139725cf881426329.tar.gz 3fa2c7562bad50feab2228631059052fff2fefd3205b7c99c76d4952b0bd3c6b
 phpize
 CPPFLAGS="$DEFAULT_FLAGS" ./configure --silent
 make -j$NPROC
@@ -68,7 +68,7 @@ mv modules/*.so /build/php-modules/
 # Compile redis
 mkdir /tmp/redis
 cd /tmp/redis
-download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz 57135db32a0ccb1659f56c75feb26c10ea94fb3d2471edd047d94a9800f959b0
+download_and_check https://github.com/JakubOnderka/phpredis/archive/c61ef491b0f67455dfd6ce0c74ec70f6d399e9a1.tar.gz 664c9d725843aba11d6c4ede553bfd3f1d549e9dc0a7c4a9f3806c50ab69196b
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --enable-redis-igbinary
 #./configure --silent --enable-redis-igbinary
