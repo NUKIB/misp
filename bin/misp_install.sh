@@ -92,3 +92,6 @@ chmod 644 /customize/img_orgs/*
 
 # Create alias to cake console command
 echo 'alias cake="su-exec apache /var/www/MISP/app/Console/cake"' >> /root/.bashrc
+
+# Save build date to file
+date -Iseconds > /build-date
