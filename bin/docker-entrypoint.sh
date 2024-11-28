@@ -43,8 +43,10 @@ file_env 'ZEROMQ_PASSWORD'
 chown apache:apache /var/www/MISP/app/{attachments,tmp/logs,files/certs,files/img/orgs,files/img/custom}
 
 if [ "$1" = 'supervisord' ]; then
+    BUILD_DATE=$(cat /build-date)
     echo "======================================"
     echo "MISP $MISP_VERSION container image provided by National Cyber and Information Security Agency of the Czech Republic"
+    echo "Container image build at ${BUILD_DATE}"
     echo "In case of any problem with this image, please fill issue at https://github.com/NUKIB/misp/issues"
     echo "======================================"
 
