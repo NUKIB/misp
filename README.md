@@ -88,6 +88,8 @@ MISP requires MySQL or MariaDB database.
 * `MYSQL_LOGIN` (required, string) - database user
 * `MYSQL_PASSWORD` (optional, string)
 * `MYSQL_DATABASE` (required, string) - database name
+* `MYSQL_SETTINGS` (optional, string) - database settings, which should be set for each db connection (JSON dict, or semicolon separated key value pairs)
+* `MYSQL_FLAGS` (required, string) - PDO flags which should be set for each db connection (JSON dict, or semicolon separated key value pairs)
 
 ### Redis
 
