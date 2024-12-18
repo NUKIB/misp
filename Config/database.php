@@ -11,6 +11,20 @@ class DATABASE_CONFIG {
         'database' => '{{ MYSQL_DATABASE }}',
         'prefix' => '',
         'encoding' => 'utf8',
-        'settings' => ['time_zone' => '"+00:00"'],
+        'settings' => [
+            'time_zone' => '"+00:00"',
+    {% if MYSQL_SETTINGS -%}
+        {% for setting, value in MYSQL_SETTINGS.items() %}
+            '{{ setting }}' => '{{ value }}',
+        {% endfor %}
+    {%- endif %}
+        ],
+{% if MYSQL_FLAGS %}
+        'flags' => [
+    {% for flag, value in MYSQL_FLAGS.items() %}
+            '{{ flag }}' => '{{ value }}',
+    {% endfor %}
+        ]
+{% endif %}
     ];
 }
