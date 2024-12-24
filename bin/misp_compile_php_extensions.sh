@@ -37,7 +37,7 @@ mkdir /build/php-modules/
 # Compile simdjson
 mkdir /tmp/simdjson
 cd /tmp/simdjson
-download_and_check https://github.com/JakubOnderka/simdjson_php/archive/7c2497afffc1eb8002b21d6e2c7b672da90abce5.tar.gz 191004bd7b1a48fa58571bcccf3257277ef229c55a67ebfefebc5a30e6e80b1a
+download_and_check https://github.com/JakubOnderka/simdjson_php/archive/c3e65c99874d40c6e39b674ad036d153ed0bd85e.tar.gz f7603c1244ab03f53807aa7d96bcc326e57620a4efe71914cbf4619aca540fc7
 phpize
 CPPFLAGS="$DEFAULT_FLAGS" ./configure --silent
 make -j$NPROC
