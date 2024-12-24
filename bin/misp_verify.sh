@@ -3,6 +3,10 @@
 set -e
 set -o xtrace
 
+# Show python version
+python -V
+python3 -V
+
 # Check if PHP is properly configured
 php -v
 php-fpm --test
