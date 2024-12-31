@@ -1,5 +1,5 @@
 pymisp
-lief
+lief==0.15.1 # lief 0.16.1 is broken on arm64
 python-magic
 plyara
 pyzmq
