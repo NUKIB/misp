@@ -70,7 +70,7 @@ pip3.12 install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/pyt
 cd /var/www/MISP/app/
 # Remove unused packages
 su-exec apache php composer.phar --no-cache remove --update-no-dev iglocska/cake-resque
-su-exec apache php composer.phar --no-cache require --update-no-dev sentry/sdk jakub-onderka/openid-connect-php:1.1.0 aws/aws-sdk-php
+su-exec apache php composer.phar --no-cache require --update-no-dev sentry/sdk jakub-onderka/openid-connect-php:1.2.0 aws/aws-sdk-php
 
 # Create attachments folder and set correct owner
 mkdir /var/www/MISP/app/attachments
@@ -92,3 +92,6 @@ chmod 644 /customize/img_orgs/*
 
 # Create alias to cake console command
 echo 'alias cake="su-exec apache /var/www/MISP/app/Console/cake"' >> /root/.bashrc
+
+# Save build date to file
+date -Iseconds > /build-date
