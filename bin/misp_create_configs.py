@@ -100,8 +100,7 @@ def check_oidc_code_challenge(variable_name: str, value: str):
     if value not in valid_methods:
         raise ValueError(f"Environment variable '{variable_name}' value is not valid, must be one of {valid_methods}")
 
-
-def parse_oidc_roles(variable_name: str, value: str) -> dict:
+def dict_parser(variable_name: str, value: str, seperator: str = ',', key_value_delemiter: str = '=', variable_description: str = "") -> dict:
     value = value.strip()
     if len(value) == 0:
         return {}
@@ -110,20 +109,28 @@ def parse_oidc_roles(variable_name: str, value: str) -> dict:
         try:
             return json.loads(value)
         except Exception as e:
-            warning(f"OIDC roles mapping variable '{variable_name}' looks like JSON, but is not valid: {e}")
+            warning(f"{variable_description} '{variable_name}' looks like JSON, but is not valid: {e}")
 
     output = {}
-    for item in value.split(','):
+    for item in value.split(seperator):
         item = item.strip()
-        if "=" not in item:
-            raise ValueError(f"OIDC roles mapping variable '{variable_name}' contains invalid mapping '{item}', should contain '='")
+        if key_value_delemiter not in item:
+            raise ValueError(f"{variable_description}'{variable_name}' contains invalid mapping '{item}', should contain '{key_value_delemiter}'")
         parts = item.split("=")
         if len(parts) != 2:
-            raise ValueError(f"OIDC roles mapping variable '{variable_name}' contains invalid mapping '{item}', should contain just one '='")
+            raise ValueError(f"{variable_description} '{variable_name}' contains invalid mapping '{item}', should contain just one '{key_value_delemiter}'")
         if len(parts[0]) == 0 or len(parts[1]) == 0:
-            raise ValueError(f"OIDC roles mapping variable '{variable_name}' contains invalid mapping '{item}'")
+            raise ValueError(f"{variable_description} '{variable_name}' contains invalid mapping '{item}'")
         output[parts[0]] = parts[1]
     return output
+
+
+def parse_oidc_roles(variable_name: str, value: str) -> dict:
+    return dict_parser(variable_name, value, seperator=',', variable_description="OIDC roles mapping variable")
+
+
+def parse_mysql_settings(variable_name: str, value: str) -> dict:
+    return dict_parser(variable_name, value, seperator=';', variable_description="MYSQL variable")
 
 
 VARIABLES = {
@@ -133,6 +140,8 @@ VARIABLES = {
     "MYSQL_LOGIN": Option(required=True),
     "MYSQL_PASSWORD": Option(sensitive=True),
     "MYSQL_DATABASE": Option(required=True),
+    "MYSQL_SETTINGS": Option(required=False, parser=parse_mysql_settings),
+    "MYSQL_FLAGS": Option(required=False, parser=parse_mysql_settings),
     # Redis
     "REDIS_HOST": Option(required=True),
     "REDIS_PASSWORD": Option(sensitive=True),
