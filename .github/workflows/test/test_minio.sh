@@ -9,19 +9,19 @@
 # MinIO container is put on same bridge network as MISP
 # MinIO client (mc) and MISP REST API is used 
 
-MINIO_ACCESS_KEY=$1
-MINIO_SECRET_KEY=$2
+MINIO_ROOT_USER=$1
+MINIO_ROOT_PASSWORD=$2
 BUCKET_NAME=$3
 AUTHKEY=$4
 
-if [[ (-z MINIO_ACCESS_KEY) || (-z MINIO_SECRET_KEY) || (-z BUCKET_NAME) || (-z AUTHKEY) ]]; then
-    echo "Missing env vars: "  $MINIO_ACCESS_KEY "/" $MINIO_SECRET_KEY "/" $BUCKET_NAME "/" $AUTHKEY
+if [[ (-z MINIO_ROOT_USER) || (-z MINIO_ROOT_PASSWORD) || (-z BUCKET_NAME) || (-z AUTHKEY) ]]; then
+    echo "Missing env vars: "  $MINIO_ROOT_USER "/" $MINIO_ROOT_PASSWORD "/" $BUCKET_NAME "/" $AUTHKEY
 fi
 
 
 echo "Setup MinIO container"
 NETWORK=$(docker inspect misp --format="{{ .HostConfig.NetworkMode }}")
-docker run -d --expose 9000 --network $NETWORK -e MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY -e MINIO_SECRET_KEY=$MINIO_SECRET_KEY --quiet --name minio ghcr.io/cparta/minio-cicd:latest
+docker run -d --expose 9000 --network $NETWORK -e MINIO_ROOT_USER=$MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD --quiet --name minio ghcr.io/cparta/minio-cicd:latest
 
 echo "Ensure MinIO client exists"
 curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
@@ -29,7 +29,7 @@ curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x .
 echo "Create bucket"
 MINIO_IP=$(docker inspect minio --format="{{ .NetworkSettings.Networks.$NETWORK.IPAddress }}")
 echo "Minio IP" $MINIO_IP
-./mc alias set minio http://$MINIO_IP:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+./mc alias set minio http://$MINIO_IP:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
 ./mc mb minio/$BUCKET_NAME 
 
 echo "Create event"

@@ -17,8 +17,8 @@ env:
   # See https://github.com/goodwithtech/dockle/issues/188
   DOCKLE_HOST: "unix:///var/run/docker.sock"
   BUCKET_NAME: testbucket
-  MINIO_ACCESS_KEY: testuser 
-  MINIO_SECRET_KEY: i5Qkesr8fbV0Vezn0zojaIyKvnObUtNMXFu38wlT
+  MINIO_ROOT_USER: testuser 
+  MINIO_ROOT_PASSWORD: i5Qkesr8fbV0Vezn0zojaIyKvnObUtNMXFu38wlT
 
 jobs:
   build:
@@ -62,8 +62,8 @@ jobs:
       name: Test
       env:
         BUCKET_NAME: ${{ env.BUCKET_NAME }}
-        S3_ACCESS_KEY: ${{ env.MINIO_ACCESS_KEY }}
-        S3_SECRET_KEY: ${{ env.MINIO_SECRET_KEY }}    
+        S3_ACCESS_KEY: ${{ env.MINIO_ROOT_USER }}
+        S3_SECRET_KEY: ${{ env.MINIO_ROOT_PASSWORD }}    
       run: |
         cat .github/workflows/test/.test-env.sh >> ./.env_s3
         docker history ${{ env.TEST_TAG }}
