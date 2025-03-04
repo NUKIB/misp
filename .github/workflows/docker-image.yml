@@ -61,16 +61,18 @@ jobs:
     -
       name: Test
       env:
+        MISP_USER: admin@admin.test # default user
         BUCKET_NAME: ${{ env.BUCKET_NAME }}
         S3_ACCESS_KEY: ${{ env.MINIO_ROOT_USER }}
-        S3_SECRET_KEY: ${{ env.MINIO_ROOT_PASSWORD }}    
+        S3_SECRET_KEY: ${{ env.MINIO_ROOT_PASSWORD }}
       run: |
         cat .github/workflows/test/.test-env.sh >> ./.env_s3
         docker history ${{ env.TEST_TAG }}
         MISP_IMAGE=${{ env.TEST_TAG }} docker compose up --detach --quiet-pull
         sleep 15 # Wait until container is ready
         docker logs misp
-        AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake user init)
+        docker exec misp su-exec apache /var/www/MISP/app/Console/cake user init # Ensure default user init
+        AUTHKEY=$(docker exec misp su-exec apache /var/www/MISP/app/Console/cake user change_authkey $MISP_USER | sed -n -e 's/Authentication key changed to: //p')
         VERSION=$(curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion)
         echo $VERSION | jq
         .github/workflows/test/test_minio.sh $S3_ACCESS_KEY $S3_SECRET_KEY $BUCKET_NAME $AUTHKEY
