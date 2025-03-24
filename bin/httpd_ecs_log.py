@@ -172,7 +172,7 @@ def convert_access_log_to_ecs(log: dict, logger: EcsLogger) -> dict:
                 "id": log["request_id"],
                 "x_forwarded_for": log["http_x_forwarded_for"],  # custom field
                 "method": log["request_method"],
-                "referer": log["http_referer"],
+                "referrer": log["http_referer"],
             },
             "response": {
                 "status_code": log["status"],
