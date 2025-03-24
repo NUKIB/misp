@@ -23,7 +23,7 @@ fi
 
 mkdir /tmp/zlib-ng
 cd /tmp/zlib-ng
-download_and_check https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.3.tar.gz f2fb245c35082fe9ea7a22b332730f63cf1d42f04d84fe48294207d033cba4dd
+download_and_check https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.4.tar.gz a73343c3093e5cdc50d9377997c3815b878fd110bf6511c2c7759f2afb90f5a3
 CFLAGS="-flto=auto -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wl,-z,relro,-z,now ${MARCH}" ./configure --zlib-compat
 make -j$(nproc)
 strip libz.so.1.3.1.zlib-ng
