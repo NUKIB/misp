@@ -178,6 +178,7 @@ VARIABLES = {
     "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0, validation=check_uint),
     "OIDC_UPDATE_USER_ROLE": Option(typ=bool, default=True),
     "OIDC_TOKEN_SIGNED_ALGORITHM": Option(),
+    "OIDC_LOGOUT_URL": Option(validation=check_is_url),
     # Logging
     "ECS_LOG_ENABLED": Option(typ=bool, default=False),
     "ECS_LOG_CONSOLE": Option(typ=bool, default=True),
