@@ -22,7 +22,7 @@ Both machines can be any system that is supported by Docker, so Windows, macOS, 
 
 * Export all images to `misp.tar` file:
   
-  `docker save -o misp.tar mariadb:11.2 redis:7.2 ghcr.io/nukib/misp-modules:latest ghcr.io/nukib/misp:latest`
+  `docker save -o misp.tar mariadb:11.5 redis:7.4 ghcr.io/nukib/misp-modules:latest ghcr.io/nukib/misp:latest`
 
 * Transfer whole directory (`misp.tar` and `docker-compose.yml` files) to air gapped system
 
