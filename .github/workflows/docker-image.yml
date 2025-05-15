@@ -21,16 +21,88 @@ env:
   MINIO_ROOT_PASSWORD: i5Qkesr8fbV0Vezn0zojaIyKvnObUtNMXFu38wlT
 
 jobs:
-  build:
+  build_arm64:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Fetch variables
+        run: for v in $(python3 .github/workflows/docker-version.py ${{ github.event.inputs.misp_ref }}); do echo $v >> $GITHUB_ENV; done
+        id: variables
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-arm64-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-arm64-
+
+      - name: Build Docker for linux/arm64
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          tags: ${{ env.TEST_TAG }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          build-args: |
+            CACHEBUST=${{ env.MISP_COMMIT }}
+            MISP_VERSION=${{ env.MISP_VERSION }}
+
+      # Temp fix
+      # https://github.com/docker/build-push-action/issues/252
+      # https://github.com/moby/buildkit/issues/1896
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          du -sh /tmp/.buildx-cache
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: nukib
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push image
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: |
+            nukib/misp:latest
+            ghcr.io/nukib/misp:latest
+          build-args: |
+            CACHEBUST=${{ env.MISP_COMMIT }}
+            MISP_VERSION=${{ env.MISP_VERSION }}
+
+  build_amd64:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
     -
       name: Checkout
       uses: actions/checkout@v4
-    -
-      name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
     -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -43,9 +115,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        key: ${{ runner.os }}-buildx-amd64-${{ github.sha }}
         restore-keys: |
-          ${{ runner.os }}-buildx-
+          ${{ runner.os }}-buildx-amd64-
     -
       name: Build and export to Docker
       uses: docker/build-push-action@v5
@@ -53,8 +125,8 @@ jobs:
         context: .
         load: true
         tags: ${{ env.TEST_TAG }}
-        cache-from: type=local,src=/tmp/.buildx-cache/amd64
-        cache-to: type=local,dest=/tmp/.buildx-cache-new/amd64,mode=max
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
         build-args: |
           CACHEBUST=${{ env.MISP_COMMIT }}
           MISP_VERSION=${{ env.MISP_VERSION }}
@@ -81,18 +153,6 @@ jobs:
         curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://localhost:8080/servers/getVersion
         docker compose down
     -
-      name: Build Docker for linux/arm64
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        platforms: linux/arm64
-        tags: ${{ env.TEST_TAG }}
-        cache-from: type=local,src=/tmp/.buildx-cache/arm64
-        cache-to: type=local,dest=/tmp/.buildx-cache-new/arm64,mode=max
-        build-args: |
-          CACHEBUST=${{ env.MISP_COMMIT }}
-          MISP_VERSION=${{ env.MISP_VERSION }}
-    -
       # Temp fix
       # https://github.com/docker/build-push-action/issues/252
       # https://github.com/moby/buildkit/issues/1896
@@ -117,12 +177,12 @@ jobs:
         username: nukib
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     -
-      name: Build and push
+      name: Push
       if: github.event_name != 'pull_request'
       uses: docker/build-push-action@v5
       with:
         context: .
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         push: true
         tags: |
           nukib/misp:latest
