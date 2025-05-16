@@ -16,7 +16,7 @@ download_and_check () {
 }
 
 # Install required packages for build
-dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel brotli-devel diffutils file ssdeep-devel
+dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel brotli-devel diffutils file
 
 # Fix PHP for GCC 14
 sed -i "s/#if __has_feature(c_atomic)/#if __has_feature(c_atomic) \&\& defined(__clang__)/" /usr/include/php/Zend/zend_atomic.h
@@ -37,7 +37,7 @@ mkdir /build/php-modules/
 # Compile simdjson
 mkdir /tmp/simdjson
 cd /tmp/simdjson
-download_and_check https://github.com/JakubOnderka/simdjson_php/archive/292309a311edf94db2b5c538a4e677cb93be1c91.tar.gz 4d3e54a16ea96a2f6d04eeb6f9cdde96c144725dd033c0ed44add7b7e198c66b
+download_and_check https://github.com/JakubOnderka/simdjson_php/archive/2838544f7589c39bab9d63ff6db01ff5e82838eb.tar.gz 23563ce992cd6da53010092eb5a489f0b32138dfdf16ea9cfa1dd5edcadea152
 phpize
 CPPFLAGS="$DEFAULT_FLAGS" ./configure --silent
 make -j$NPROC
@@ -71,16 +71,18 @@ cd /tmp/redis
 download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.2.0.tar.gz 470333b27cbf9485d36b610b81300c06491a6575f22c6801a9cefc55285ed123
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --enable-redis-igbinary
-#./configure --silent --enable-redis-igbinary
 make -j$NPROC
 mv modules/*.so /build/php-modules/
 
 # Compile ssdeep
 mkdir /tmp/ssdeep
 cd /tmp/ssdeep
-download_and_check https://github.com/JakubOnderka/pecl-text-ssdeep/archive/3a2e2d9e5d58fe55003aa8b1f31009c7ad7f54e0.tar.gz 275bb3d6ed93b5897c9b37dac358509c3696239f521453d175ac582c81e23cbb
+download_and_check https://github.com/JakubOnderka/pecl-text-ssdeep/archive/aa7ea7045a294548aedc3ccdfbb3936e1716bebd.tar.gz 1b4bc4985bf04fdd6026c5f76f7e4d75be100409235c54eb41aa031a18561299
+cd ssdeep
+download_and_check https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz ff2eabc78106f009b4fb2def2d76fb0ca9e12acf624cbbfad9b3eb390d931313
+cd ..
 phpize
-CFLAGS="$DEFAULT_FLAGS" ./configure --silent --with-ssdeep=/usr --with-libdir=lib64
+CFLAGS="$DEFAULT_FLAGS" ./configure --silent --enable-libfuzzy=no --with-libdir=lib64
 make -j$NPROC
 mv modules/*.so /build/php-modules/
 
