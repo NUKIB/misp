@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.12
-# This script converts Apache logs from custom defined format to JSON
+# This script converts Apache logs from custom-defined format to JSON
 # Generating JSON directly by setting ErrorLogFormat is problematic because of JSON escaping
 import re
 import sys
@@ -13,7 +13,7 @@ try:
     import orjson as json
 
     def jsonl_serialize(value) -> bytes:
-        # orjson is faster alternative of standard json library that supports serializing datetime.datetime by default
+        # orjson is a faster alternative of a standard JSON library that supports serializing datetime.datetime by default
         return json.dumps(value, option=json.OPT_UTC_Z | json.OPT_APPEND_NEWLINE)
 
 except ModuleNotFoundError:
@@ -319,7 +319,7 @@ def parse_error_log(line: str) -> dict:
             output["error"]["code"] = error_code
 
         if client:
-            ip, port = client.split(":")
+            ip, port = client.rsplit(":", 1)
             output["client"] = {
                 "ip": ip,
                 "port": int(port),
