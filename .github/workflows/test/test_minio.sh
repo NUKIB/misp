@@ -13,6 +13,7 @@ MINIO_ROOT_USER=$1
 MINIO_ROOT_PASSWORD=$2
 BUCKET_NAME=$3
 AUTHKEY=$4
+if [ `arch` == "x86_64" ]; then MINIO_ARCH=amd64; else MINIO_ARCH=arm64; fi
 
 if [[ (-z MINIO_ROOT_USER) || (-z MINIO_ROOT_PASSWORD) || (-z BUCKET_NAME) || (-z AUTHKEY) ]]; then
     echo "Missing env vars: "  $MINIO_ROOT_USER "/" $MINIO_ROOT_PASSWORD "/" $BUCKET_NAME "/" $AUTHKEY
@@ -24,7 +25,7 @@ NETWORK=$(docker inspect misp --format="{{ .HostConfig.NetworkMode }}")
 docker run -d --expose 9000 --network $NETWORK -e MINIO_ROOT_USER=$MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD --quiet --name minio quay.io/minio/minio:latest server /data
 
 echo "Ensure MinIO client exists"
-curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
+curl -o ./mc -# https://dl.min.io/client/mc/release/linux-${MINIO_ARCH}/mc && chmod +x ./mc
 
 echo "Create bucket"
 MINIO_IP=$(docker inspect minio --format="{{ .NetworkSettings.Networks.$NETWORK.IPAddress }}")
