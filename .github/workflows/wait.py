@@ -3,6 +3,7 @@ import sys
 import time
 import argparse
 import urllib.request
+from http.client import HTTPResponse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("url")
@@ -11,8 +12,11 @@ args = parser.parse_args()
 max_tries = 20
 while True:
     try:
-        urllib.request.urlopen(args.url)
-        break
+        resp: HTTPResponse = urllib.request.urlopen(args.url, timeout=1)
+        if 200 <= resp.getcode() < 300:
+            break
+        else:
+            raise Exception("Invalid response code {}".format(resp.getcode()))
     except Exception as e:
         max_tries -= 1
         if max_tries == 0:

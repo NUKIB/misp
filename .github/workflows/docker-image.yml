@@ -84,7 +84,7 @@ jobs:
           echo $VERSION | jq
           .github/workflows/test/test_minio.sh $S3_ACCESS_KEY $S3_SECRET_KEY $BUCKET_NAME $AUTHKEY
           docker restart misp # Also test restart
-          sleep 10 # Wait until container is ready
+          python3 .github/workflows/wait.py http://127.0.0.1:8080 # Wait until MISP container is ready
           curl --fail -v -H "Authorization: $AUTHKEY" -H "Accept: application/json" http://127.0.0.1:8080/servers/getVersion
           docker compose down
 
