@@ -13,7 +13,7 @@ on:
         default: 'develop'
 
 env:
-  TEST_TAG: misp:latest
+  REGISTRY_IMAGE: ghcr.io/nukib/misp
   BUCKET_NAME: testbucket
   MINIO_ROOT_USER: testuser 
   MINIO_ROOT_PASSWORD: i5Qkesr8fbV0Vezn0zojaIyKvnObUtNMXFu38wlT
@@ -45,19 +45,23 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-buildx-
 
       - name: Build Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           load: true
-          tags: ${{ env.TEST_TAG }}
+          tags: |
+            ${{ env.REGISTRY_IMAGE }}
+            nukib/misp
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           build-args: |
             CACHEBUST=${{ env.MISP_COMMIT }}
             MISP_VERSION=${{ env.MISP_VERSION }}
 
-      - name: Image history
-        run: docker history ${{ env.TEST_TAG }}
+      - name: Image history and inspect
+        run: |
+          docker inspect ${{ env.REGISTRY_IMAGE }}
+          docker history ${{ env.REGISTRY_IMAGE }}
 
       - name: Start contains for testing
         env:
@@ -66,7 +70,7 @@ jobs:
           S3_SECRET_KEY: ${{ env.MINIO_ROOT_PASSWORD }}
         run: |
           cp .github/workflows/test/.test-env.sh ./.env_s3
-          MISP_IMAGE=${{ env.TEST_TAG }} docker compose up --detach --quiet-pull
+          MISP_IMAGE=${{ env.REGISTRY_IMAGE }} docker compose up --detach --quiet-pull
           python3 .github/workflows/wait.py http://127.0.0.1:8080 # Wait until MISP container is ready
           docker ps -a
           docker logs misp
@@ -112,15 +116,62 @@ jobs:
           username: nukib
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push image
+      - name: Push by digest
         if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v5
+        id: build
+        uses: docker/build-push-action@v6
         with:
-          context: .
-          push: true
           tags: |
-            nukib/misp:latest
-            ghcr.io/nukib/misp:latest
-          build-args: |
-            CACHEBUST=${{ env.MISP_COMMIT }}
-            MISP_VERSION=${{ env.MISP_VERSION }}
+            ${{ env.REGISTRY_IMAGE }}
+            nukib/misp
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        if: github.event_name != 'pull_request'
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ runner.arch == 'X64' && 'amd64' || 'arm64' }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  push:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: nukib
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create --tag ${{ env.REGISTRY_IMAGE }}:latest $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
+          docker buildx imagetools create --tag nukib/misp:latest $(printf 'nukib/misp@sha256:%s ' *)
