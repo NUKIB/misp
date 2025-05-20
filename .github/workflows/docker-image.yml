@@ -72,6 +72,10 @@ jobs:
           cp .github/workflows/test/.test-env.sh ./.env_s3
           MISP_IMAGE=${{ env.REGISTRY_IMAGE }} docker compose up --detach --quiet-pull
           python3 .github/workflows/wait.py http://127.0.0.1:8080 # Wait until MISP container is ready
+
+      - name: Show MISP container logs
+        if: always()
+        run: |
           docker ps -a
           docker logs misp
 
