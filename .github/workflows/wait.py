@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("url")
 args = parser.parse_args()
 
-max_tries = 20
+max_tries = 30
 while True:
     try:
         resp: HTTPResponse = urllib.request.urlopen(args.url, timeout=1)
