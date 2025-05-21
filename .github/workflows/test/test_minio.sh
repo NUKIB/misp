@@ -1,4 +1,4 @@
-#/bin/bash -e
+#/bin/bash
 
 # Script for testing MinIO connection:
 # - Spins up a MinIO container and creates a bucket
@@ -8,6 +8,8 @@
 
 # MinIO container is put on same bridge network as MISP
 # MinIO client (mc) and MISP REST API is used 
+
+set -e
 
 MINIO_ROOT_USER=$1
 MINIO_ROOT_PASSWORD=$2
@@ -29,6 +31,7 @@ curl -o ./mc -# https://dl.min.io/client/mc/release/linux-${MINIO_ARCH}/mc && ch
 
 echo "Create bucket"
 MINIO_IP=$(docker inspect minio --format="{{ .NetworkSettings.Networks.$NETWORK.IPAddress }}")
+python3 .github/workflows/wait.py --ignore-http-error http://$MINIO_IP:9000
 echo "Minio IP" $MINIO_IP
 ./mc alias set minio http://$MINIO_IP:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
 ./mc mb minio/$BUCKET_NAME 
