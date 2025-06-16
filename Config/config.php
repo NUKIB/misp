@@ -58,7 +58,11 @@ $oidcAuth = [
     'check_user_validity' => {{ OIDC_CHECK_USER_VALIDITY }},
     'update_user_role' => {{ OIDC_UPDATE_USER_ROLE | bool}},
 ];
+{% if OIDC_LOGOUT_URL %}
+$plugin['CustomAuth_custom_logout'] = "{{ OIDC_LOGOUT_URL }}?client_id={{ OIDC_CLIENT_ID_INNER }}&redirect_uri={{ MISP_BASEURL | urlencode }}";
+{% else %}
 $plugin['CustomAuth_custom_logout'] = "{{ MISP_BASEURL }}/oauth2callback?logout={{ MISP_BASEURL | urlencode }}";
+{% endif %}
 $plugin['CustomAuth_custom_password_reset'] = {{ OIDC_PASSWORD_RESET | str }};
 {% else %}
 $oidcAuth = NULL;
