@@ -187,7 +187,7 @@ For pulling events from another MISP or fetching feeds MISP requires access to I
 
 Automation tasks are run by [jobber](https://github.com/dshearer/jobber) application, which is managed by `supervisor`. Check [`.jobber`](.jobber) file for tasks definition.
 
-You can change default configuration by modifying these environment variables:
+You can change the default configuration by modifying these environment variables:
 
 * `JOBBER_USER_ID` (optional, int, default `1`) - MISP user ID which is used in scheduled tasks by Jobber (1 is the user ID of the initial created admin@admin.test user)
 * `JOBBER_CACHE_FEEDS_TIME` (optional, string, default `0 R0-10 6,8,10,12,14,16,18`) - [Jobber time string][jobber-time-string] for cache feeds task scheduling
@@ -195,12 +195,12 @@ You can change default configuration by modifying these environment variables:
 * `JOBBER_PULL_SERVERS_TIME` (optional, string, default `0 R0-10 6,10,15`) - [Jobber time string][jobber-time-string] for pull servers task scheduling
 * `JOBBER_PUSH_SERVERS_TIME` (optional, string) - [Jobber time string][jobber-time-string] for pushing to servers task scheduling
 * `JOBBER_CACHE_SERVERS_TIME` (optional, string, default `0 R0-10 6,10,15`) - [Jobber time string][jobber-time-string] for cache servers task scheduling
-* `JOBBER_SCAN_ATTACHMENT_TIME` (optional, string, default `0 R0-10 6`) - [Jobber time string][jobber-time-string] for scan attachment task scheduling
+* `JOBBER_SCAN_ATTACHMENT_TIME` (optional, string, default `0 R0-10 3`) - [Jobber time string][jobber-time-string] for scan attachment task scheduling
 * `JOBBER_LOG_ROTATE_TIME` (optional, string, default `0 0 5`) - [Jobber time string][jobber-time-string] for log rotate task scheduling
 * `JOBBER_USER_CHECK_VALIDITY_TIME` (optional, string, default `0 0 5`) - [Jobber time string][jobber-time-string] for updating user role and org or blocking invalid users (makes sense only if `OIDC_OFFLINE_ACCESS` and `OIDC_CHECK_USER_VALIDITY` is set)
-* `JOBBER_SEND_PERIODIC_SUMMARY` (optional, string, default `0 0 6 * * 1-5`) - [Jobber time string][jobber-time-string]for sending periodic summary for users (must be just once per day)
+* `JOBBER_SEND_PERIODIC_SUMMARY` (optional, string, default `0 0 6 * * 1-5`) - [Jobber time string][jobber-time-string] for sending periodic summary for users (must be just once per day)
 
-If provided time string is empty, job will be disabled.
+If provided time string is empty, the job will be disabled.
 
 [jobber-time-string]: https://dshearer.github.io/jobber/doc/v1.4/#time-strings
 
