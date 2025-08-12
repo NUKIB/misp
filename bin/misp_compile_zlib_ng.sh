@@ -16,7 +16,7 @@ download_and_check () {
 
 ARCH=$(uname -i)
 if [ "$ARCH" == 'x86_64' ]; then
-  MARCH="-march=x86-64-v2";
+  MARCH="-march=$DEFAULT_X86_64_MARCH";
 else
   MARCH="";
 fi

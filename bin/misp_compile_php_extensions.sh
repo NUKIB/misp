@@ -25,7 +25,7 @@ sed -i "s/#if __has_feature(c_atomic)/#if __has_feature(c_atomic) \&\& defined(_
 NPROC=$(nproc)
 ARCH=$(uname -i)
 if [ "$ARCH" == 'x86_64' ]; then
-  MARCH="-march=x86-64-v2";
+  MARCH="-march=$DEFAULT_X86_64_MARCH";
 else
   MARCH="";
 fi

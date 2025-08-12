@@ -3,6 +3,8 @@ ARG BASE_IMAGE=almalinux:9
 FROM $BASE_IMAGE AS base
 ARG PHP_VERSION=8.3
 ENV PHP_VERSION=$PHP_VERSION
+ARG DEFAULT_X86_64_MARCH=x86-64-v2
+ENV DEFAULT_X86_64_MARCH=$DEFAULT_X86_64_MARCH
 
 # Some packages requires building, so use different stage for that
 FROM base AS builder
