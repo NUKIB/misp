@@ -144,6 +144,7 @@ VARIABLES = {
     "MYSQL_FLAGS": Option(required=False, parser=parse_mysql_settings),
     # Redis
     "REDIS_HOST": Option(required=True),
+    "REDIS_PORT": Option(typ=int, default=6379, validation=check_uint),
     "REDIS_PASSWORD": Option(sensitive=True),
     "REDIS_USE_TLS": Option(typ=bool, default=False),
     # Proxy
@@ -382,13 +383,12 @@ def generate_jit_config(enabled: bool):
 
     write_file("/etc/php.d/10-opcache-jit.ini", config)
 
-
-def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_use_tls: Optional[bool] = False, redis_password: Optional[str] = None):
+def generate_sessions_in_redis_config(enabled: bool, redis_host: str, redis_port: int, redis_use_tls: Optional[bool] = False, redis_password: Optional[str] = None):
     if not enabled:
         return
 
     scheme = "tls" if redis_use_tls else "tcp"
-    redis_path = f"{scheme}://{redis_host}:6379?database=12"
+    redis_path = f"{scheme}://{redis_host}:{redis_port}?database=12"
     if redis_password:
         redis_password = quote_plus(redis_password)
         redis_path = f"{redis_path}&auth={redis_password}"
@@ -604,7 +604,7 @@ def create():
     generate_xdebug_config(variables["PHP_XDEBUG_ENABLED"], variables["PHP_XDEBUG_PROFILER_TRIGGER"])
     generate_snuffleupagus_config(variables['PHP_SNUFFLEUPAGUS'])
     generate_jit_config(not variables['PHP_SNUFFLEUPAGUS']) # PHP JIT is not supported when snuffleupagus is enabled
-    generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_USE_TLS"], variables["REDIS_PASSWORD"])
+    generate_sessions_in_redis_config(variables["PHP_SESSIONS_IN_REDIS"], variables["REDIS_HOST"], variables["REDIS_PORT"], variables["REDIS_USE_TLS"], variables["REDIS_PASSWORD"])
     generate_apache_config(variables)
     generate_rsyslog_config(variables)
     generate_vector_config(variables)
