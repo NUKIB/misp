@@ -1,9 +1,6 @@
 # Rules tailored for MISP
 # Copyright (C) 2022 National Cyber and Information Security Agency of the Czech Republic
 
-# Disable old PHP version warning
-sp.global.show_old_php_warning.disable();
-
 # Prevent the execution of writeable PHP files.
 sp.readonly_exec.no_extended_checks().enable();
 
