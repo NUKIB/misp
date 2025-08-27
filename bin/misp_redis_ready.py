@@ -23,8 +23,6 @@ def convert_bool(value: str) -> bool:
     error(f"Environment variable 'REDIS_USE_TLS' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{value}` given")
 
 
-
-
 def connect(host: str, port: int, password: Optional[str] = None, use_tls: bool = False) -> redis.Redis:
     r = redis.Redis(host=host, port=port, password=password, ssl=use_tls)
     r.ping()
