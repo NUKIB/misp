@@ -268,6 +268,7 @@ VARIABLES = {
     "CACHE_WORKERS": Option(typ=int, default=1, validation=check_uint),
     "PRIO_WORKERS": Option(typ=int, default=3, validation=check_uint),
     "UPDATE_WORKERS": Option(typ=int, default=1, validation=check_uint),
+    "SCHEDULER_WORKERS": Option(typ=int, default=1, validation=check_uint),
 }
 
 CONFIG_CREATED_CANARY_FILE = "/.misp-configs-created"
