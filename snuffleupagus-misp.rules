@@ -33,7 +33,12 @@ sp.disable_function.function("curl_setopt").param("value").value_r("file://").dr
 sp.disable_function.function("curl_init").param("url").value_r("file://").drop().alias("file:// protocol is disabled");
 
 # Command executions
-sp.disable_function.function("proc_open").param("command").value_r("[$|;&`\\n\\(\\)\\\\]").drop();
+# Drop all command parameter value not matching allowlist (avoid shell expansion)
+sp.disable_function.function("proc_open").param("command").value_r("[^a-zA-Z0-9_./-]").drop();
+# Also drop all STRING parameters containing shell expansion chars
+# MISP can send command parameters as an Array, thus containing '[' and ']', forcing us to only match strings
+# The rule above -should- hit before this one. 
+sp.disable_function.function("proc_open").param("command").param_type("STRING").value_r("[$|;&`\\n\\(\\)\\\\]").drop();
 sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Lib/Tools/ProcessTool.php").allow();
 sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Lib/Tools/BackgroundJobs/BackgroundJob.php").allow();
 sp.disable_function.function("proc_open").filename("/var/www/MISP/app/Vendor/pear/crypt_gpg/Crypt/GPG/Engine.php").allow();
