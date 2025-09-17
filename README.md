@@ -213,6 +213,7 @@ Supervisor is used to run all processes within the container, you can adjust the
 * `CACHE_WORKERS` (optional, int, default `1`) - number of cache workers to start
 * `PRIO_WORKERS` (optional, int, default `3`) - number of prio workers to start
 * `UPDATE_WORKERS` (optional, int, default `1`) - number of update workers to start
+* `SCHEDULER_WORKERS` (optional, int, default `1`) - number of task scheduler workers to start
 
 If one of the variables is set to `0`, no workers will be started.
 
