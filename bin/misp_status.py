@@ -111,8 +111,8 @@ def check_zeromq():
 
 
 def check_redis():
-    host, password, use_tls = misp_redis_ready.get_connection_info()
-    misp_redis_ready.connect(host, password, use_tls)
+    host, port, password, use_tls = misp_redis_ready.get_connection_info()
+    misp_redis_ready.connect(host, port, password, use_tls)
 
 
 def main() -> dict:

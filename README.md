@@ -96,6 +96,7 @@ MISP requires MySQL or MariaDB database.
 By default, MISP requires Redis. MISP will connect to Redis defined in `REDIS_HOST` variable on port `6379`. Redis alternative [Dragonfly](https://www.dragonflydb.io) is also supported.
 
 * `REDIS_HOST` (required, string) - hostname or IP address
+* `REDIS_PORT` (optional, int, default `6379`) - port used when connecting to redis
 * `REDIS_PASSWORD` (optional, string) - password used to connect password-protected Redis instance
 * `REDIS_USE_TLS` (optional, bool) - enable encrypted communication
 

@@ -23,23 +23,23 @@ def convert_bool(value: str) -> bool:
     error(f"Environment variable 'REDIS_USE_TLS' must be boolean (`true`, `1`, `yes`, `false`, `0` or `no`), `{value}` given")
 
 
-def connect(host: str, password: Optional[str] = None, use_tls: bool = False) -> redis.Redis:
-    r = redis.Redis(host=host, port=6379, password=password, ssl=use_tls)
+def connect(host: str, port: int, password: Optional[str] = None, use_tls: bool = False) -> redis.Redis:
+    r = redis.Redis(host=host, port=port, password=password, ssl=use_tls)
     r.ping()
     return r
 
 
-def wait_for_connection(host: str, password: Optional[str] = None, use_tls: bool = False) -> redis.Redis:
-    logging.info(f"Connecting to Redis server {host}")
+def wait_for_connection(host: str, port: int, password: Optional[str] = None, use_tls: bool = False) -> redis.Redis:
+    logging.info(f"Connecting to Redis server {host}:{port}")
     last_exception = None
     for i in range(1, 10):
         try:
-            return connect(host, password, use_tls)
+            return connect(host, port, password, use_tls)
         except Exception as e:
             last_exception = e
             logging.info("Waiting for Redis connection...")
             time.sleep(1)
-    logging.error(f"Could not connect to Redis server {host}")
+    logging.error(f"Could not connect to Redis server {host}:{port}")
     print(last_exception, file=sys.stderr)
     sys.exit(1)
 
@@ -73,6 +73,10 @@ def get_connection_info() -> Tuple[str, Optional[str], bool]:
     host = os.environ.get("REDIS_HOST")
     if host is None:
         error("Environment variable 'REDIS_HOST' not set.")
+        
+    port = os.environ.get("REDIS_PORT")
+    if port is None:
+        port = 6379
 
     password = os.environ.get("REDIS_PASSWORD")
 
@@ -85,8 +89,8 @@ def get_connection_info() -> Tuple[str, Optional[str], bool]:
 def main():
     logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
 
-    host, password, use_tls = get_connection_info()
-    redis = wait_for_connection(host, password, use_tls)
+    host, port, password, use_tls = get_connection_info()
+    redis = wait_for_connection(host, port, password, use_tls)
 
     info = redis.info("server")
     logging.info(f"Connected to Redis {info['redis_version']}")

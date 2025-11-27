@@ -11,7 +11,7 @@ $plugin['ZeroMQ_username'] = '{{ ZEROMQ_USERNAME }}';
 $plugin['ZeroMQ_password'] = {{ ZEROMQ_PASSWORD | str }};
 {% endif %}
 $plugin['ZeroMQ_redis_host'] = '{{ "tls://" if REDIS_USE_TLS else "" }}{{ REDIS_HOST }}';
-$plugin['ZeroMQ_redis_port'] = 6379;
+$plugin['ZeroMQ_redis_port'] = {{ REDIS_PORT | default('6379') | int }};
 $plugin['ZeroMQ_redis_password'] = {{ REDIS_PASSWORD | str }};
 $plugin['ZeroMQ_redis_database'] = 10;
 {% endif %}
@@ -95,7 +95,7 @@ $config = [
     'uuid' => '{{ MISP_UUID }}',
     'host_org_id' => {{ MISP_HOST_ORG_ID }},
     'redis_host' => '{{ "tls://" if REDIS_USE_TLS else "" }}{{ REDIS_HOST }}',
-    'redis_port' => 6379,
+    'redis_port' => {{ REDIS_PORT | default('6379') | int }},
     'redis_database' => 13,
     'redis_password' => {{ REDIS_PASSWORD | str }},
     'log_client_ip' => true,
@@ -129,7 +129,7 @@ $config = [
   'SimpleBackgroundJobs' => [
     'enabled' => true,
     'redis_host' => '{{ "tls://" if REDIS_USE_TLS else "" }}{{ REDIS_HOST }}',
-    'redis_port' => 6379,
+    'redis_port' => {{ REDIS_PORT | default('6379') | int }},
     'redis_password' => {{ REDIS_PASSWORD | str }},
     'redis_database' => 11,
     'redis_namespace' => 'background_jobs',
