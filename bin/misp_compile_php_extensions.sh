@@ -3,8 +3,8 @@
 # Unfortunately, PHP packages from CentOS repos missing some required extensions, so we have to build them
 set -e
 
-# Enable GCC Toolset version 14
-source scl_source enable gcc-toolset-14
+# Enable GCC Toolset version 15
+source scl_source enable gcc-toolset-15
 
 set -o xtrace
 
@@ -17,9 +17,6 @@ download_and_check () {
 
 # Install required packages for build
 dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False php-devel brotli-devel diffutils file ssdeep-devel
-
-# Fix PHP for GCC 14
-sed -i "s/#if __has_feature(c_atomic)/#if __has_feature(c_atomic) \&\& defined(__clang__)/" /usr/include/php/Zend/zend_atomic.h
 
 # Build modules with march optimised for x86-64-v2
 NPROC=$(nproc)
