@@ -100,7 +100,8 @@ def check_oidc_code_challenge(variable_name: str, value: str):
     if value not in valid_methods:
         raise ValueError(f"Environment variable '{variable_name}' value is not valid, must be one of {valid_methods}")
 
-def dict_parser(variable_name: str, value: str, seperator: str = ',', key_value_delemiter: str = '=', variable_description: str = "") -> dict:
+
+def dict_parser(variable_name: str, value: str, seperator: str = ',', key_value_delimiter: str = '=', variable_description: str = "") -> dict:
     value = value.strip()
     if len(value) == 0:
         return {}
@@ -114,11 +115,11 @@ def dict_parser(variable_name: str, value: str, seperator: str = ',', key_value_
     output = {}
     for item in value.split(seperator):
         item = item.strip()
-        if key_value_delemiter not in item:
-            raise ValueError(f"{variable_description}'{variable_name}' contains invalid mapping '{item}', should contain '{key_value_delemiter}'")
+        if key_value_delimiter not in item:
+            raise ValueError(f"{variable_description}'{variable_name}' contains invalid mapping '{item}', should contain '{key_value_delimiter}'")
         parts = item.split("=")
         if len(parts) != 2:
-            raise ValueError(f"{variable_description} '{variable_name}' contains invalid mapping '{item}', should contain just one '{key_value_delemiter}'")
+            raise ValueError(f"{variable_description} '{variable_name}' contains invalid mapping '{item}', should contain just one '{key_value_delimiter}'")
         if len(parts[0]) == 0 or len(parts[1]) == 0:
             raise ValueError(f"{variable_description} '{variable_name}' contains invalid mapping '{item}'")
         output[parts[0]] = parts[1]
@@ -127,6 +128,15 @@ def dict_parser(variable_name: str, value: str, seperator: str = ',', key_value_
 
 def parse_oidc_roles(variable_name: str, value: str) -> dict:
     return dict_parser(variable_name, value, seperator=',', variable_description="OIDC roles mapping variable")
+
+
+def parse_x_forwarded_headers(variable_name: str, value: str) -> list:
+    valid_values = ("X-Forwarded-Host", "X-Forwarded-Port", "X-Forwarded-Proto", "Forwarded")
+    headers = value.split(" ")
+    for header in headers:
+        if header not in valid_values:
+            raise ValueError(f"'{variable_name}' contains invalid value '{header}'")
+    return headers
 
 
 def parse_mysql_settings(variable_name: str, value: str) -> dict:
@@ -179,6 +189,7 @@ VARIABLES = {
     "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0, validation=check_uint),
     "OIDC_UPDATE_USER_ROLE": Option(typ=bool, default=True),
     "OIDC_TOKEN_SIGNED_ALGORITHM": Option(),
+    "OIDC_X_FORWARDED_HEADERS": Option(typ=str, parser=parse_x_forwarded_headers),
     # Logging
     "ECS_LOG_ENABLED": Option(typ=bool, default=False),
     "ECS_LOG_CONSOLE": Option(typ=bool, default=True),
