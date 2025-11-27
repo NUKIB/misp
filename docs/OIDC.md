@@ -24,6 +24,7 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 * `OIDC_CHECK_USER_VALIDITY` (optional, int, default `0`) - number of seconds, after which user will be revalidated if he is still active in IdP. Zero means that this functionality is disabled. Recommended value is `300`.
 * `OIDC_UPDATE_USER_ROLE` (optional, bool, default `true`) - if disabled, manually modified role in MISP admin interface will be not changed from roles defined in OIDC
 * `OIDC_TOKEN_SIGNED_ALGORITHM` (optional, string) - can be any of `RS256|RS384|RS512|PS256|PS384|PS512|HS256|HS384|HS512|ES256|ES384|ES512`, the algorithms supported by `mod_auth_openidc` (the Apache OIDC-module), leaving empty will make `mod_auth_openidc` default to `RS256` 
+* `OIDC_X_FORWARDED_HEADERS` (optional, string) - define the X-Forwarded-* or Forwarded space separated headers that will be considered as set by a reverse proxy in front of mod_auth_openidc. Must be one or more of: X-Forwarded-Host, X-Forwarded-Port, X-Forwarded-Proto or Forwarded
 
 ### Inner
 
