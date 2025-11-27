@@ -65,6 +65,13 @@ The format is `<IdP ROLE NAME>=<MISP ROLE ID OR NAME>` or also JSON string can b
 You can provide OIDC claim `organization` to a user, which can contain organisation name or UUID. If this claim exists,
 MISP will assign a user to that organisation.
 
+## Reverse proxy
+
+When using a reverse proxy you will need to set the X-Forwarded-* headers in the reverse proxy. 
+Apache is configured to look in the following headers: `X-Forwarded-Host X-Forwarded-Proto X-Forwarded-Port`
+
+If the reverse proxy terminates TLS the OIDC login will not work without `X-Forwarded-Proto` set. This is due to that Apache listens on plain HTTP.
+
 ## Caveats
 
 ### User blocking
