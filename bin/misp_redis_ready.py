@@ -69,21 +69,18 @@ def wait_for_load(connection: redis.Redis):
         logging.warning("Redis is still loading data to memory, waiting skipped")
 
 
-def get_connection_info() -> Tuple[str, Optional[str], bool]:
+def get_connection_info() -> Tuple[str, int, Optional[str], bool]:
     host = os.environ.get("REDIS_HOST")
     if host is None:
         error("Environment variable 'REDIS_HOST' not set.")
         
-    port = os.environ.get("REDIS_PORT")
-    if port is None:
-        port = 6379
-
+    port = int(os.environ.get("REDIS_PORT", 6379))
     password = os.environ.get("REDIS_PASSWORD")
 
     use_tls = os.environ.get("REDIS_USE_TLS")
     use_tls = convert_bool(use_tls) if use_tls else False
 
-    return host, password, use_tls
+    return host, port, password, use_tls
 
 
 def main():
