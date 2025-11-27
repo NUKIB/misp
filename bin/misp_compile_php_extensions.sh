@@ -68,7 +68,7 @@ mv modules/*.so /build/php-modules/
 # Compile redis
 mkdir /tmp/redis
 cd /tmp/redis
-download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.2.0.tar.gz 470333b27cbf9485d36b610b81300c06491a6575f22c6801a9cefc55285ed123
+download_and_check https://github.com/phpredis/phpredis/archive/refs/tags/6.3.0.tar.gz cb8f81df1a275599e4f8ddcfec7e1f65ed1953e6f5673649149fd680ebff4cad
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --enable-redis-igbinary
 #./configure --silent --enable-redis-igbinary
