@@ -90,6 +90,15 @@ MISP requires MySQL or MariaDB database.
 * `MYSQL_DATABASE` (required, string) - database name
 * `MYSQL_SETTINGS` (optional, string) - database settings, which should be set for each db connection (JSON dict, or semicolon separated key value pairs)
 * `MYSQL_FLAGS` (required, string) - PDO flags which should be set for each db connection (JSON dict, or semicolon separated key value pairs)
+* `MYSQL_TLS_CA_PATH` (optional, string) - Path to Certificate authority that is used to validate TLS connections with the database (See below)
+* `MYSQL_TLS_CERT` (optional, string) - Path to Certificate that is used to identify mTLS connections with the database (See below)
+* `MYSQL_TLS_KEY` (optional, string) - Path to Key that is used to identify mTLS connections with the database (See below)
+
+#### TLS with MySQL
+
+In order to use TLS when communicating with MySQL you need to have a path to a CA in `MYSQL_TLS_CA_PATH`. You also need to have corresponding PDO flags set: `MYSQL_FLAGS: "PDO::ATTR_STRINGIFY_FETCHES=true;PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT=true;PDO::MYSQL_ATTR_SSL_CA='/path/to/ca.crt'"` (Note: You may need to escape the single quotes depending on how you implement the container).
+
+To use mTLS you also need to add the cert and keys and the PDO flags (`PDO::MYSQL_ATTR_SSL_CERT` and `PDO::MYSQL_ATTR_SSL_KEY`) as well as configure your MySQL settings to ensure TLS is used.
 
 ### Redis
 
@@ -208,7 +217,8 @@ If provided time string is empty, the job will be disabled.
 ### Supervisor
 
 Supervisor is used to run all processes within the container, you can adjust the amount of workers that should be started by modifying these variables:
-
+* `SUPERVISOR_USERNAME` (required, string, default `supervisor`) - Username for the supervisor user
+* `SUPERVISOR_PASSWORD` (required, string, default `changeme`) - Password for the supervisor user
 * `DEFAULT_WORKERS` (optional, int, default `1`) - number of default workers to start
 * `EMAIL_WORKERS` (optional, int, default `3`) - number of email workers to start
 * `CACHE_WORKERS` (optional, int, default `1`) - number of cache workers to start
