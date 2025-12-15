@@ -281,6 +281,8 @@ VARIABLES = {
     "PRIO_WORKERS": Option(typ=int, default=3, validation=check_uint),
     "UPDATE_WORKERS": Option(typ=int, default=1, validation=check_uint),
     "SCHEDULER_WORKERS": Option(typ=int, default=1, validation=check_uint),
+    "SUPERVISOR_USERNAME": Option(default="supervisor"),
+    "SUPERVISOR_PASSWORD": Option(default="changeme", sensitive=True),
 }
 
 CONFIG_CREATED_CANARY_FILE = "/.misp-configs-created"
