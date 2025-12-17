@@ -4,7 +4,6 @@ mod_auth_openidc
 zip
 brotli
 supervisor
-ssdeep-libs
 rsyslog
 vector
 crypto-policies-scripts
