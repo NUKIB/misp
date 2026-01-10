@@ -34,7 +34,7 @@ mkdir /build/php-modules/
 # Compile simdjson
 mkdir /tmp/simdjson
 cd /tmp/simdjson
-download_and_check https://github.com/JakubOnderka/simdjson_php/archive/bf2aa8470908159ea4870bfbb577238d14abc793.tar.gz 402c0e3bf216b3f532dbbd9b2f22e70dd04bcd63850b460493a8b6b28160e58d
+download_and_check https://github.com/JakubOnderka/simdjson_php/archive/fca6281abb48da61ed77843b6775110c5b60b37b.tar.gz 5438bd5436063142ba52311349368d2a4b379db59331f8bbf18c29b114c43457
 phpize
 CPPFLAGS="$DEFAULT_FLAGS" ./configure --silent
 make -j$NPROC
@@ -53,7 +53,7 @@ mv modules/*.so /build/php-modules/
 # Compile zstd library and zstd extension
 mkdir /tmp/zstd
 cd /tmp/zstd
-download_and_check https://github.com/kjdev/php-ext-zstd/archive/ac2cef86b4d04322ee703d23a684e67f1763cded.tar.gz 68327fcdfe317b97b60327115e020404bd514aff283c799ec0b2465ca5678dd1
+download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.15.2.tar.gz 3543a86b0e2ddffd7da2e94aaf97e03701e0efbf0a94d6904e084b823d8a9412
 cd zstd
 download_and_check https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
 cd ..
