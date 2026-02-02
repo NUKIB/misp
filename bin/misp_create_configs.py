@@ -481,6 +481,18 @@ def generate_vector_config(variables: dict):
             }
 
     if variables["ECS_LOG_FILE"]:
+        logrotate_config = f'{variables["ECS_LOG_FILE"]} {{ \n' \
+                 f'    daily\n' \
+                 f'    rotate 4\n' \
+                 f'    dateext\n' \
+                 f'    create\n' \
+                 f'    compress\n' \
+                 f'    missingok\n' \
+                 f'    notifempty\n' \
+                 f'    copytruncate\n' \
+                 f'}} \n'  
+        write_file("/etc/logrotate.d/vector", logrotate_config)
+
         if variables["ECS_LOG_FILE_FORMAT"] == "ecs":
             sinks = {
                 "file": {
