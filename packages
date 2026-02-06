@@ -8,6 +8,7 @@ ssdeep-libs
 rsyslog
 vector
 crypto-policies-scripts
+logrotate
 
 # Python
 python3.12
