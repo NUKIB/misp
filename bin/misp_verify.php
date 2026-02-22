@@ -30,7 +30,13 @@ function testSsdeep()
     assert($result === 57);
 }
 
+function testSimdjson()
+{
+    assert(simdjson_decode(simdjson_encode(["Ahoj" => "světe"]))["Ahoj"] === "světe");
+}
+
 testBrotli();
 testZstd();
 testIgbinary();
 testSsdeep();
+testSimdjson();
