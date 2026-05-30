@@ -45,7 +45,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-buildx-
 
       - name: Build Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           load: true
@@ -123,7 +123,7 @@ jobs:
       - name: Push by digest
         if: github.event_name != 'pull_request'
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           tags: |
             ${{ env.REGISTRY_IMAGE }}
