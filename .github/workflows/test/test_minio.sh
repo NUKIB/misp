@@ -28,6 +28,7 @@ docker run -d --expose 9000 --network $NETWORK -e MINIO_ROOT_USER=$MINIO_ROOT_US
 
 echo "Ensure MinIO client exists"
 curl -o ./mc -# https://dl.min.io/client/mc/release/linux-${MINIO_ARCH}/mc && chmod +x ./mc
+./mc version
 
 echo "Create bucket"
 MINIO_IP=$(docker inspect minio --format="{{ .NetworkSettings.Networks.$NETWORK.IPAddress }}")
