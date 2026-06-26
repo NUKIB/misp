@@ -34,7 +34,7 @@ mkdir /build/php-modules/
 # Compile simdjson
 mkdir /tmp/simdjson
 cd /tmp/simdjson
-download_and_check https://github.com/JakubOnderka/simdjson_php/archive/a0aaf953614792bcd2ec38831dfecb5475272bf8.tar.gz be53d17307882ea3eb2ba64429870491867c63bd6b48352ea07a809b9a793391
+download_and_check https://github.com/JakubOnderka/simdjson_php/archive/6813fcd1f7bca320c1e17ca89c2b9f8c6f063721.tar.gz 4e5e9a703a1bb90ca1615fbea7b3db97d496bb3d093bca9a23369b40ee37292a
 phpize
 CPPFLAGS="$DEFAULT_FLAGS" ./configure --silent
 make -j$NPROC
@@ -53,7 +53,7 @@ mv modules/*.so /build/php-modules/
 # Compile zstd library and zstd extension
 mkdir /tmp/zstd
 cd /tmp/zstd
-download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.15.2.tar.gz 3543a86b0e2ddffd7da2e94aaf97e03701e0efbf0a94d6904e084b823d8a9412
+download_and_check https://github.com/kjdev/php-ext-zstd/archive/refs/tags/0.16.0.tar.gz 0dd59954167de75d8bb335268144a54b4df1326c807580305fc0e3763c923f7d
 cd zstd
 download_and_check https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
 cd ..
@@ -84,7 +84,7 @@ mv modules/*.so /build/php-modules/
 # Compile brotli
 mkdir /tmp/brotli
 cd /tmp/brotli
-download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.18.3.tar.gz a725581ef0ba937b62244689ce542d186ef344078fa7cd802e953f60f3b1d61b
+download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.19.0.tar.gz d5a75c4a022459fc413c43d1116335bef9b580e2fc2ac4d12930b7c5462d05b6
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --with-libbrotli
 make -j$NPROC
