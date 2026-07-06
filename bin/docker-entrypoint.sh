@@ -94,7 +94,7 @@ if [ "$1" = 'supervisord' ]; then
     fi
 
     # Precompress some CSS and JavaScript files by brotli
-    brotli -f /var/www/MISP/app/webroot/css/{bootstrap,bootstrap-datepicker,bootstrap-colorpicker,font-awesome,chosen.min,main}.css
+    brotli -f /var/www/MISP/app/webroot/css/{bootstrap,bootstrap-datepicker,bootstrap-colorpicker,font-awesome,chosen.min,main,misp-iconify}.css
     brotli -f /var/www/MISP/app/webroot/js/{jquery,jquery-ui.min,chosen.jquery.min,bootstrap,bootstrap-datepicker,misp,vis}.js
 
     # Update all data stored in JSONs like objects, warninglists etc.
