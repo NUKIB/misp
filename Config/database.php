@@ -10,7 +10,7 @@ class DATABASE_CONFIG {
         'password' => {{ MYSQL_PASSWORD | str }},
         'database' => '{{ MYSQL_DATABASE }}',
         'prefix' => '',
-        'encoding' => 'utf8',
+        'encoding' => 'utf8mb4 COLLATE utf8mb4_unicode_ci',
         'settings' => [
             'time_zone' => '"+00:00"',
     {% if MYSQL_SETTINGS -%}
