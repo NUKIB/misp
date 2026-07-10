@@ -12,7 +12,6 @@ crypto-policies-scripts
 # Python
 python3.12
 python3.12-pip
-python3.12-wheel
 python3.12-urllib3
 python3.12-idna
 python3.12-lxml
