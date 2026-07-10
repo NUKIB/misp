@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mariadb:12.2
+    image: mariadb:12.3
     restart: always
     container_name: misp-mysql
     tmpfs:
