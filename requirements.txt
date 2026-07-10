@@ -1,4 +1,4 @@
-pymisp
+pymisp[fileobjects]
 lief
 python-magic
 plyara
