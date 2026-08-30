@@ -10,6 +10,7 @@ import xmlrpc.client
 import logging
 import subprocess
 import requests
+import base64
 import misp_redis_ready
 
 
@@ -22,20 +23,47 @@ class UnixStreamHTTPConnection(http.client.HTTPConnection):
 
 
 class UnixStreamTransport(xmlrpc.client.Transport, object):
-    def __init__(self, socket_path):
+    def __init__(self, socket_path, username=None, password=None):
         self.socket_path = socket_path
+        self.username = username
+        self.password = password
+        self.verbose = False
         super().__init__()
 
     def make_connection(self, host):
         return UnixStreamHTTPConnection(self.socket_path)
 
+    def request(self, host, handler, request_body, verbose=False):
+        # Build connection and headers similar to xmlrpc.client.Transport.request
+        conn = self.make_connection(host)
+        if verbose:
+            conn.set_debuglevel(1)
 
-class UnixStreamXMLRPCClient(xmlrpc.client.ServerProxy):
-    def __init__(self, addr, **kwargs):
-        transport = UnixStreamTransport(addr)
-        super().__init__(
-            "http://", transport=transport, **kwargs
-        )
+        headers = {
+            "Content-Type": "text/xml",
+            "User-Agent": self.user_agent,
+            "Content-Length": str(len(request_body)),
+        }
+
+        if self.username and self.password:
+            credentials = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+            headers["Authorization"] = f"Basic {credentials}"
+            logging.debug(f"[Supervisor] Sending auth header: Authorization: Basic {credentials[:20]}...")
+        else:
+            logging.debug("[Supervisor] No credentials configured")
+
+        logging.debug(f"[Supervisor] Headers: {headers}")
+        conn.request("POST", handler, request_body, headers)
+        response = conn.getresponse()
+
+        logging.debug(f"[Supervisor] Response status: {response.status} {response.reason}")
+        logging.debug(f"[Supervisor] Response headers: {response.getheaders()}")
+
+        if response.status != 200:
+            # Match xmlrpc.client.Transport.request behavior by raising ProtocolError
+            raise xmlrpc.client.ProtocolError(host + handler, response.status, response.reason, response.getheaders())
+
+        return self.parse_response(response)
 
 
 class SubprocessException(Exception):
@@ -46,7 +74,15 @@ class SubprocessException(Exception):
 
 
 s = requests.Session()
-supervisor_api = UnixStreamXMLRPCClient("/run/supervisor/supervisor.sock")
+
+# Get supervisor credentials from environment
+SUPERVISOR_USERNAME = os.environ.get('SUPERVISOR_USERNAME', 'supervisor')
+SUPERVISOR_PASSWORD = os.environ.get('SUPERVISOR_PASSWORD', 'changeme')
+SUPERVISOR_SOCKET = "/run/supervisor/supervisor.sock"
+
+# Create transport with authentication
+transport = UnixStreamTransport(SUPERVISOR_SOCKET, SUPERVISOR_USERNAME, SUPERVISOR_PASSWORD)
+supervisor_api = xmlrpc.client.ServerProxy("http://", transport=transport)
 
 
 def check_supervisor():
@@ -116,6 +152,17 @@ def check_redis():
 
 
 def main() -> dict:
+    # Enable DEBUG logging only when MISP_DEBUG is set to a truthy value
+    misp_debug = os.environ.get("MISP_DEBUG", "").lower()
+    debug_enabled = misp_debug in ("1", "true", "yes", "on")
+    level = logging.DEBUG if debug_enabled else logging.INFO
+    logging.basicConfig(level=level, format='%(levelname)s:%(name)s:%(message)s')
+
+    # Reduce noisy library logs when not debugging
+    if not debug_enabled:
+        logging.getLogger('urllib3').setLevel(logging.WARNING)
+        logging.getLogger('xmlrpc').setLevel(logging.WARNING)
+
     output = {
         "supervisor": False,
         "httpd": False,
