@@ -1,4 +1,6 @@
 pymisp[fileobjects]
+# forced version until pymisp is updated to support pure-magic-rs 0.5
+pure-magic-rs==0.4.3
 lief
 python-magic
 plyara
