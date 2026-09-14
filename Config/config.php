@@ -52,6 +52,9 @@ $oidcAuth = [
     ],
     'roles_property' => {{ OIDC_ROLES_PROPERTY_INNER | str }},
     'organisation_property' => {{ OIDC_ORGANISATION_PROPERTY | str }},
+    {% if OIDC_SCOPES %}
+    'scopes' => [{% for scope in OIDC_SCOPES %}'{{ scope }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+    {% endif %}
     'default_org' => '{{ OIDC_DEFAULT_ORG if OIDC_DEFAULT_ORG else MISP_ORG }}',
     'unblock' => true,
     'offline_access' => {{ OIDC_OFFLINE_ACCESS | bool }},

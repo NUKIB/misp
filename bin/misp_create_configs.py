@@ -130,6 +130,10 @@ def parse_oidc_roles(variable_name: str, value: str) -> dict:
     return dict_parser(variable_name, value, seperator=',', variable_description="OIDC roles mapping variable")
 
 
+def parse_oidc_scopes(variable_name: str, value: str) -> list:
+    return [scope.strip() for scope in value.split(',') if scope.strip()]
+
+
 def parse_x_forwarded_headers(variable_name: str, value: str) -> list:
     valid_values = ("X-Forwarded-Host", "X-Forwarded-Port", "X-Forwarded-Proto", "Forwarded")
     headers = value.split(" ")
@@ -185,6 +189,7 @@ VARIABLES = {
     ),
     "OIDC_ROLES_PROPERTY_INNER": Option(),
     "OIDC_ORGANISATION_PROPERTY": Option(default="organization"),
+    "OIDC_SCOPES": Option(parser=parse_oidc_scopes),
     "OIDC_OFFLINE_ACCESS": Option(typ=bool, default=False),
     "OIDC_CHECK_USER_VALIDITY": Option(typ=int, default=0, validation=check_uint),
     "OIDC_UPDATE_USER_ROLE": Option(typ=bool, default=True),

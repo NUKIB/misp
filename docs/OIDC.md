@@ -20,6 +20,7 @@ OIDC authentication is not used. Instead, Apache checks if a key is valid and le
 * `OIDC_ROLES_PROPERTY` (optional, string, default `roles`) - name of claim used for user roles in MISP
 * `OIDC_ROLES_MAPPING` (optional, string, default see bellow) - roles mapping from roles provided by IdP to MISP roles
 * `OIDC_ORGANISATION_PROPERTY` (optional, string, default `organization`) - ID token or user info claim that will be used as an organisation in MISP. This property should contain organisation ID, name or UUID.
+* `OIDC_SCOPES` (optional, string) - comma-separated list of OIDC scopes to request (e.g., `profile,email`). Make sure to add your custom scope here if you set any in the identity provider.
 * `OIDC_OFFLINE_ACCESS` (optional, boolean, default `false`) - if true, offline access token will be requested for user
 * `OIDC_CHECK_USER_VALIDITY` (optional, int, default `0`) - number of seconds, after which user will be revalidated if he is still active in IdP. Zero means that this functionality is disabled. Recommended value is `300`.
 * `OIDC_UPDATE_USER_ROLE` (optional, bool, default `true`) - if disabled, manually modified role in MISP admin interface will be not changed from roles defined in OIDC
