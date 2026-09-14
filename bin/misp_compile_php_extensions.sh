@@ -34,7 +34,7 @@ mkdir /build/php-modules/
 # Compile simdjson
 mkdir /tmp/simdjson
 cd /tmp/simdjson
-download_and_check https://github.com/JakubOnderka/simdjson_php/archive/d62c9065fe48716f900d82de1f810801f660946c.tar.gz 02904c257da4f1a427e54b391c7c9265e362fdd8a56ccba896804e9548602168
+download_and_check https://github.com/JakubOnderka/simdjson_php/archive/cdc42a599d65db28f54ac26125c3986b7f610dd5.tar.gz 36ba88c8df895da127e36db9bd219ffeb88e9f21df863fd9fd3af7da4ce1938e
 phpize
 CPPFLAGS="$DEFAULT_FLAGS" ./configure --silent
 make -j$NPROC
@@ -93,7 +93,7 @@ mv modules/*.so /build/php-modules/
 # Compile snuffleupagus
 mkdir /tmp/snuffleupagus
 cd /tmp/snuffleupagus
-download_and_check https://github.com/jvoisin/snuffleupagus/archive/refs/tags/v0.13.0.tar.gz 350a33cd3906bdba46f5c4cf3d00edeb81eaf6a7b9a3a7e5ef47bc967492ae90
+download_and_check https://github.com/jvoisin/snuffleupagus/archive/refs/tags/v0.14.0.tar.gz 080cf7e24d15a8650e271837030fca546e627c7a4c7317710c683282fdcb71c6
 cd src
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --enable-snuffleupagus
