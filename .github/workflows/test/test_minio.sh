@@ -24,7 +24,7 @@ fi
 
 echo "Setup MinIO container"
 NETWORK=$(docker inspect misp --format="{{ .HostConfig.NetworkMode }}")
-docker run -d --expose 9000 --network $NETWORK -e MINIO_ROOT_USER=$MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD --quiet --name minio quay.io/minio/minio:latest server /data
+docker run -d --expose 9000 --network $NETWORK -e MINIO_ROOT_USER=$MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD --quiet --name minio cgr.dev/chainguard/minio:latest server /data
 
 echo "Ensure MinIO client exists"
 curl -L -o ./mc -# https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.linux-${MINIO_ARCH}.RELEASE.2025-08-13T08-35-41Z
@@ -46,7 +46,7 @@ echo "Add attachment to event"
 echo "{\"msg\": \"Hello World\"}" > ./send.json
 DATA=$(cat ./send.json | base64)
 FILENAME=testfile
-echo "{\"request\":{\"files\":[{\"filename\":\"$FILENAME\",\"data\":\"$DATA\"}], \"category\":\"Payload delivery\",\"info\":\"some info\"}}" > ./obj.json
+echo "{\"request\":{\"files\":[{\"filename\":\"$FILENAME\",\"data\":\"$DATA\"}],\"category\":\"Payload delivery\",\"info\":\"some info\"}}" > ./obj.json
 until curl -X POST -H "Authorization: $AUTHKEY" -H "Accept: application/json" -H "Content-type: application/json" --data "@./obj.json" --write-out "%{http_code}" http://localhost:8080/events/upload_sample/$EVENT_ID  | grep -q "200"; do echo -n "."; sleep 5; done; echo " done"
 
 echo "Download attachment from bucket"
