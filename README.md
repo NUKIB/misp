@@ -55,7 +55,7 @@ For production usage, please:
 * change passwords for MariaDB and Redis,
 * modify environment variables to requested values,
 * deploy reverse proxy (for example `nginx`) before MISP to handle HTTPS connections.
-  * do not forget to send the proper `X-Forwared-For` header
+  * do not forget to send the proper `[X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Forwarded-For)` header
 
 ### Usage in air-gapped environment
 
