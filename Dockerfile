@@ -17,6 +17,7 @@ RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc-
 FROM builder AS php-build
 COPY bin/misp_compile_php_extensions.sh bin/misp_enable_epel.sh /build/
 RUN --mount=type=tmpfs,target=/tmp \
+    dnf install -y almalinux-release-testing && \
     dnf module enable -y php:$PHP_VERSION && \
     bash /build/misp_enable_epel.sh && \
     bash /build/misp_compile_php_extensions.sh
@@ -40,6 +41,7 @@ COPY bin/misp_enable_epel.sh bin/misp_enable_vector.sh /usr/local/bin/
 RUN --mount=type=tmpfs,target=/var/cache/dnf \
     bash /usr/local/bin/misp_enable_epel.sh && \
     bash /usr/local/bin/misp_enable_vector.sh && \
+    dnf install -y almalinux-release-testing && \
     dnf module -y enable php:$PHP_VERSION && \
     dnf install --setopt=tsflags=nodocs --setopt=install_weak_deps=False -y $(grep -vE "^\s*#" /tmp/packages | tr "\n" " ") && \
     pip3.12 --no-cache-dir install --disable-pip-version-check -r /tmp/requirements.txt && \
