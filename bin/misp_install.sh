@@ -29,6 +29,7 @@ sed -e 's/;assert.active = On/assert.active = Off/' -i ${PHP_INI}
 sed -e 's/expose_php = On/expose_php = Off/' -i ${PHP_INI}
 sed -e 's/session.sid_length = 26/session.sid_length = 32/' -i ${PHP_INI}
 sed -e 's/session.use_strict_mode = 0/session.use_strict_mode = 1/' -i ${PHP_INI}
+sed -e 's/;session.upload_progress.enabled = On/session.upload_progress.enabled = Off/' -i ${PHP_INI} # Possible workaround (not confirmed) for CVE-2026-109618 and CVE-2026-109619, but we don't need it anyway
 sed -e 's/pcre.jit=0/pcre.jit=1/' -i ${PHP_INI}
 sed -e 's/opcache.enable_cli=1/opcache.enable_cli=0/' -i /etc/php.d/10-opcache.ini
 # use igbinary serializer for apcu and sessions
