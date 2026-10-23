@@ -22,7 +22,7 @@ class DATABASE_CONFIG {
 {% if MYSQL_FLAGS %}
         'flags' => [
     {% for flag, value in MYSQL_FLAGS.items() %}
-            '{{ flag }}' => '{{ value }}',
+            {{ flag }} => {{ value }},
     {% endfor %}
         ]
 {% endif %}
