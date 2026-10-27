@@ -84,7 +84,7 @@ mv modules/*.so /build/php-modules/
 # Compile brotli
 mkdir /tmp/brotli
 cd /tmp/brotli
-download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.19.0.tar.gz d5a75c4a022459fc413c43d1116335bef9b580e2fc2ac4d12930b7c5462d05b6
+download_and_check https://github.com/kjdev/php-ext-brotli/archive/refs/tags/0.21.1.tar.gz 252af499f354133c056cdb87652121d1d6a69cdcce18c66c5cfe46daeccdbf22
 phpize
 CFLAGS="$DEFAULT_FLAGS" ./configure --silent --with-libbrotli
 make -j$NPROC
