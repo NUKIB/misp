@@ -11,6 +11,9 @@ class DATABASE_CONFIG {
         'database' => '{{ MYSQL_DATABASE }}',
         'prefix' => '',
         'encoding' => 'utf8mb4 COLLATE utf8mb4_unicode_ci',
+{% if MYSQL_USE_TLS %}
+        'ssl_ca' => '{{ MYSQL_TLS_CA }}',
+{% endif %}
         'settings' => [
             'time_zone' => '"+00:00"',
     {% if MYSQL_SETTINGS -%}
@@ -19,9 +22,12 @@ class DATABASE_CONFIG {
         {% endfor %}
     {%- endif %}
         ],
-{% if MYSQL_FLAGS %}
+{% if MYSQL_FLAGS or (MYSQL_USE_TLS and not MYSQL_TLS_VERIFY) %}
         'flags' => [
-    {% for flag, value in MYSQL_FLAGS.items() %}
+{% if MYSQL_USE_TLS and not MYSQL_TLS_VERIFY %}
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+{% endif %}
+    {% for flag, value in (MYSQL_FLAGS or {}).items() %}
             '{{ flag }}' => '{{ value }}',
     {% endfor %}
         ]
