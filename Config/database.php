@@ -22,9 +22,12 @@ class DATABASE_CONFIG {
         {% endfor %}
     {%- endif %}
         ],
-{% if MYSQL_FLAGS %}
+{% if MYSQL_FLAGS or (MYSQL_USE_TLS and not MYSQL_TLS_VERIFY) %}
         'flags' => [
-    {% for flag, value in MYSQL_FLAGS.items() %}
+{% if MYSQL_USE_TLS and not MYSQL_TLS_VERIFY %}
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+{% endif %}
+    {% for flag, value in (MYSQL_FLAGS or {}).items() %}
             '{{ flag }}' => '{{ value }}',
     {% endfor %}
         ]
