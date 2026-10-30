@@ -152,6 +152,8 @@ VARIABLES = {
     "MYSQL_DATABASE": Option(required=True),
     "MYSQL_SETTINGS": Option(required=False, parser=parse_mysql_settings),
     "MYSQL_FLAGS": Option(required=False, parser=parse_mysql_settings),
+    "MYSQL_USE_TLS": Option(typ=bool, default=False),
+    "MYSQL_TLS_CA": Option(default="/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"),
     # Redis
     "REDIS_HOST": Option(required=True),
     "REDIS_PORT": Option(typ=int, default=6379, validation=check_uint),
@@ -593,6 +595,9 @@ def create():
     for var in ("OIDC_PROVIDER_INNER", "OIDC_CLIENT_ID_INNER", "OIDC_CLIENT_SECRET_INNER", "OIDC_AUTHENTICATION_METHOD_INNER", "OIDC_CODE_CHALLENGE_METHOD_INNER", "OIDC_ROLES_PROPERTY_INNER"):
         if not variables[var]:
             variables[var] = variables[var.replace("_INNER", "")]
+
+    if variables["MYSQL_USE_TLS"] and not os.access(variables["MYSQL_TLS_CA"], os.R_OK):
+        error(f"TLS for MySQL is enabled, but CA file '{variables['MYSQL_TLS_CA']}' from 'MYSQL_TLS_CA' does not exist or is not readable")
 
     if variables["OIDC_LOGIN"]:
         for var in ("OIDC_PROVIDER", "OIDC_CLIENT_CRYPTO_PASS", "OIDC_CLIENT_ID", "OIDC_CLIENT_SECRET"):

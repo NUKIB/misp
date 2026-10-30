@@ -11,6 +11,9 @@ class DATABASE_CONFIG {
         'database' => '{{ MYSQL_DATABASE }}',
         'prefix' => '',
         'encoding' => 'utf8mb4 COLLATE utf8mb4_unicode_ci',
+{% if MYSQL_USE_TLS %}
+        'ssl_ca' => '{{ MYSQL_TLS_CA }}',
+{% endif %}
         'settings' => [
             'time_zone' => '"+00:00"',
     {% if MYSQL_SETTINGS -%}

@@ -87,6 +87,8 @@ MISP requires MySQL or MariaDB database.
 * `MYSQL_DATABASE` (required, string) - database name
 * `MYSQL_SETTINGS` (optional, string) - database settings, which should be set for each db connection (JSON dict, or semicolon separated key value pairs)
 * `MYSQL_FLAGS` (required, string) - PDO flags which should be set for each db connection (JSON dict, or semicolon separated key value pairs)
+* `MYSQL_USE_TLS` (optional, bool, default `false`) - connect to the database over TLS; the server certificate and hostname are always verified
+* `MYSQL_TLS_CA` (optional, string, default `/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem`) - path to the CA certificate (PEM) used to verify the database server certificate, for example a mounted file with your internal CA
 
 ### Redis
 
