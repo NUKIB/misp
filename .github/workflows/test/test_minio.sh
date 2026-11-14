@@ -33,7 +33,7 @@ chmod +x ./mc
 
 echo "Create bucket"
 MINIO_IP=$(docker inspect minio --format="{{ .NetworkSettings.Networks.$NETWORK.IPAddress }}")
-python3 .github/workflows/wait.py --ignore-http-error http://$MINIO_IP:9000
+python3 .github/workflows/wait.py http://$MINIO_IP:9000/minio/health/ready
 echo "Minio IP" $MINIO_IP
 ./mc alias set minio http://$MINIO_IP:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
 ./mc mb minio/$BUCKET_NAME 
