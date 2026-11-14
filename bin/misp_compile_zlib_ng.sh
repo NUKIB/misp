@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (C) 2024 National Cyber and Information Security Agency of the Czech Republic
 set -e
-
-# Enable GCC Toolset version 15
-source scl_source enable gcc-toolset-15
-
 set -o xtrace
 
 download_and_check () {

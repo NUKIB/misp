@@ -2,10 +2,6 @@
 # Copyright (C) 2022 National Cyber and Information Security Agency of the Czech Republic
 # Unfortunately, PHP packages from CentOS repos missing some required extensions, so we have to build them
 set -e
-
-# Enable GCC Toolset version 15
-source scl_source enable gcc-toolset-15
-
 set -o xtrace
 
 download_and_check () {
