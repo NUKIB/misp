@@ -137,6 +137,8 @@ $config = [
     'max_job_history_ttl' => 86400,
     'supervisor_host' => 'unix:/run/supervisor/supervisor.sock',
     'supervisor_port' => 9001,
+    'supervisor_username' => '{{ SUPERVISOR_USERNAME | default("supervisor") }}',
+    'supervisor_password' => '{{ SUPERVISOR_PASSWORD | default("changeme") }}',
   ],
   'GnuPG' => [
     'onlyencrypted' => false,

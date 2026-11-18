@@ -65,6 +65,8 @@ services:
       MISP_MODULE_URL: http://misp-modules
       MISP_EMAIL: ahoj@example.com # Please change for production
       SECURITY_SALT: PleaseChangeForProduction # Please change for production
+      SUPERVISOR_USERNAME: supervisor
+      SUPERVISOR_PASSWORD: PleaseChangeForProduction # Please change for production
       ZEROMQ_ENABLED: yes
       SYSLOG_ENABLED: no
       ECS_LOG_ENABLED: yes
