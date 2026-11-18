@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 env:
   REGISTRY_IMAGE: ghcr.io/nukib/misp
   BUCKET_NAME: testbucket
@@ -14,6 +17,9 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
@@ -60,7 +66,7 @@ jobs:
           docker inspect ${{ env.REGISTRY_IMAGE }}
           docker history ${{ env.REGISTRY_IMAGE }}
 
-      - name: Start contains for testing
+      - name: Start containers for testing
         env:
           BUCKET_NAME: ${{ env.BUCKET_NAME }}
           S3_ACCESS_KEY: ${{ env.MINIO_ROOT_USER }}
@@ -144,6 +150,9 @@ jobs:
           retention-days: 1
 
   push:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name != 'pull_request'
