@@ -68,10 +68,15 @@ cd /var/www/MISP/app/files/
 pip3.12 --no-cache-dir install scripts/mixbox scripts/misp-stix scripts/python-maec scripts/python-stix scripts/python-cybox
 
 # Install MISP composer dependencies
+# Composer provided by MISP itself is outdated, so we have to download latest version
+curl --proto '=https' --tlsv1.3 -sS --location --fail -o /tmp/composer.phar https://getcomposer.org/download/2.11.2/composer.phar
+echo "dd158c0afd41d15fac89e1b4e47b5d42911fe316c3687cd5edac98319b25d028 /tmp/composer.phar" | sha256sum -c -
 cd /var/www/MISP/app/
 # Remove unused packages
-su-exec apache php composer.phar --no-cache remove --update-no-dev iglocska/cake-resque
-su-exec apache php composer.phar --no-cache require --update-no-dev sentry/sdk jakub-onderka/openid-connect-php:1.5.0 aws/aws-sdk-php
+su-exec apache php /tmp/composer.phar --no-cache remove --update-no-dev iglocska/cake-resque
+su-exec apache php /tmp/composer.phar --no-cache require --update-no-dev sentry/sdk jakub-onderka/openid-connect-php:1.5.0 aws/aws-sdk-php
+# Remove downloaded composer
+rm /tmp/composer.phar
 
 # Create attachments folder and set correct owner
 mkdir /var/www/MISP/app/attachments
