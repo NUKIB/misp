@@ -1,7 +1,7 @@
 name: Check External Release
 on:
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: '0 5 * * *' # run every day at 5 AM
   workflow_dispatch:
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
         if: steps.compare.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: automation/update-misp-version
+          branch: "automation/update-misp-${{ steps.compare.outputs.new_version }}"
           delete-branch: true
           commit-message: 'Update MISP version to ${{ steps.compare.outputs.new_version }}'
           title: "Update MISP version to ${{ steps.compare.outputs.new_version }}"
