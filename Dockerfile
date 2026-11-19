@@ -5,6 +5,7 @@ ARG PHP_VERSION=8.4
 ENV PHP_VERSION=$PHP_VERSION
 ARG DEFAULT_X86_64_MARCH=x86-64-v2
 ENV DEFAULT_X86_64_MARCH=$DEFAULT_X86_64_MARCH
+ENV TERM=xterm
 
 # Some packages requires building, so use different stage for that
 FROM base AS builder
