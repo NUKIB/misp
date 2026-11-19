@@ -23,8 +23,8 @@ else
   MARCH="";
 fi
 
-DEFAULT_FLAGS="-O2 -flto=auto -fstack-protector-strong ${MARCH}"
-DEFAULT_LDFLAGS="-Wl,-z,relro,-z,now -flto=auto"
+DEFAULT_FLAGS="-O2 -flto=auto -fstack-protector-strong -D_FORTIFY_SOURCE=2 ${MARCH}"
+DEFAULT_LDFLAGS="-Wl,-z,relro,-z,now -Wl,-z,noexecstack -flto=auto"
 
 mkdir /build/php-modules/
 
