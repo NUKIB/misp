@@ -66,6 +66,13 @@ jobs:
           docker inspect ${{ env.REGISTRY_IMAGE }}
           docker history ${{ env.REGISTRY_IMAGE }}
 
+      - name: Run Trivy vulnerability scanner
+        uses: anchore/scan-action@v7
+        with:
+          image: ${{ env.REGISTRY_IMAGE }}
+          fail-build: false
+          output-format: table
+
       - name: Start containers for testing
         env:
           BUCKET_NAME: ${{ env.BUCKET_NAME }}
