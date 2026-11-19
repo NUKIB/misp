@@ -1,7 +1,7 @@
 name: Check External Release
 on:
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: '0 5 * * *' # run every day at 5 AM
   workflow_dispatch:
 
 jobs:
@@ -40,7 +40,11 @@ jobs:
 
       - name: Commit version file
         if: steps.compare.outputs.changed == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: peter-evans/create-pull-request@v7
         with:
-          commit_message: 'Update MISP version to ${{ steps.compare.outputs.new_version }}'
-          file_pattern: MISP_VERSION
+          branch: "automation/update-misp-${{ steps.compare.outputs.new_version }}"
+          delete-branch: true
+          commit-message: 'Update MISP version to ${{ steps.compare.outputs.new_version }}'
+          title: "Update MISP version to ${{ steps.compare.outputs.new_version }}"
+          add-paths: |
+            MISP_VERSION

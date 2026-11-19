@@ -1,17 +1,19 @@
 # Base image
 ARG BASE_IMAGE=almalinux:9
 FROM $BASE_IMAGE AS base
-ARG PHP_VERSION=8.3
+ARG PHP_VERSION=8.4
 ENV PHP_VERSION=$PHP_VERSION
 ARG DEFAULT_X86_64_MARCH=x86-64-v2
 ENV DEFAULT_X86_64_MARCH=$DEFAULT_X86_64_MARCH
+ENV TERM=xterm
 
 # Some packages requires building, so use different stage for that
 FROM base AS builder
 COPY su-exec.c /tmp/
-RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc-toolset-15 make && \
-    source scl_source enable gcc-toolset-15 && \
-    gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c
+RUN dnf install -y --setopt=tsflags=nodocs --setopt=install_weak_deps=False gcc-toolset-15 make
+# Enable gcc-toolset so we don't need to call source scl_source enable gcc-toolset-15 for every shell
+ENV PATH="/opt/rh/gcc-toolset-15/root/usr/bin:${PATH}"
+RUN gcc -Wall -Werror -g -o /usr/local/bin/su-exec /tmp/su-exec.c
 
 # Build PHP extensions that are not included in packages
 FROM builder AS php-build
