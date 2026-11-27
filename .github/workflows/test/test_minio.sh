@@ -29,11 +29,11 @@ docker run -d --expose 9000 --network $NETWORK -e MINIO_ROOT_USER=$MINIO_ROOT_US
 echo "Ensure MinIO client exists"
 curl -L -o ./mc -# https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.linux-${MINIO_ARCH}.RELEASE.2025-08-13T08-35-41Z
 chmod +x ./mc
-./mc version
+./mc --version
 
 echo "Create bucket"
 MINIO_IP=$(docker inspect minio --format="{{ .NetworkSettings.Networks.$NETWORK.IPAddress }}")
-python3 .github/workflows/wait.py --ignore-http-error http://$MINIO_IP:9000
+python3 .github/workflows/wait.py http://$MINIO_IP:9000/minio/health/ready
 echo "Minio IP" $MINIO_IP
 ./mc alias set minio http://$MINIO_IP:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
 ./mc mb minio/$BUCKET_NAME 
